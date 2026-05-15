@@ -1,0 +1,172 @@
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap");
+@import "tailwindcss";
+
+@theme inline {
+  --color-brand-orange: #F7941D;
+  --color-brand-green: #8DC63F;
+  --color-brand-purple: #6B2D8B;
+  --color-bg: #FAF6F0;
+  --color-surface: #F0EAE2;
+  --color-brown: #5C3317;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "DM Sans", sans-serif;
+}
+
+:root {
+  --background: #FAF6F0;
+  --foreground: #2A1208;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: #FAF6F0;
+  color: #2A1208;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 { font-family: "Cormorant Garamond", Georgia, serif; }
+
+/* ── Animations ── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33%       { transform: translateY(-8px) rotate(1deg); }
+  66%       { transform: translateY(-4px) rotate(-1deg); }
+}
+@keyframes ripple {
+  0%   { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(3); opacity: 0; }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(107,45,139,0); }
+  50%       { box-shadow: 0 0 60px 12px rgba(107,45,139,0.15); }
+}
+
+.animate-float      { animation: float 6s ease-in-out infinite; }
+.animate-fade-up    { animation: fade-up 0.8s ease forwards; }
+.animate-fade-in    { animation: fade-in 1.2s ease forwards; }
+.animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-700 { animation-delay: 0.7s; }
+
+/* ── Utility ── */
+.cta-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.cta-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(107,45,139,0.2);
+}
+
+/* Nav links — dark text on white bg */
+.nav-link {
+  position: relative;
+  transition: color 0.3s ease;
+  color: rgba(42,18,8,0.65);
+}
+.nav-link:hover { color: #6B2D8B; }
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0;
+  width: 0; height: 1px;
+  background: #6B2D8B;
+  transition: width 0.3s ease;
+}
+.nav-link:hover::after { width: 100%; }
+
+/* Nav links — for orange navbar state */
+.nav-link-orange {
+  position: relative;
+  transition: color 0.3s ease;
+}
+.nav-link-orange:hover { color: #fff !important; }
+.nav-link-orange::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0;
+  width: 0; height: 1px;
+  background: rgba(255,255,255,0.7);
+  transition: width 0.3s ease;
+}
+.nav-link-orange:hover::after { width: 100%; }
+
+.section-divider {
+  width: 48px; height: 2px;
+  background: linear-gradient(90deg, #6B2D8B, #F7941D);
+  margin: 0 auto 2rem;
+}
+
+/* Cards — white with brown/purple border */
+.card-light {
+  background: #FFFFFF;
+  border: 1px solid rgba(107,45,139,0.1);
+  border-radius: 1.5rem;
+  transition: border-color 0.3s ease, transform 0.4s ease, box-shadow 0.3s ease;
+}
+.card-light:hover {
+  border-color: rgba(107,45,139,0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(107,45,139,0.1);
+}
+
+/* Keep card-dark alias for purple/brown sections */
+.card-dark {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 1.5rem;
+  transition: border-color 0.3s ease, transform 0.4s ease;
+}
+.card-dark:hover {
+  border-color: rgba(255,255,255,0.3);
+  transform: translateY(-4px);
+}
+
+/* Purple sections */
+.purple-band {
+  background: linear-gradient(135deg, #3D1560 0%, #6B2D8B 50%, #3D1560 100%);
+}
+.purple-section {
+  background: #6B2D8B;
+}
+.purple-glow {
+  box-shadow: 0 0 80px rgba(107,45,139,0.15);
+}
+
+/* Brown accent sections */
+.brown-section {
+  background: #5C3317;
+}
+.brown-light {
+  background: #E8D5C4;
+}
+
+/* Dividers */
+.purple-rule {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(107,45,139,0.2), transparent);
+}
+
+.stat-number {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 300;
+  color: #6B2D8B;
+}
+.hero-headline {
+  color: #2A1208;
+}
