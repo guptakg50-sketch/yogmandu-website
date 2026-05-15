@@ -1,5 +1,200 @@
 "use client";
-import { useRef } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
+
+/* ── Animated counter ── */
+function useCounter(target: number, duration = 1400) {
+  const [count, setCount] = useState(0);
+  const [started, setStarted] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setStarted(true); obs.disconnect(); } },
+      { threshold: 0.5 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!started) return;
+    let start: number;
+    const step = (ts: number) => {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      setCount(Math.round(ease * target));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [started, target, duration]);
+
+  return { count, ref };
+}
+
+/* ── 3-D tilt card ── */
+function TiltCard({ p, delay }: { p: typeof pillars[0]; delay: number }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setVisible(true); },
+      { threshold: 0.2 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  const handleMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const el = cardRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width  - 0.5;
+    const y = (e.clientY - r.top)  / r.height - 0.5;
+    el.style.transform = `perspective(800px) rotateY(${x * 12}deg) rotateX(${-y * 10}deg) scale(1.03)`;
+    el.style.boxShadow = `${-x * 16}px ${y * 16}px 48px ${p.color}28, 0 8px 32px rgba(42,18,8,0.08)`;
+  }, [p.color]);
+
+  const handleLeave = useCallback(() => {
+    const el = cardRef.current;
+    if (!el) return;
+    el.style.transform = "perspective(800px) rotateY(0deg) rotateX(0deg) scale(1)";
+    el.style.boxShadow = "0 4px 24px rgba(42,18,8,0.06)";
+  }, []);
+
+  return (
+    <div
+      ref={cardRef}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      style={{
+        background: "white",
+        borderRadius: "1.5rem",
+        padding: "2rem",
+        border: `1px solid ${p.color}18`,
+        boxShadow: "0 4px 24px rgba(42,18,8,0.06)",
+        transition: "transform 0.12s ease, box-shadow 0.12s ease, opacity 0.7s ease, translate 0.7s ease",
+        willChange: "transform",
+        cursor: "default",
+        opacity: visible ? 1 : 0,
+        translate: visible ? "0 0" : "0 40px",
+        transitionDelay: `${delay}ms`,
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Top gradient line */}
+      <div style={{
+        position: "absolute", top: 0, left: "10%", right: "10%", height: 2,
+        background: `linear-gradient(90deg, transparent, ${p.color}, transparent)`,
+        opacity: 0.5,
+      }} />
+
+      {/* Corner glow */}
+      <div style={{
+        position: "absolute", top: 0, right: 0, width: 120, height: 120, pointerEvents: "none",
+        background: `radial-gradient(circle at 100% 0%, ${p.color}14 0%, transparent 65%)`,
+      }} />
+
+      {/* Icon */}
+      <div style={{
+        width: 52, height: 52, borderRadius: "1rem", marginBottom: 20,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        background: `${p.color}10`, border: `1.5px solid ${p.color}25`,
+        position: "relative",
+      }}>
+        {p.icon}
+        {/* Icon inner glow */}
+        <div style={{
+          position: "absolute", inset: 0, borderRadius: "inherit",
+          background: `radial-gradient(circle at 50% 0%, ${p.color}20, transparent 70%)`,
+        }} />
+      </div>
+
+      <h3 style={{
+        fontFamily: "Cormorant Garamond, serif", fontSize: "1.35rem",
+        fontWeight: 400, color: "#2A1208", marginBottom: 10,
+      }}>
+        {p.title}
+      </h3>
+      <p style={{ fontSize: "0.85rem", fontWeight: 300, lineHeight: 1.75, color: "rgba(42,18,8,0.5)" }}>
+        {p.body}
+      </p>
+
+      {/* Bottom accent dot */}
+      <div style={{
+        position: "absolute", bottom: 20, right: 20, width: 8, height: 8,
+        borderRadius: "50%", background: p.color, opacity: 0.25,
+      }} />
+    </div>
+  );
+}
+
+/* ── Pulsing stat orb ── */
+function StatOrb({ s, i }: { s: typeof stats[0]; i: number }) {
+  const { count, ref } = useCounter(s.numeric ?? 0, 1600);
+  const [visible, setVisible] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setVisible(true); },
+      { threshold: 0.3 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <div ref={wrapRef} style={{
+      display: "flex", flexDirection: "column", alignItems: "center", gap: 12,
+      opacity: visible ? 1 : 0,
+      translate: visible ? "0 0" : "0 30px",
+      transition: `opacity 0.6s ease ${i * 120}ms, translate 0.6s ease ${i * 120}ms`,
+    }}>
+      {/* Rings */}
+      <div style={{ position: "relative", width: 100, height: 100 }}>
+        {/* Outer pulse ring */}
+        <div style={{
+          position: "absolute", inset: -8, borderRadius: "50%",
+          border: `1px solid ${s.color}`,
+          opacity: 0.15,
+          animation: `orb-pulse 2.4s ease-in-out ${i * 0.3}s infinite`,
+        }} />
+        {/* Mid ring */}
+        <div style={{
+          position: "absolute", inset: -2, borderRadius: "50%",
+          border: `1px solid ${s.color}30`,
+        }} />
+        {/* Main orb */}
+        <div ref={ref} style={{
+          width: "100%", height: "100%", borderRadius: "50%",
+          background: `radial-gradient(circle at 35% 35%, ${s.color}28 0%, ${s.color}10 60%, transparent 100%)`,
+          border: `1.5px solid ${s.color}30`,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: `0 0 32px ${s.color}18, inset 0 1px 0 rgba(255,255,255,0.6)`,
+        }}>
+          <span style={{
+            fontFamily: "Cormorant Garamond, serif", fontSize: "1.9rem",
+            fontWeight: 300, color: s.color, lineHeight: 1,
+          }}>
+            {s.numeric !== undefined ? `${count}${s.suffix ?? ""}` : s.value}
+          </span>
+        </div>
+      </div>
+      <p style={{ fontSize: "0.75rem", fontWeight: 300, color: "rgba(42,18,8,0.45)", letterSpacing: "0.04em", textAlign: "center" }}>
+        {s.label}
+      </p>
+    </div>
+  );
+}
 
 const pillars = [
   {
@@ -35,114 +230,86 @@ const pillars = [
   },
 ];
 
-function PillarCard({ p }: { p: (typeof pillars)[0] }) {
-  const ref = useRef<HTMLDivElement>(null);
-  return (
-    <div
-      ref={ref}
-      className="relative rounded-2xl p-8"
-      style={{
-        background: "white",
-        border: `1px solid ${p.color}15`,
-        boxShadow: "0 4px 24px rgba(42,18,8,0.05)",
-        transition: "transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease",
-      }}
-      onMouseEnter={() => {
-        if (!ref.current) return;
-        ref.current.style.transform = "translateY(-5px)";
-        ref.current.style.boxShadow = `0 20px 48px ${p.color}22`;
-        ref.current.style.borderColor = `${p.color}35`;
-      }}
-      onMouseLeave={() => {
-        if (!ref.current) return;
-        ref.current.style.transform = "translateY(0)";
-        ref.current.style.boxShadow = "0 4px 24px rgba(42,18,8,0.05)";
-        ref.current.style.borderColor = `${p.color}15`;
-      }}
-    >
-      <div className="absolute top-0 left-8 right-8 h-px"
-        style={{ background: `linear-gradient(90deg, transparent, ${p.color}40, transparent)` }} />
-      <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
-        style={{ background: `${p.color}10`, border: `1px solid ${p.color}20` }}>
-        {p.icon}
-      </div>
-      <h3 className="text-xl font-light mb-3"
-        style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>
-        {p.title}
-      </h3>
-      <p className="text-sm font-light leading-relaxed" style={{ color: "rgba(42,18,8,0.5)" }}>
-        {p.body}
-      </p>
-    </div>
-  );
-}
-
 const stats = [
-  { value: "500+", label: "Graduates worldwide", color: "#F7941D" },
-  { value: "40+",  label: "Countries represented", color: "#6B2D8B" },
-  { value: "10+",  label: "Years in Kathmandu",    color: "#8DC63F" },
-  { value: "RYS",  label: "Yoga Alliance certified", color: "#F7941D" },
+  { value: "500+", numeric: 500, suffix: "+", label: "Graduates worldwide",    color: "#F7941D" },
+  { value: "40+",  numeric: 40,  suffix: "+", label: "Countries represented",  color: "#6B2D8B" },
+  { value: "10+",  numeric: 10,  suffix: "+", label: "Years in Kathmandu",     color: "#8DC63F" },
+  { value: "RYS",  numeric: undefined,         label: "Yoga Alliance certified", color: "#F7941D" },
 ];
 
 export default function WhySection() {
   return (
-    <section className="py-24 px-6 relative overflow-hidden" style={{ background: "#FAF6F0" }}>
-      {/* Background texture */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[300px]"
-          style={{ background: "radial-gradient(ellipse, rgba(247,148,29,0.07) 0%, transparent 70%)" }} />
-        <div className="absolute bottom-0 right-0 w-64 h-64"
-          style={{ background: "radial-gradient(circle, rgba(107,45,139,0.06) 0%, transparent 70%)" }} />
-        <svg className="absolute inset-0 w-full h-full opacity-[0.025]" xmlns="http://www.w3.org/2000/svg">
+    <section style={{ background: "#FAF6F0", padding: "6rem 1.5rem", position: "relative", overflow: "hidden" }}>
+
+      {/* Layered background */}
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+        <div style={{
+          position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
+          width: 800, height: 400, borderRadius: "50%",
+          background: "radial-gradient(ellipse, rgba(247,148,29,0.07) 0%, transparent 65%)",
+        }} />
+        <div style={{
+          position: "absolute", bottom: 0, right: 0, width: 300, height: 300,
+          background: "radial-gradient(circle, rgba(107,45,139,0.07) 0%, transparent 70%)",
+        }} />
+        {/* Subtle grid */}
+        <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.025 }}>
           <defs>
-            <pattern id="dots" width="60" height="60" patternUnits="userSpaceOnUse">
-              <circle cx="30" cy="30" r="1" fill="#6B2D8B" />
+            <pattern id="why-grid" width="48" height="48" patternUnits="userSpaceOnUse">
+              <circle cx="24" cy="24" r="1" fill="#6B2D8B" />
             </pattern>
           </defs>
-          <rect width="100%" height="100%" fill="url(#dots)" />
+          <rect width="100%" height="100%" fill="url(#why-grid)" />
         </svg>
+        {/* Floating decorative rings */}
+        <div style={{
+          position: "absolute", left: "5%", top: "20%", width: 160, height: 160,
+          borderRadius: "50%", border: "1px solid rgba(247,148,29,0.1)",
+          animation: "float 9s ease-in-out infinite",
+        }} />
+        <div style={{
+          position: "absolute", right: "8%", bottom: "25%", width: 100, height: 100,
+          borderRadius: "50%", border: "1px solid rgba(107,45,139,0.1)",
+          animation: "float 7s ease-in-out 1.5s infinite",
+        }} />
       </div>
 
-      <div className="max-w-7xl mx-auto relative">
-        <div className="text-center mb-16">
-          <p className="text-xs tracking-[0.3em] uppercase mb-3" style={{ color: "#6B2D8B" }}>Why Yogmandu</p>
-          <h2 className="text-4xl md:text-5xl font-light mb-4"
-            style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto", position: "relative" }}>
+
+        {/* Header */}
+        <div style={{ textAlign: "center", marginBottom: "4rem" }}>
+          <p style={{ fontSize: "0.62rem", letterSpacing: "0.3em", textTransform: "uppercase",
+            color: "#6B2D8B", marginBottom: 12 }}>Why Yogmandu</p>
+          <h2 style={{
+            fontFamily: "Cormorant Garamond, serif",
+            fontSize: "clamp(2.2rem, 5vw, 3.2rem)",
+            fontWeight: 300, color: "#2A1208", lineHeight: 1.15, marginBottom: 16,
+          }}>
             The difference you can <em style={{ color: "#F7941D" }}>feel</em>
           </h2>
-          <div className="section-divider mt-5" />
+          <div style={{ width: 48, height: 2, background: "linear-gradient(90deg,#6B2D8B,#F7941D)", margin: "0 auto" }} />
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
-          {stats.map((s) => (
-            <div key={s.value} className="text-center group">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-4"
-                style={{
-                  background: `${s.color}10`,
-                  border: `1.5px solid ${s.color}25`,
-                  transition: "transform 0.3s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.08)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-              >
-                <span className="text-3xl font-light"
-                  style={{ fontFamily: "Cormorant Garamond, serif", color: s.color }}>
-                  {s.value}
-                </span>
-              </div>
-              <p className="text-xs font-light tracking-wide" style={{ color: "rgba(42,18,8,0.45)" }}>
-                {s.label}
-              </p>
-            </div>
-          ))}
+        <div style={{
+          display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1.5rem",
+          marginBottom: "4.5rem", maxWidth: 680, margin: "0 auto 4.5rem",
+        }}>
+          {stats.map((s, i) => <StatOrb key={s.value} s={s} i={i} />)}
         </div>
 
         {/* Pillars */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {pillars.map((p) => <PillarCard key={p.title} p={p} />)}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.5rem" }}>
+          {pillars.map((p, i) => <TiltCard key={p.title} p={p} delay={i * 100} />)}
         </div>
       </div>
+
+      <style>{`
+        @keyframes orb-pulse {
+          0%, 100% { transform: scale(1);   opacity: 0.15; }
+          50%       { transform: scale(1.25); opacity: 0.05; }
+        }
+      `}</style>
     </section>
   );
 }
