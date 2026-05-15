@@ -23,7 +23,7 @@ function Bowl({ onClick, isRinging }: { onClick: () => void; isRinging: boolean 
   });
 
   return (
-    <group onClick={onClick} style={{ cursor: "pointer" }}>
+    <group onClick={onClick}>
       {/* Bowl body */}
       <mesh ref={meshRef} position={[0, 0, 0]}>
         <cylinderGeometry args={[0.65, 0.45, 0.45, 64, 1, true]} />
