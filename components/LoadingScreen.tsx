@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import Image from "next/image";
 
 export default function LoadingScreen() {
   const [visible, setVisible] = useState(true);
@@ -30,47 +29,27 @@ export default function LoadingScreen() {
         pointerEvents: fading ? "none" : "all",
       }}
     >
-      {/* Outer rotating ring */}
       <div style={{ position: "relative", width: 120, height: 120 }}>
-        <svg
-          width="120" height="120"
-          viewBox="0 0 120 120"
-          style={{
-            position: "absolute",
-            inset: 0,
-            animation: "spin-loader 2.4s linear infinite",
-          }}
-        >
-          <circle
-            cx="60" cy="60" r="54"
-            fill="none"
-            stroke="#F7941D"
-            strokeWidth="1.5"
-            strokeDasharray="80 260"
-            strokeLinecap="round"
-            opacity="0.6"
-          />
-        </svg>
-        {/* Inner counter-rotating ring */}
-        <svg
-          width="120" height="120"
-          viewBox="0 0 120 120"
-          style={{
-            position: "absolute",
-            inset: 0,
-            animation: "spin-loader 3.6s linear infinite reverse",
-          }}
-        >
-          <circle
-            cx="60" cy="60" r="44"
-            fill="none"
-            stroke="#6B2D8B"
-            strokeWidth="1"
-            strokeDasharray="40 236"
-            strokeLinecap="round"
-            opacity="0.4"
-          />
-        </svg>
+        {/* Outer ring — div border, GPU composited */}
+        <div style={{
+          position: "absolute",
+          inset: 0,
+          borderRadius: "50%",
+          border: "1.5px solid rgba(247,148,29,0.15)",
+          borderTopColor: "#F7941D",
+          animation: "ls-spin 1.8s linear infinite",
+          willChange: "transform",
+        }} />
+        {/* Inner ring — counter-spin */}
+        <div style={{
+          position: "absolute",
+          inset: 12,
+          borderRadius: "50%",
+          border: "1px solid rgba(107,45,139,0.12)",
+          borderBottomColor: "#6B2D8B",
+          animation: "ls-spin 2.6s linear infinite reverse",
+          willChange: "transform",
+        }} />
 
         {/* Logo in center */}
         <div style={{
@@ -84,31 +63,21 @@ export default function LoadingScreen() {
             width: 72,
             height: 72,
             borderRadius: "50%",
-            overflow: "hidden",
-            position: "relative",
-            animation: "pulse-loader 1.8s ease-in-out infinite",
-          }}>
-            <Image
-              src="/logo.png"
-              alt="Yogmandu"
-              fill
-              priority
-              sizes="72px"
-              style={{ objectFit: "cover" }}
-            />
-          </div>
+            backgroundImage: "url('/logo.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }} />
         </div>
       </div>
 
       {/* Brand name */}
-      <div style={{ marginTop: 20, textAlign: "center" }}>
+      <div style={{ marginTop: 20, textAlign: "center", animation: "ls-fadein 0.7s ease 0.2s both" }}>
         <p style={{
           fontFamily: "Cormorant Garamond, serif",
           fontSize: "1.6rem",
           fontWeight: 300,
           letterSpacing: "0.04em",
           color: "#2A1208",
-          animation: "fade-in-loader 0.8s ease 0.3s both",
         }}>
           <span style={{ color: "#F7941D" }}>Yog</span>
           <span style={{ color: "#6B2D8B" }}>mandu</span>
@@ -119,23 +88,17 @@ export default function LoadingScreen() {
           textTransform: "uppercase",
           color: "rgba(42,18,8,0.35)",
           marginTop: 4,
-          animation: "fade-in-loader 0.8s ease 0.6s both",
         }}>
           Yoga &amp; Sound Healing · Nepal
         </p>
       </div>
 
       <style>{`
-        @keyframes spin-loader {
-          from { transform: rotate(0deg); }
-          to   { transform: rotate(360deg); }
+        @keyframes ls-spin {
+          to { transform: rotate(360deg); }
         }
-        @keyframes pulse-loader {
-          0%, 100% { transform: scale(1); }
-          50%       { transform: scale(1.04); }
-        }
-        @keyframes fade-in-loader {
-          from { opacity: 0; transform: translateY(6px); }
+        @keyframes ls-fadein {
+          from { opacity: 0; transform: translateY(8px); }
           to   { opacity: 1; transform: translateY(0); }
         }
       `}</style>

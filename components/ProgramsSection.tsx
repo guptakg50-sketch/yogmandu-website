@@ -129,27 +129,28 @@ export default function ProgramsSection() {
     return () => clearInterval(t);
   }, []);
 
-  /* per-card 3-D transform — uses CSS transition for reliability */
+  /* per-card 3-D transform — only compositor-friendly props (no filter/blur) */
   const cardStyle = (i: number): React.CSSProperties => {
     const off    = i - active;
     const absOff = Math.abs(off);
-    const rotY   = Math.max(-80, Math.min(80, off * 48));
-    const tx     = off * 78;
-    const scale  = Math.max(0.55, 1 - absOff * 0.18);
-    const op     = Math.max(0, 1 - absOff * 0.45);
-    const blur   = absOff >= 1 ? `blur(${Math.min(absOff * 1.5, 4)}px)` : "none";
-    const zIdx   = 20 - Math.round(absOff * 6);
+    const rotY   = Math.max(-50, Math.min(50, off * 35));
+    const tx     = off * 480;
+    const scale  = Math.max(0.62, 1 - absOff * 0.14);
+    const op     = Math.max(0, 1 - absOff * 0.42);
+    const zIdx   = 20 - Math.round(absOff * 5);
     return {
       position: "absolute",
-      top: 0, left: "50%",
-      width: "min(460px, 88vw)",
-      transform: `translateX(calc(-50% + ${tx}%)) perspective(1200px) rotateY(${rotY}deg) scale(${scale})`,
+      top: 0,
+      left: "calc(50% - 210px)",
+      width: 420,
+      // perspective comes from parent container — don't repeat it here
+      transform: `translateX(${tx}px) rotateY(${rotY}deg) scale(${scale})`,
       opacity: op,
-      filter: blur,
       zIndex: zIdx,
       pointerEvents: absOff > 1.5 ? "none" : "auto",
-      transition: "transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.55s ease, filter 0.55s ease",
+      transition: "transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.55s ease",
       willChange: "transform, opacity",
+      backfaceVisibility: "hidden",
       cursor: absOff > 0.4 ? "pointer" : "default",
     };
   };
@@ -181,13 +182,19 @@ export default function ProgramsSection() {
         </div>
 
         {/* Carousel viewport */}
-        <div style={{ position:"relative", height:560, perspective:"1400px" }}>
+        <div style={{
+          position:"relative", height:560,
+          perspective:"1400px",
+          perspectiveOrigin:"50% 40%",
+          overflow:"hidden",
+          WebkitMaskImage:"linear-gradient(to right, transparent 0%, black 14%, black 86%, transparent 100%)",
+          maskImage:"linear-gradient(to right, transparent 0%, black 14%, black 86%, transparent 100%)",
+        }}>
           {CARDS.map((card, i) => (
             <div
               key={i}
-              ref={el => { cardRefs.current[i] = el; }}
               style={cardStyle(i)}
-              onClick={() => { if (Math.abs(i - animIdx.current) > 0.4) setActive(i); }}
+              onClick={() => { if (i !== active) setActive(i); }}
             >
               <div style={{
                 borderRadius:"1.75rem",

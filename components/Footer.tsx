@@ -3,16 +3,16 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer style={{ background: "linear-gradient(160deg, #7A3A00 0%, #4A1A00 60%, #2A0D00 100%)", color: "#fff", position: "relative", overflow: "hidden" }}>
+    <footer style={{ background: "#FAF6F0", color: "#2A1208", position: "relative", overflow: "hidden" }}>
 
       {/* Subtle bg glows */}
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
-        <div style={{ position: "absolute", top: -100, left: -100, width: 400, height: 400, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(247,148,29,0.12) 0%, transparent 70%)" }} />
-        <div style={{ position: "absolute", bottom: -80, right: -80, width: 350, height: 350, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(107,45,139,0.4) 0%, transparent 70%)" }} />
+        <div style={{ position: "absolute", top: -80, left: -80, width: 360, height: 360, borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(247,148,29,0.08) 0%, transparent 70%)" }} />
+        <div style={{ position: "absolute", bottom: -60, right: -60, width: 300, height: 300, borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(107,45,139,0.07) 0%, transparent 70%)" }} />
         {/* Mandala watermark */}
-        <svg style={{ position: "absolute", right: 40, top: "50%", transform: "translateY(-50%)", opacity: 0.05 }}
+        <svg style={{ position: "absolute", right: 40, top: "50%", transform: "translateY(-50%)", opacity: 0.04 }}
           width="280" height="280" viewBox="0 0 280 280" fill="none">
           <circle cx="140" cy="140" r="130" stroke="#F7941D" strokeWidth="1"/>
           <circle cx="140" cy="140" r="100" stroke="#F7941D" strokeWidth="1"/>
@@ -27,14 +27,14 @@ export default function Footer() {
       </div>
 
       {/* ── CTA row ── */}
-      <div style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", padding: "3rem 2rem", position: "relative" }}>
+      <div style={{ borderBottom: "1px solid rgba(42,18,8,0.07)", padding: "3rem 2rem", position: "relative" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", flexWrap: "wrap",
           alignItems: "center", justifyContent: "space-between", gap: "1.5rem" }}>
           <div>
             <p style={{ fontSize: "0.65rem", letterSpacing: "0.28em", textTransform: "uppercase",
               color: "#8DC63F", marginBottom: 8 }}>Begin your journey</p>
             <h3 style={{ fontFamily: "Cormorant Garamond, serif",
-              fontSize: "clamp(1.5rem, 3vw, 2.2rem)", fontWeight: 300, lineHeight: 1.15, margin: 0 }}>
+              fontSize: "clamp(1.5rem, 3vw, 2.2rem)", fontWeight: 300, lineHeight: 1.15, margin: 0, color: "#2A1208" }}>
               Nepal is calling.<br />
               <em style={{ color: "#F7941D" }}>Are you ready?</em>
             </h3>
@@ -43,12 +43,12 @@ export default function Footer() {
             <Link href="/yoga-teacher-training" className="cta-lift" style={{
               padding: "0.7rem 1.6rem", borderRadius: 999, background: "#F7941D",
               color: "#fff", fontSize: "0.83rem", fontWeight: 500,
-              boxShadow: "0 6px 24px rgba(247,148,29,0.4)", textDecoration: "none" }}>
+              boxShadow: "0 6px 24px rgba(247,148,29,0.35)", textDecoration: "none" }}>
               View Programs
             </Link>
             <Link href="/contact" className="cta-lift" style={{
               padding: "0.7rem 1.6rem", borderRadius: 999,
-              border: "1px solid rgba(255,255,255,0.25)", color: "rgba(255,255,255,0.85)",
+              border: "1.5px solid #6B2D8B", color: "#6B2D8B",
               fontSize: "0.83rem", fontWeight: 300, textDecoration: "none" }}>
               Get in Touch
             </Link>
@@ -71,15 +71,15 @@ export default function Footer() {
             <div>
               <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.45rem", fontWeight: 400 }}>
                 <span style={{ color: "#F7941D" }}>Yog</span>
-                <span style={{ color: "#8DC63F" }}>mandu</span>
+                <span style={{ color: "#6B2D8B" }}>mandu</span>
               </div>
               <div style={{ fontSize: "0.58rem", letterSpacing: "0.22em", textTransform: "uppercase",
-                color: "rgba(255,255,255,0.35)", marginTop: 2 }}>
+                color: "rgba(42,18,8,0.35)", marginTop: 2 }}>
                 Yoga &amp; Sound Healing · Nepal
               </div>
             </div>
           </div>
-          <p style={{ fontSize: "0.83rem", lineHeight: 1.75, color: "rgba(255,255,255,0.45)",
+          <p style={{ fontSize: "0.83rem", lineHeight: 1.75, color: "rgba(42,18,8,0.45)",
             maxWidth: 260, fontWeight: 300, marginBottom: 24 }}>
             Yoga Alliance certified teacher training &amp; authentic Tibetan Sound Healing in Kathmandu, Nepal. Transforming practitioners since 2014.
           </p>
@@ -97,19 +97,19 @@ export default function Footer() {
                 aria-label={s.label}
                 style={{ width: 36, height: 36, borderRadius: "50%", display: "flex",
                   alignItems: "center", justifyContent: "center",
-                  background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)",
-                  color: "rgba(255,255,255,0.5)", transition: "all 0.25s" }}
+                  background: "rgba(42,18,8,0.05)", border: "1px solid rgba(42,18,8,0.1)",
+                  color: "rgba(42,18,8,0.35)", transition: "all 0.25s" }}
                 onMouseEnter={e => {
                   const el = e.currentTarget as HTMLAnchorElement;
-                  el.style.background = "rgba(247,148,29,0.2)";
-                  el.style.borderColor = "rgba(247,148,29,0.5)";
+                  el.style.background = "rgba(247,148,29,0.1)";
+                  el.style.borderColor = "rgba(247,148,29,0.4)";
                   el.style.color = "#F7941D";
                 }}
                 onMouseLeave={e => {
                   const el = e.currentTarget as HTMLAnchorElement;
-                  el.style.background = "rgba(255,255,255,0.07)";
-                  el.style.borderColor = "rgba(255,255,255,0.12)";
-                  el.style.color = "rgba(255,255,255,0.5)";
+                  el.style.background = "rgba(42,18,8,0.05)";
+                  el.style.borderColor = "rgba(42,18,8,0.1)";
+                  el.style.color = "rgba(42,18,8,0.35)";
                 }}>
                 <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24">
                   <path d={s.d}/>
@@ -132,12 +132,12 @@ export default function Footer() {
             ].map(l => (
               <li key={l.label}>
                 <Link href={l.href} style={{ fontSize: "0.83rem", fontWeight: 300,
-                  color: "rgba(255,255,255,0.45)", textDecoration: "none",
+                  color: "rgba(42,18,8,0.45)", textDecoration: "none",
                   display: "flex", alignItems: "center", gap: 8, transition: "color 0.2s" }}
                   onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = "#F7941D")}
-                  onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,0.45)")}>
+                  onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(42,18,8,0.45)")}>
                   <span style={{ width: 4, height: 4, borderRadius: "50%",
-                    background: "#F7941D", opacity: 0.6, flexShrink: 0 }} />
+                    background: "#F7941D", opacity: 0.5, flexShrink: 0 }} />
                   {l.label}
                 </Link>
               </li>
@@ -158,12 +158,12 @@ export default function Footer() {
             ].map(l => (
               <li key={l.label}>
                 <Link href={l.href} style={{ fontSize: "0.83rem", fontWeight: 300,
-                  color: "rgba(255,255,255,0.45)", textDecoration: "none",
+                  color: "rgba(42,18,8,0.45)", textDecoration: "none",
                   display: "flex", alignItems: "center", gap: 8, transition: "color 0.2s" }}
                   onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = "#8DC63F")}
-                  onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,0.45)")}>
+                  onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(42,18,8,0.45)")}>
                   <span style={{ width: 4, height: 4, borderRadius: "50%",
-                    background: "#8DC63F", opacity: 0.6, flexShrink: 0 }} />
+                    background: "#8DC63F", opacity: 0.5, flexShrink: 0 }} />
                   {l.label}
                 </Link>
               </li>
@@ -174,7 +174,7 @@ export default function Footer() {
         {/* Contact */}
         <div>
           <h4 style={{ fontSize: "0.62rem", letterSpacing: "0.26em", textTransform: "uppercase",
-            color: "rgba(255,255,255,0.4)", marginBottom: 20, fontWeight: 400 }}>Find Us</h4>
+            color: "rgba(42,18,8,0.35)", marginBottom: 20, fontWeight: 400 }}>Find Us</h4>
           <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 14 }}>
             {[
               { icon: "📍", text: "Thamel, Kathmandu, Nepal" },
@@ -184,7 +184,7 @@ export default function Footer() {
             ].map(c => (
               <li key={c.text} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                 <span style={{ fontSize: "0.85rem" }}>{c.icon}</span>
-                <span style={{ fontSize: "0.8rem", fontWeight: 300, color: "rgba(255,255,255,0.38)", lineHeight: 1.5 }}>
+                <span style={{ fontSize: "0.8rem", fontWeight: 300, color: "rgba(42,18,8,0.4)", lineHeight: 1.5 }}>
                   {c.text}
                 </span>
               </li>
@@ -194,15 +194,15 @@ export default function Footer() {
       </div>
 
       {/* ── Bottom bar ── */}
-      <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", padding: "1.2rem 2rem" }}>
+      <div style={{ borderTop: "1px solid rgba(42,18,8,0.07)", padding: "1.2rem 2rem" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", flexWrap: "wrap",
           justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-          <p style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.2)", fontWeight: 300, margin: 0 }}>
+          <p style={{ fontSize: "0.7rem", color: "rgba(42,18,8,0.25)", fontWeight: 300, margin: 0 }}>
             © {new Date().getFullYear()} Yogmandu. All rights reserved.
           </p>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#8DC63F", opacity: 0.7 }} />
-            <span style={{ fontSize: "0.7rem", color: "rgba(141,198,63,0.6)", fontWeight: 300, letterSpacing: "0.08em" }}>
+            <span style={{ fontSize: "0.7rem", color: "rgba(141,198,63,0.7)", fontWeight: 300, letterSpacing: "0.08em" }}>
               Yoga Alliance RYS 200 &amp; 300 · Kathmandu, Nepal
             </span>
           </div>
