@@ -156,7 +156,7 @@ export default function ProgramsSection() {
   };
 
   return (
-    <section style={{ background:"#FFF4E8", position:"relative", overflow:"hidden", padding:"6rem 0" }}>
+    <section style={{ background:"#F9F5FF", position:"relative", overflow:"hidden", padding:"6rem 0" }}>
 
       {/* 3-D canvas */}
       <div style={{ position:"absolute", inset:0, zIndex:0, pointerEvents:"none" }}>
@@ -167,7 +167,7 @@ export default function ProgramsSection() {
       </div>
       {/* vignette */}
       <div style={{ position:"absolute", inset:0, zIndex:1, pointerEvents:"none",
-        background:"radial-gradient(ellipse 60% 70% at 50% 50%, rgba(255,244,232,0.1) 0%, rgba(255,244,232,0.78) 100%)" }} />
+        background:"radial-gradient(ellipse 60% 70% at 50% 50%, rgba(249,245,255,0.1) 0%, rgba(249,245,255,0.82) 100%)" }} />
 
       {/* Content */}
       <div style={{ position:"relative", zIndex:2 }}>
@@ -233,15 +233,15 @@ export default function ProgramsSection() {
                   fontWeight:300, color:"#2A1208", marginBottom:10 }}>
                   {card.title}
                 </h3>
-                <p style={{ fontSize:"0.83rem", lineHeight:1.75, color:"rgba(42,18,8,0.55)",
-                  fontWeight:300, marginBottom:18 }}>
+                <p style={{ fontSize:"0.83rem", lineHeight:1.75, color:"#4A2E1A",
+                  fontWeight:400, marginBottom:18 }}>
                   {card.desc}
                 </p>
                 <ul style={{ listStyle:"none", padding:0, margin:"0 0 1.5rem",
                   display:"flex", flexDirection:"column", gap:9 }}>
                   {card.features.map(f => (
                     <li key={f} style={{ display:"flex", alignItems:"center", gap:9,
-                      fontSize:"0.82rem", fontWeight:300, color:"rgba(42,18,8,0.68)" }}>
+                      fontSize:"0.82rem", fontWeight:400, color:"#3D2015" }}>
                       <span style={{ width:17, height:17, borderRadius:"50%",
                         background:`${card.accent}15`, display:"flex", alignItems:"center",
                         justifyContent:"center", flexShrink:0 }}>

@@ -5,13 +5,31 @@ import * as THREE from "three";
 
 const testimonials = [
   {
+    quote: "Yoga helped me attain a flexible body, a fresh mind, and positive thinking. The teachers at Yogmandu are incredibly supportive and knowledgeable.",
+    name: "Sabnam Shahi",
+    origin: "Nepal",
+    flag: "🇳🇵",
+    program: "Yoga Classes",
+    stars: 5,
+    color: "#F7941D",
+  },
+  {
+    quote: "Yoga helped me attain a flexible body, a fresh mind, and positive thinking. I feel completely transformed after joining Yogmandu.",
+    name: "Pawan Kumar BK",
+    origin: "Nepal",
+    flag: "🇳🇵",
+    program: "Yoga Classes",
+    stars: 5,
+    color: "#6B2D8B",
+  },
+  {
     quote: "The 200hr training at Yogmandu completely transformed how I understand my own body and breath. The teachers hold space with such presence and warmth.",
     name: "Sarah M.",
     origin: "Australia",
     flag: "🇦🇺",
     program: "200hr YTT",
     stars: 5,
-    color: "#6B2D8B",
+    color: "#8DC63F",
   },
   {
     quote: "I came for yoga, but the sound healing sessions cracked something open in me. The Tibetan bowls resonate in ways words can't fully describe.",
@@ -23,31 +41,22 @@ const testimonials = [
     color: "#F7941D",
   },
   {
-    quote: "The valley, the mountains, the community — Kathmandu itself becomes part of your practice. Yogmandu chooses this location for a reason.",
+    quote: "The valley, the mountains, the community — Kathmandu itself becomes part of your practice. Dr. Gautam's teaching is unmatched in authenticity.",
     name: "Priya N.",
     origin: "United Kingdom",
     flag: "🇬🇧",
-    program: "300hr YTT",
-    stars: 5,
-    color: "#8DC63F",
-  },
-  {
-    quote: "I've attended many yoga trainings, but none with this level of authentic Himalayan lineage. The philosophy teachings alone are worth the journey.",
-    name: "Marco L.",
-    origin: "Italy",
-    flag: "🇮🇹",
     program: "200hr YTT",
     stars: 5,
     color: "#6B2D8B",
   },
   {
-    quote: "The sound bath sessions gave me the deepest rest I've had in years. I left Nepal with a completely new relationship to silence and stillness.",
-    name: "Aisha K.",
-    origin: "UAE",
-    flag: "🇦🇪",
-    program: "Sound Healing",
+    quote: "I've attended many yoga trainings, but none with this level of authentic Himalayan lineage. The philosophy teachings alone are worth the journey to Nepal.",
+    name: "Marco L.",
+    origin: "Italy",
+    flag: "🇮🇹",
+    program: "200hr YTT",
     stars: 5,
-    color: "#F7941D",
+    color: "#8DC63F",
   },
 ];
 
@@ -306,7 +315,7 @@ export default function Testimonials() {
             style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)" }}>
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#8DC63F" }} />
             <span className="text-xs tracking-[0.25em] uppercase font-light" style={{ color: "rgba(255,255,255,0.8)" }}>
-              500+ Verified Graduates
+              3,000+ Teachers Trained Worldwide
             </span>
           </div>
           <h2 className="text-5xl md:text-6xl font-light text-white mb-4"

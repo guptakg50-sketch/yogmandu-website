@@ -5,26 +5,29 @@
   --color-brand-orange: #F7941D;
   --color-brand-green: #8DC63F;
   --color-brand-purple: #6B2D8B;
-  --color-bg: #FAF6F0;
-  --color-surface: #F0EAE2;
+  --color-bg: #FFFFFF;
+  --color-surface: #F5F0FA;
   --color-brown: #5C3317;
   --font-display: "Cormorant Garamond", Georgia, serif;
   --font-body: "DM Sans", sans-serif;
 }
 
 :root {
-  --background: #FAF6F0;
+  --background: #FFFFFF;
   --foreground: #2A1208;
+  --text-body: #4A2E1A;
+  --text-muted: #7A5840;
+  --text-subtle: #9A7860;
 }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 
 body {
-  background: #FAF6F0;
+  background: #FFFFFF;
   color: #2A1208;
   font-family: "DM Sans", sans-serif;
-  font-weight: 300;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
 }
 

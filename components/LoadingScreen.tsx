@@ -59,14 +59,7 @@ export default function LoadingScreen() {
           alignItems: "center",
           justifyContent: "center",
         }}>
-          <div style={{
-            width: 72,
-            height: 72,
-            borderRadius: "50%",
-            backgroundImage: "url('/logo.png')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }} />
+          <img src="/logo.png" alt="Yogmandu" style={{ height: 72, width: "auto", objectFit: "contain" }} />
         </div>
       </div>
 

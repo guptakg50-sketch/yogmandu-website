@@ -122,7 +122,7 @@ function TiltCard({ p, delay }: { p: typeof pillars[0]; delay: number }) {
         }}>
           {p.title}
         </h3>
-        <p style={{ fontSize: "0.85rem", fontWeight: 300, lineHeight: 1.75, color: "rgba(42,18,8,0.5)" }}>
+        <p style={{ fontSize: "0.85rem", fontWeight: 400, lineHeight: 1.75, color: "#4A2E1A" }}>
           {p.body}
         </p>
         <div style={{
@@ -184,7 +184,7 @@ function StatOrb({ s, i }: { s: typeof stats[0]; i: number }) {
           </span>
         </div>
       </div>
-      <p style={{ fontSize: "0.75rem", fontWeight: 300, color: "rgba(42,18,8,0.45)", letterSpacing: "0.04em", textAlign: "center" }}>
+      <p style={{ fontSize: "0.75rem", fontWeight: 400, color: "#5C3D2E", letterSpacing: "0.04em", textAlign: "center" }}>
         {s.label}
       </p>
     </div>
@@ -226,15 +226,15 @@ const pillars = [
 ];
 
 const stats = [
-  { value: "500+", numeric: 500, suffix: "+", label: "Graduates worldwide",     color: "#F7941D" },
-  { value: "40+",  numeric: 40,  suffix: "+", label: "Countries represented",   color: "#6B2D8B" },
-  { value: "10+",  numeric: 10,  suffix: "+", label: "Years in Kathmandu",      color: "#8DC63F" },
-  { value: "RYS",  numeric: undefined,         label: "Yoga Alliance certified", color: "#F7941D" },
+  { value: "3000+", numeric: 3000, suffix: "+", label: "Teachers trained",       color: "#F7941D" },
+  { value: "50+",   numeric: 50,   suffix: "+", label: "Countries represented",  color: "#6B2D8B" },
+  { value: "2015",  numeric: undefined,          label: "Established in Nepal",   color: "#8DC63F" },
+  { value: "RYS",   numeric: undefined,          label: "Yoga Alliance certified", color: "#F7941D" },
 ];
 
 export default function WhySection() {
   return (
-    <section style={{ background: "#FAF6F0", padding: "6rem 1.5rem", position: "relative", overflow: "hidden" }}>
+    <section style={{ background: "#FFFFFF", padding: "6rem 1.5rem", position: "relative", overflow: "hidden" }}>
 
       {/* ── 3-D CSS background elements ── */}
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none", perspective: "600px" }}>

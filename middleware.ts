@@ -1,0 +1,39 @@
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+const ADMIN_COOKIE = "yogmandu_admin_session";
+const USER_COOKIE  = "yogmandu_user_session";
+
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // ── Admin protection ──────────────────────────────────────────────────────
+  // Redirect to /admin/login if no session cookie present.
+  // Full HMAC verification happens server-side in requireAdminSession().
+  if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
+    if (!request.cookies.get(ADMIN_COOKIE)?.value) {
+      const loginUrl = new URL("/admin/login", request.url);
+      loginUrl.searchParams.set("from", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  // ── Account protection ────────────────────────────────────────────────────
+  const publicAccountPaths = ["/account/login", "/account/register"];
+  if (
+    pathname.startsWith("/account") &&
+    !publicAccountPaths.some(p => pathname.startsWith(p))
+  ) {
+    if (!request.cookies.get(USER_COOKIE)?.value) {
+      const loginUrl = new URL("/account/login", request.url);
+      loginUrl.searchParams.set("from", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: ["/admin/:path*", "/account/:path*"],
+};
