@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export const runtime = "edge";
-
 const ADMIN_COOKIE = "yogmandu_admin_session";
 const USER_COOKIE  = "yogmandu_user_session";
 
