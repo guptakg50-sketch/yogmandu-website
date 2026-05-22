@@ -65,14 +65,31 @@ function PhotoPlane({
   const [error, setError]   = useState(false);
 
   useEffect(() => {
-    const loader = new THREE.TextureLoader();
-    loader.load(
-      photo.src,
-      (t) => { t.colorSpace = THREE.SRGBColorSpace; setTex(t); },
-      undefined,
-      () => setError(true),
-    );
+    let cancelled = false;
+    // Use the native Image constructor instead of THREE.TextureLoader to avoid
+    // WebGL cross-origin issues and React 19 Strict Mode double-effect races.
+    const img = new window.Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      if (cancelled) return;
+      const texture = new THREE.Texture(img);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.needsUpdate = true;   // required: tells Three.js to upload to GPU
+      setTex(texture);
+    };
+    img.onerror = () => { if (!cancelled) setError(true); };
+    img.src = photo.src;
+    return () => {
+      cancelled = true;
+      img.onload = null;
+      img.onerror = null;
+    };
   }, [photo.src]);
+
+  // Dispose GPU texture when the plane is removed
+  useEffect(() => {
+    return () => { tex?.dispose(); };
+  }, [tex]);
 
   const targetScale = isSelected ? scale * 2.2 : hovered ? scale * 1.12 : scale;
   const targetZ     = isSelected ? 4 : hovered ? 0.4 : 0;
