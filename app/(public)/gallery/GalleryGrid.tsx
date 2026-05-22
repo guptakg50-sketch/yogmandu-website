@@ -1,7 +1,28 @@
 "use client";
 
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
+import dynamic from "next/dynamic";
 import type { DBMedia } from "@/lib/publicData";
+
+const FloatingLotus = dynamic(() => import("@/components/FloatingLotus"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-72 flex items-center justify-center">
+      <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(141,198,63,0.12)", border: "1px solid rgba(141,198,63,0.25)", animation: "pulse 2s infinite" }} />
+    </div>
+  ),
+});
+
+const PARTICLES = [
+  { left: 7,  delay: 0.3, dur: 4.2, size: 3 }, { left: 16, delay: 1.4, dur: 5.1, size: 2 },
+  { left: 25, delay: 0.7, dur: 3.8, size: 4 }, { left: 34, delay: 2.0, dur: 4.9, size: 2 },
+  { left: 43, delay: 0.5, dur: 5.6, size: 3 }, { left: 54, delay: 1.9, dur: 4.3, size: 2 },
+  { left: 63, delay: 0.8, dur: 3.7, size: 4 }, { left: 72, delay: 2.3, dur: 5.0, size: 3 },
+  { left: 81, delay: 0.6, dur: 4.7, size: 2 }, { left: 90, delay: 1.1, dur: 3.9, size: 3 },
+  { left: 11, delay: 3.0, dur: 6.1, size: 2 }, { left: 22, delay: 2.6, dur: 5.4, size: 3 },
+  { left: 49, delay: 3.4, dur: 4.5, size: 2 }, { left: 67, delay: 1.0, dur: 5.9, size: 4 },
+  { left: 87, delay: 2.8, dur: 4.1, size: 2 },
+];
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface PhotoItem { id: string; src: string; cat: string; title: string; desc: string }
@@ -78,14 +99,14 @@ function TiltPhotoCard({
     const x = (e.clientX - r.left) / r.width  - 0.5;
     const y = (e.clientY - r.top)  / r.height - 0.5;
     el.style.transform = `perspective(800px) rotateY(${x * 14}deg) rotateX(${-y * 10}deg) scale(1.03)`;
-    el.style.boxShadow = `${-x * 24}px ${y * 24}px 60px rgba(0,0,0,0.55), 0 0 0 1px ${accent}33`;
+    el.style.boxShadow = `${-x * 18}px ${y * 18}px 40px rgba(0,0,0,0.18), 0 0 0 1.5px ${accent}55`;
   }, [accent]);
 
   const handleLeave = useCallback(() => {
     const el = cardRef.current;
     if (!el) return;
     el.style.transform = "perspective(800px) rotateY(0deg) rotateX(0deg) scale(1)";
-    el.style.boxShadow = `0 8px 32px rgba(0,0,0,0.35)`;
+    el.style.boxShadow = `0 4px 24px rgba(0,0,0,0.10)`;
   }, []);
 
   return (
@@ -103,8 +124,8 @@ function TiltPhotoCard({
         flexShrink: 0,
         willChange: "transform",
         transition: "transform 0.12s ease, box-shadow 0.12s ease",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
-        background: "#110020",
+        boxShadow: "0 4px 24px rgba(0,0,0,0.10)",
+        background: "#fff",
       }}
     >
       {/* Accent line at top */}
@@ -302,17 +323,17 @@ export default function GalleryGrid({ media }: GalleryGridProps) {
     <>
       <style>{`
         .ym-filter-btn { transition: all 0.22s ease; }
-        .ym-filter-btn:hover { border-color: rgba(255,255,255,0.38) !important; color: rgba(255,255,255,0.8) !important; }
+        .ym-filter-btn:hover { border-color: #c97a18 !important; color: #c97a18 !important; }
         .ym-nav-btn { transition: background 0.18s, opacity 0.18s; }
-        .ym-nav-btn:hover:not(:disabled) { background: rgba(255,255,255,0.12) !important; }
-        .ym-nav-btn:disabled { opacity: 0.2; cursor: default; }
+        .ym-nav-btn:hover:not(:disabled) { background: rgba(0,0,0,0.08) !important; }
+        .ym-nav-btn:disabled { opacity: 0.25; cursor: default; }
         .ym-dot { transition: all 0.25s ease; }
 
         /* Carousel track */
         .ym-track {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 20px;
+          gap: 24px;
           transition: opacity 0.18s ease;
         }
         @media (max-width: 900px) {
@@ -331,74 +352,126 @@ export default function GalleryGrid({ media }: GalleryGridProps) {
 
       {/* ── Hero ─────────────────────────────────────────────────────────────── */}
       <section style={{
-        background: "linear-gradient(160deg, #0d0010 0%, #1a0030 60%, #0a001a 100%)",
+        position: "relative",
+        background: "linear-gradient(160deg, #1a0a2e 0%, #2d1060 45%, #3a1458 75%, #1a0a2e 100%)",
         padding: "9rem 1.5rem 5rem",
+        minHeight: "70vh",
+        display: "flex",
+        alignItems: "center",
+        overflow: "hidden",
       }}>
-        <div style={{ maxWidth: 960, margin: "0 auto" }}>
-          <p style={{ fontSize:"0.7rem", letterSpacing:"0.32em", textTransform:"uppercase", color:"#8DC63F", marginBottom:18 }}>
-            Visual Journey
-          </p>
-          <h1 style={{
-            fontFamily:"Cormorant Garamond, serif",
-            fontSize:"clamp(3rem, 7vw, 5.5rem)", fontWeight:300,
-            color:"#fff", lineHeight:1.05, marginBottom:18,
-          }}>
-            Life at <em style={{ color:"#F7941D" }}>Yogmandu</em>
-          </h1>
-          <p style={{ fontSize:"1rem", color:"rgba(255,255,255,0.45)", lineHeight:1.8, maxWidth:480 }}>
-            Moments from our classes, ceremonies, and the spirit of Kathmandu.
-          </p>
+        {/* Glowing orbs */}
+        <div style={{ position:"absolute", inset:0, pointerEvents:"none" }}>
+          <div style={{ position:"absolute", top:"8%", right:"12%", width:420, height:420, borderRadius:"50%",
+            background:"radial-gradient(circle, rgba(107,45,139,0.45) 0%, transparent 70%)", filter:"blur(55px)" }} />
+          <div style={{ position:"absolute", bottom:"10%", left:"6%", width:320, height:320, borderRadius:"50%",
+            background:"radial-gradient(circle, rgba(247,148,29,0.18) 0%, transparent 70%)", filter:"blur(50px)" }} />
+          <div style={{ position:"absolute", top:"40%", left:"30%", width:200, height:200, borderRadius:"50%",
+            background:"radial-gradient(circle, rgba(141,198,63,0.12) 0%, transparent 70%)", filter:"blur(40px)" }} />
+        </div>
+
+        {/* Floating particles */}
+        <div style={{ position:"absolute", inset:0, pointerEvents:"none", overflow:"hidden" }}>
+          <style>{`
+            @keyframes floatUp {
+              0%   { transform: translateY(100vh) scale(0);   opacity: 0; }
+              10%  { opacity: 1; }
+              90%  { opacity: 0.6; }
+              100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+            }
+          `}</style>
+          {PARTICLES.map((p, i) => (
+            <div key={i} style={{
+              position: "absolute",
+              left: `${p.left}%`,
+              bottom: 0,
+              width: p.size,
+              height: p.size,
+              borderRadius: "50%",
+              background: i % 3 === 0 ? "#F7941D" : i % 3 === 1 ? "#8DC63F" : "#9B6BDF",
+              opacity: 0,
+              animation: `floatUp ${p.dur}s ease-in-out ${p.delay}s infinite`,
+            }} />
+          ))}
+        </div>
+
+        {/* Content grid */}
+        <div style={{ maxWidth:1100, margin:"0 auto", width:"100%", position:"relative", zIndex:1,
+          display:"grid", gridTemplateColumns:"1fr auto", gap:"2rem", alignItems:"center" }}>
+          <div>
+            <p style={{ fontSize:"0.68rem", letterSpacing:"0.35em", textTransform:"uppercase", color:"#8DC63F", marginBottom:20 }}>
+              Visual Journey
+            </p>
+            <h1 style={{
+              fontFamily:"Cormorant Garamond, serif",
+              fontSize:"clamp(3rem, 7vw, 5.5rem)", fontWeight:300,
+              color:"#fff", lineHeight:1.05, marginBottom:20,
+            }}>
+              Life at <em style={{ color:"#F7941D" }}>Yogmandu</em>
+            </h1>
+            <p style={{ fontSize:"1rem", color:"rgba(255,255,255,0.48)", lineHeight:1.8, maxWidth:460 }}>
+              Moments from our classes, ceremonies, and the spirit of Kathmandu.
+            </p>
+          </div>
+
+          {/* 3-D lotus */}
+          <div style={{ width:260, flexShrink:0 }} className="hidden md:block">
+            <FloatingLotus size="lg" />
+          </div>
         </div>
       </section>
 
       {/* ── Filters ──────────────────────────────────────────────────────────── */}
       <div style={{
-        background:"#0a000f", borderBottom:"1px solid rgba(255,255,255,0.07)",
+        background:"#fff", borderBottom:"1px solid #e8e2d9",
         position:"sticky", top:64, zIndex:10, padding:"0 1.5rem",
+        boxShadow:"0 2px 12px rgba(0,0,0,0.06)",
       }}>
-        <div style={{ maxWidth:960, margin:"0 auto", display:"flex", alignItems:"center", gap:8, flexWrap:"wrap", padding:"0.9rem 0" }}>
+        <div style={{ maxWidth:960, margin:"0 auto", display:"flex", alignItems:"center", gap:8, flexWrap:"wrap", padding:"0.85rem 0" }}>
           {CATEGORIES.map(cat => {
             const active = cat === activeCategory;
             return (
               <button key={cat} className="ym-filter-btn"
                 onClick={() => activeCategory !== cat && setActiveCategory(cat)}
                 style={{
-                  padding:"0.38rem 1rem", borderRadius:99,
+                  padding:"0.36rem 1.05rem", borderRadius:99,
                   fontSize:"0.78rem", fontWeight:500, cursor:"pointer",
                   background: active ? "#F7941D" : "transparent",
-                  color:  active ? "#fff" : "rgba(255,255,255,0.4)",
-                  border: active ? "1.5px solid #F7941D" : "1.5px solid rgba(255,255,255,0.12)",
+                  color:  active ? "#fff" : "#7a6a58",
+                  border: active ? "1.5px solid #F7941D" : "1.5px solid #d9d0c4",
                 }}
               >{cat}</button>
             );
           })}
-          <span style={{ marginLeft:"auto", fontSize:"0.7rem", color:"rgba(255,255,255,0.2)" }}>
+          <span style={{ marginLeft:"auto", fontSize:"0.7rem", color:"#b0a898" }}>
             {filtered.length} photos
           </span>
         </div>
       </div>
 
       {/* ── Carousel ─────────────────────────────────────────────────────────── */}
-      <section style={{ background:"#080012", padding:"3rem 1.5rem 5rem" }}>
+      <section style={{ background:"#F9F5F0", padding:"3rem 1.5rem 5rem" }}>
         <div style={{ maxWidth:1200, margin:"0 auto" }}>
 
           {/* Nav row */}
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"1.5rem" }}>
-            <p style={{ fontSize:"0.72rem", color:"rgba(255,255,255,0.25)", letterSpacing:"0.1em" }}>
+            <p style={{ fontSize:"0.72rem", color:"#b0a898", letterSpacing:"0.1em" }}>
               Showing {startIdx + 1}–{Math.min(startIdx + VISIBLE, filtered.length)} of {filtered.length}
             </p>
             <div style={{ display:"flex", gap:10, alignItems:"center" }}>
               <button className="ym-nav-btn" disabled={!canPrev} onClick={() => slide(-1)}
                 style={{
-                  width:44, height:44, borderRadius:"50%", border:"1px solid rgba(255,255,255,0.14)",
-                  background:"rgba(255,255,255,0.05)", color:"#fff", fontSize:18, cursor:"pointer",
+                  width:44, height:44, borderRadius:"50%", border:"1px solid #ddd5c8",
+                  background:"#fff", color:"#5a4a38", fontSize:18, cursor:"pointer",
                   display:"flex", alignItems:"center", justifyContent:"center",
+                  boxShadow:"0 2px 8px rgba(0,0,0,0.07)",
                 }}>←</button>
               <button className="ym-nav-btn" disabled={!canNext} onClick={() => slide(1)}
                 style={{
-                  width:44, height:44, borderRadius:"50%", border:"1px solid rgba(255,255,255,0.14)",
-                  background:"rgba(255,255,255,0.05)", color:"#fff", fontSize:18, cursor:"pointer",
+                  width:44, height:44, borderRadius:"50%", border:"1px solid #ddd5c8",
+                  background:"#fff", color:"#5a4a38", fontSize:18, cursor:"pointer",
                   display:"flex", alignItems:"center", justifyContent:"center",
+                  boxShadow:"0 2px 8px rgba(0,0,0,0.07)",
                 }}>→</button>
             </div>
           </div>
@@ -418,7 +491,7 @@ export default function GalleryGrid({ media }: GalleryGridProps) {
 
           {/* Dot pagination */}
           {totalPages > 1 && (
-            <div style={{ display:"flex", justifyContent:"center", gap:8, marginTop:"2rem" }}>
+            <div style={{ display:"flex", justifyContent:"center", gap:8, marginTop:"2.5rem" }}>
               {Array.from({ length: totalPages }, (_, i) => (
                 <button
                   key={i}
@@ -427,7 +500,7 @@ export default function GalleryGrid({ media }: GalleryGridProps) {
                   style={{
                     width: i === currentPage ? 24 : 8,
                     height: 8, borderRadius: 99, border: "none", cursor: "pointer",
-                    background: i === currentPage ? "#F7941D" : "rgba(255,255,255,0.18)",
+                    background: i === currentPage ? "#F7941D" : "#d9d0c4",
                     padding: 0,
                   }}
                 />
@@ -439,13 +512,13 @@ export default function GalleryGrid({ media }: GalleryGridProps) {
 
       {/* ── CTA ──────────────────────────────────────────────────────────────── */}
       <section style={{
-        background:"#0a000f", padding:"4.5rem 1.5rem",
-        textAlign:"center", borderTop:"1px solid rgba(255,255,255,0.06)",
+        background:"#fff8f0", padding:"4.5rem 1.5rem",
+        textAlign:"center", borderTop:"1px solid #ede6dc",
       }}>
         <p style={{
           fontFamily:"Cormorant Garamond, serif",
           fontSize:"clamp(1.5rem, 4vw, 2.5rem)", fontWeight:300,
-          color:"#fff", marginBottom:24,
+          color:"#2a1a0a", marginBottom:24,
         }}>
           Come practice with us in <em style={{ color:"#F7941D" }}>Kathmandu</em>
         </p>
