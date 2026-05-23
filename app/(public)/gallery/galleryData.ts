@@ -1,0 +1,76 @@
+// Static gallery data + helpers for /gallery and /gallery/all.
+// Image files live in /public/images/gallery/{yoga,bell,certificates}/
+
+export type PhotoItem = {
+  id:    string;
+  src:   string;
+  title: string;
+  cat:   string;
+  desc?: string;
+};
+
+export const CATEGORIES = ["All", "Yoga", "Sound Healing", "Certificates"] as const;
+
+export const CAT_ACCENT: Record<string, string> = {
+  All:              "#F7941D",
+  Yoga:             "#F7941D",
+  "Sound Healing":  "#6B2D8B",
+  Certificates:     "#8DC63F",
+};
+
+const yogaPhotos: PhotoItem[] = Array.from({ length: 12 }, (_, i) => ({
+  id:    `yoga-${i + 1}`,
+  src:   `/images/gallery/yoga/yoga-${i + 1}.jpg`,
+  title: `Yoga Practice ${i + 1}`,
+  cat:   "Yoga",
+}));
+
+const bowlPhotos: PhotoItem[] = Array.from({ length: 16 }, (_, i) => ({
+  id:    `bowl-${i + 1}`,
+  src:   `/images/gallery/bell/bowl-${i + 1}.jpg`,
+  title: `Singing Bowl ${i + 1}`,
+  cat:   "Sound Healing",
+}));
+
+const bellExtras: PhotoItem[] = [
+  { id: "bell-ringing",      src: "/images/gallery/bell/bellrining.jpg",        title: "Bell Ringing",      cat: "Sound Healing" },
+  { id: "people-sleeping-1", src: "/images/gallery/bell/people-sleeping-1.jpg", title: "Group Sound Bath",  cat: "Sound Healing" },
+  { id: "people-sleeping-2", src: "/images/gallery/bell/people-sleeping-2.jpg", title: "Deep Relaxation",   cat: "Sound Healing" },
+  { id: "people-sleeping-3", src: "/images/gallery/bell/people-sleeping-3.jpg", title: "Sound Therapy",     cat: "Sound Healing" },
+];
+
+const certificatePhotos: PhotoItem[] = Array.from({ length: 8 }, (_, i) => ({
+  id:    `certificate-${i + 1}`,
+  src:   `/images/gallery/certificates/certificate-${i + 1}.jpg`,
+  title: `Certificate ${i + 1}`,
+  cat:   "Certificates",
+}));
+
+export const STATIC_PHOTOS: PhotoItem[] = [
+  ...yogaPhotos,
+  ...bowlPhotos,
+  ...bellExtras,
+  ...certificatePhotos,
+];
+
+/**
+ * Interleaves photos across categories so the grid doesn't show
+ * 12 yoga images in a row, then 20 bowls, then 8 certificates.
+ * Uses a seeded round-robin so the order is stable per build.
+ */
+export function shuffleInterleaved(items: PhotoItem[]): PhotoItem[] {
+  const buckets = new Map<string, PhotoItem[]>();
+  for (const p of items) {
+    if (!buckets.has(p.cat)) buckets.set(p.cat, []);
+    buckets.get(p.cat)!.push(p);
+  }
+  const queues = Array.from(buckets.values());
+  const out: PhotoItem[] = [];
+  while (queues.some(q => q.length)) {
+    for (const q of queues) {
+      const next = q.shift();
+      if (next) out.push(next);
+    }
+  }
+  return out;
+}
