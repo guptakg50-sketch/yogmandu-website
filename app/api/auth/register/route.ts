@@ -1,11 +1,16 @@
 import { hashPassword, setUserSessionCookie } from "@/lib/userAuth";
 import { createUser } from "@/lib/supabaseUsers";
+import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
+import { generateToken } from "@/lib/tokens";
 import { sendWelcomeEmail } from "@/lib/email";
 import { rateLimit, getClientIp } from "@/lib/rateLimit";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 export const dynamic = "force-dynamic";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const VERIFY_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://yogmandu.com";
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
@@ -16,6 +21,9 @@ export async function POST(request: Request) {
 
   const body = await request.json().catch(() => null);
   if (!body) return Response.json({ error: "Invalid request." }, { status: 400 });
+
+  const captcha = await verifyTurnstile(body?.captchaToken, ip);
+  if (!captcha.ok) return Response.json({ error: captcha.error }, { status: 400 });
 
   const { email, password, full_name, phone, nationality, experience_level } = body;
 
@@ -42,10 +50,24 @@ export async function POST(request: Request) {
         : "Beginner",
     });
 
-    // Fire-and-forget welcome email. Don't fail registration if email isn't configured.
+    // Issue a verification token and persist it on the user row.
+    const { token: verifyToken, hash: verifyHash } = generateToken();
+    const supabase = getSupabaseAdmin();
+    await supabase
+      .from("yogmandu_users")
+      .update({
+        verification_token_hash:       verifyHash,
+        verification_token_expires_at: new Date(Date.now() + VERIFY_TTL_MS).toISOString(),
+      })
+      .eq("id", user.id);
+
+    const verifyUrl = `${SITE_URL}/account/verify-email?token=${verifyToken}`;
+
+    // Fire-and-forget welcome email. Don't fail the registration if email isn't configured.
     sendWelcomeEmail({
-      to:       user.email,
-      fullName: user.full_name,
+      to:        user.email,
+      fullName:  user.full_name,
+      verifyUrl,
     }).catch(err => console.error("[register] welcome email failed:", err));
 
     await setUserSessionCookie(user.id);

@@ -12,6 +12,7 @@ type UserProfile = {
   experience_level: string;
   bio: string;
   avatar_url: string;
+  email_verified?: boolean;
   created_at: string;
 };
 
@@ -44,6 +45,18 @@ export default function AccountDashboardPage() {
   const avatarInput                   = useRef<HTMLInputElement>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarPreview, setAvatarPreview]     = useState<string | null>(null);
+
+  // Verification state
+  const [verifyState, setVerifyState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  async function handleResendVerify() {
+    setVerifyState("sending");
+    try {
+      const res = await fetch("/api/auth/resend-verification", { method: "POST" });
+      setVerifyState(res.ok ? "sent" : "error");
+    } catch {
+      setVerifyState("error");
+    }
+  }
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -181,6 +194,46 @@ export default function AccountDashboardPage() {
       </div>
 
       <div style={{ maxWidth: 800, margin: "0 auto", padding: "16px 24px 0" }}>
+
+        {/* Email verification banner */}
+        {user.email_verified === false && (
+          <div style={{
+            background: "linear-gradient(135deg, #fff4e0, #fff8e7)",
+            border: "1px solid rgba(247,148,29,0.3)",
+            borderRadius: 14,
+            padding: "16px 20px",
+            marginBottom: 20,
+            display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap",
+          }}>
+            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(247,148,29,0.18)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F7941D" strokeWidth="2" strokeLinecap="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </div>
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "#2A1208" }}>Confirm your email address</div>
+              <div style={{ fontSize: 12, color: "#7A5840", marginTop: 2 }}>
+                We sent a verification link to <strong>{user.email}</strong>. Check your inbox.
+              </div>
+            </div>
+            <button onClick={handleResendVerify} disabled={verifyState === "sending" || verifyState === "sent"} style={{
+              padding: "8px 16px",
+              border: "1.5px solid rgba(247,148,29,0.5)",
+              borderRadius: 8,
+              background: verifyState === "sent" ? "rgba(141,198,63,0.15)" : "transparent",
+              color: verifyState === "sent" ? "#6A9A20" : "#B0731A",
+              fontSize: 12, fontWeight: 500,
+              cursor: verifyState === "sending" || verifyState === "sent" ? "default" : "pointer",
+              fontFamily: "'DM Sans', sans-serif",
+            }}>
+              {verifyState === "sending" ? "Sending…" :
+               verifyState === "sent"    ? "Email sent ✓" :
+               verifyState === "error"   ? "Try again"  :
+                                           "Resend email"}
+            </button>
+          </div>
+        )}
 
         {/* Profile hero */}
         <div style={{ background: "#fff", borderRadius: 20, padding: "32px", boxShadow: "0 4px 32px rgba(107,45,139,0.09)", border: "1px solid rgba(107,45,139,0.08)", marginBottom: 24, display: "flex", gap: 24, alignItems: "flex-start", flexWrap: "wrap" }}>

@@ -9,6 +9,7 @@ export type UserProfile = {
   experience_level: string;
   bio: string;
   avatar_url: string;
+  email_verified: boolean;
   created_at: string;
 };
 
@@ -26,7 +27,7 @@ export async function createUser(data: {
   const { data: user, error } = await supabase
     .from("yogmandu_users")
     .insert({ ...data, email: data.email.toLowerCase().trim() })
-    .select("id, email, full_name, phone, nationality, experience_level, bio, avatar_url, created_at")
+    .select("id, email, full_name, phone, nationality, experience_level, bio, avatar_url, email_verified, created_at")
     .single();
   if (error) throw new Error(error.code === "23505" ? "Email already registered." : error.message);
   return user as UserProfile;
@@ -36,7 +37,7 @@ export async function getUserByEmail(email: string): Promise<UserWithHash | null
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from("yogmandu_users")
-    .select("id, email, full_name, phone, nationality, experience_level, bio, avatar_url, created_at, password_hash")
+    .select("id, email, full_name, phone, nationality, experience_level, bio, avatar_url, email_verified, created_at, password_hash")
     .eq("email", email.toLowerCase().trim())
     .single();
   if (error || !data) return null;
@@ -47,7 +48,7 @@ export async function getUserById(id: string): Promise<UserProfile | null> {
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from("yogmandu_users")
-    .select("id, email, full_name, phone, nationality, experience_level, bio, avatar_url, created_at")
+    .select("id, email, full_name, phone, nationality, experience_level, bio, avatar_url, email_verified, created_at")
     .eq("id", id)
     .single();
   if (error || !data) return null;
@@ -63,7 +64,7 @@ export async function updateUserProfile(
     .from("yogmandu_users")
     .update({ ...updates, updated_at: new Date().toISOString() })
     .eq("id", id)
-    .select("id, email, full_name, phone, nationality, experience_level, bio, avatar_url, created_at")
+    .select("id, email, full_name, phone, nationality, experience_level, bio, avatar_url, email_verified, created_at")
     .single();
   if (error || !data) return null;
   return data as UserProfile;
