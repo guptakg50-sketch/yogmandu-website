@@ -28,33 +28,35 @@ function Bowl({ onClick, isRinging }: { onClick: () => void; isRinging: boolean 
       <mesh ref={meshRef} position={[0, 0, 0]}>
         <cylinderGeometry args={[0.65, 0.45, 0.45, 64, 1, true]} />
         <meshStandardMaterial
-          color={isRinging ? "#c49a2a" : "#b8882a"}
-          metalness={0.8}
-          roughness={0.25}
+          color={isRinging ? "#f4c548" : "#e0a838"}
+          metalness={0.9}
+          roughness={0.18}
+          emissive="#553010"
+          emissiveIntensity={isRinging ? 0.35 : 0.15}
           side={THREE.DoubleSide}
         />
       </mesh>
       {/* Bowl bottom */}
       <mesh position={[0, -0.22, 0]}>
         <cylinderGeometry args={[0.45, 0.45, 0.02, 64]} />
-        <meshStandardMaterial color="#a07820" metalness={0.7} roughness={0.3} />
+        <meshStandardMaterial color="#c89030" metalness={0.85} roughness={0.22} />
       </mesh>
       {/* Rim ring */}
       <mesh ref={rimRef} position={[0, 0.22, 0]}>
         <torusGeometry args={[0.65, 0.03, 16, 64]} />
         <meshStandardMaterial
-          color={isRinging ? "#e8c040" : "#c8a030"}
-          metalness={0.9}
-          roughness={0.1}
-          emissive={isRinging ? "#c8a030" : "#000000"}
-          emissiveIntensity={isRinging ? 0.5 : 0}
+          color={isRinging ? "#ffd862" : "#f0c450"}
+          metalness={0.95}
+          roughness={0.08}
+          emissive={isRinging ? "#e0a838" : "#5a3a10"}
+          emissiveIntensity={isRinging ? 0.7 : 0.2}
         />
       </mesh>
       {/* Decorative bands */}
       {[-0.05, 0.05].map((y, i) => (
         <mesh key={i} position={[0, y, 0]}>
           <torusGeometry args={[0.58, 0.008, 8, 64]} />
-          <meshStandardMaterial color="#906818" metalness={0.6} roughness={0.4} />
+          <meshStandardMaterial color="#b88828" metalness={0.7} roughness={0.3} />
         </mesh>
       ))}
     </group>
@@ -121,10 +123,11 @@ export default function SingingBowl() {
         gl={{ antialias: true, alpha: true }}
         style={{ background: "transparent" }}
       >
-        <ambientLight intensity={0.6} />
-        <directionalLight position={[3, 5, 3]} intensity={1.2} color="#fff8e8" />
-        <directionalLight position={[-2, 2, -2]} intensity={0.4} color="#d4a8ff" />
-        <pointLight position={[0, 2, 0]} intensity={isRinging ? 1.5 : 0.3} color="#F7941D" distance={4} />
+        <ambientLight intensity={1.1} />
+        <directionalLight position={[3, 5, 3]} intensity={1.8} color="#fff8e8" />
+        <directionalLight position={[-2, 2, -2]} intensity={0.7} color="#e8c8ff" />
+        <pointLight position={[0, 2, 0]} intensity={isRinging ? 2 : 0.7} color="#F7941D" distance={5} />
+        <pointLight position={[0, -0.5, 1.5]} intensity={0.5} color="#fff0d0" distance={3} />
         <Bowl onClick={handleClick} isRinging={isRinging} />
         <RippleRing isRinging={isRinging} />
       </Canvas>
