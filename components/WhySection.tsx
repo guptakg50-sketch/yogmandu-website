@@ -342,7 +342,7 @@ export default function WhySection() {
 
         {/* Stats */}
         <div style={{
-          display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1.5rem",
+          display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "1.5rem",
           maxWidth: 680, margin: "0 auto 4.5rem",
         }}>
           {stats.map((s, i) => <StatOrb key={s.value} s={s} i={i} />)}

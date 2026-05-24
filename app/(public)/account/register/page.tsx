@@ -187,7 +187,7 @@ export default function AccountRegisterPage() {
             </div>
 
             {/* Phone + Nationality row */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 16 }}>
               <div>
                 <label style={labelStyle}>Phone</label>
                 <input

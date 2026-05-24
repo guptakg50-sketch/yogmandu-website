@@ -253,7 +253,7 @@ export default function AboutContent() {
 
       {/* ── STORY ── */}
       <section style={{ background: "#FAF6F0", padding: "5rem 1.5rem" }}>
-        <div style={{ maxWidth: 1000, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "center" }}>
+        <div style={{ maxWidth: 1000, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: "4rem", alignItems: "center" }}>
           <div>
             <p style={{ fontSize: "0.72rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "#8DC63F", marginBottom: 16 }}>Our Mission</p>
             <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "2.8rem", fontWeight: 300, color: "#2A1208", lineHeight: 1.15, marginBottom: 24 }}>

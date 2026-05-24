@@ -453,7 +453,7 @@ function Step2({
             We'll confirm your booking within 24 hours.
           </p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 16 }}>
             <div style={{ gridColumn: "1 / -1" }}>
               <label style={labelStyle}>Full Name *</label>
               <input

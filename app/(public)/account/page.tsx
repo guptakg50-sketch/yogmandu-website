@@ -312,7 +312,7 @@ export default function AccountDashboardPage() {
 
             {editing ? (
               <form onSubmit={handleProfileSave}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 16, marginBottom: 16 }}>
                   <div style={{ gridColumn: "1 / -1" }}>
                     <label style={labelStyle}>Full name *</label>
                     <input type="text" value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} required minLength={2} style={inputStyle} />
