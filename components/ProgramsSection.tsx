@@ -266,51 +266,49 @@ export default function ProgramsSection() {
         </div>
 
         {/* Navigation */}
-        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:12, marginTop:20, padding:"0 1.5rem" }}>
-          {/* Prev / Next arrows */}
-          <div style={{ display:"flex", alignItems:"center", gap:16 }}>
-            <button
-              onClick={prev} disabled={active === 0}
-              aria-label="Previous program"
-              style={{ width:44, height:44, borderRadius:"50%", border:"1.5px solid rgba(107,45,139,0.25)",
-                background:"rgba(255,255,255,0.8)", display:"flex", alignItems:"center", justifyContent:"center",
-                cursor:active===0?"not-allowed":"pointer", opacity:active===0?0.35:1,
-                backdropFilter:"blur(8px)", transition:"all 0.25s",
-                boxShadow:"0 4px 16px rgba(107,45,139,0.12)" }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B2D8B" strokeWidth="2" strokeLinecap="round">
-                <path d="M15 18l-6-6 6-6"/>
-              </svg>
-            </button>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:12, marginTop:14, padding:"0 1.5rem" }}>
+          {/* Prev arrow */}
+          <button
+            onClick={prev} disabled={active === 0}
+            aria-label="Previous program"
+            style={{ width:32, height:32, borderRadius:"50%", border:"1px solid rgba(107,45,139,0.2)",
+              background:"rgba(255,255,255,0.75)", display:"flex", alignItems:"center", justifyContent:"center",
+              cursor:active===0?"not-allowed":"pointer", opacity:active===0?0.3:1,
+              backdropFilter:"blur(6px)", transition:"all 0.2s", flexShrink:0 }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B2D8B" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+          </button>
 
-            {/* Dot indicators */}
-            <div style={{ display:"flex", gap:8 }}>
-              {CARDS.map((_, i) => (
-                <button key={i} onClick={() => setActive(i)}
-                  style={{ width:i===active?28:8, height:8, borderRadius:999, border:"none",
-                    background:i===active?"#F7941D":"rgba(107,45,139,0.2)",
-                    cursor:"pointer", transition:"all 0.35s ease", padding:0 }}
-                />
-              ))}
-            </div>
-
-            <button
-              onClick={next} disabled={active === CARDS.length - 1}
-              aria-label="Next program"
-              style={{ width:44, height:44, borderRadius:"50%", border:"1.5px solid rgba(107,45,139,0.25)",
-                background:"rgba(255,255,255,0.8)", display:"flex", alignItems:"center", justifyContent:"center",
-                cursor:active===CARDS.length-1?"not-allowed":"pointer", opacity:active===CARDS.length-1?0.35:1,
-                backdropFilter:"blur(8px)", transition:"all 0.25s",
-                boxShadow:"0 4px 16px rgba(107,45,139,0.12)" }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B2D8B" strokeWidth="2" strokeLinecap="round">
-                <path d="M9 18l6-6-6-6"/>
-              </svg>
-            </button>
+          {/* Dot indicators */}
+          <div style={{ display:"flex", gap:6, alignItems:"center" }}>
+            {CARDS.map((_, i) => (
+              <button key={i} onClick={() => setActive(i)}
+                style={{ width:i===active?22:6, height:6, borderRadius:999, border:"none",
+                  background:i===active?"#F7941D":"rgba(107,45,139,0.18)",
+                  cursor:"pointer", transition:"all 0.3s ease", padding:0 }}
+              />
+            ))}
           </div>
 
-          {/* Card counter */}
-          <p style={{ fontSize:"0.72rem", letterSpacing:"0.16em", color:"rgba(42,18,8,0.25)", textTransform:"uppercase", margin:0 }}>
-            {active+1} / {CARDS.length} · use ← → keys
-          </p>
+          {/* Next arrow */}
+          <button
+            onClick={next} disabled={active === CARDS.length - 1}
+            aria-label="Next program"
+            style={{ width:32, height:32, borderRadius:"50%", border:"1px solid rgba(107,45,139,0.2)",
+              background:"rgba(255,255,255,0.75)", display:"flex", alignItems:"center", justifyContent:"center",
+              cursor:active===CARDS.length-1?"not-allowed":"pointer", opacity:active===CARDS.length-1?0.3:1,
+              backdropFilter:"blur(6px)", transition:"all 0.2s", flexShrink:0 }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B2D8B" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </button>
+
+          {/* Counter */}
+          <span style={{ fontSize:"0.65rem", letterSpacing:"0.14em", color:"rgba(42,18,8,0.22)",
+            textTransform:"uppercase", marginLeft:6, whiteSpace:"nowrap" }}>
+            {active+1} / {CARDS.length} · ← → keys
+          </span>
         </div>
       </div>
     </section>
