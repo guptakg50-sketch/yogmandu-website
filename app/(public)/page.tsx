@@ -244,6 +244,7 @@ export default function HomePage() {
           ].map(item => (
             <div
               key={item.href}
+              className="service-card"
               style={{
                 padding: "2rem",
                 borderRadius: "1.25rem",
@@ -251,6 +252,9 @@ export default function HomePage() {
                 background: `${item.accent}06`,
                 position: "relative",
                 overflow: "hidden",
+                // CSS vars for hover state
+                ["--card-accent" as string]: `${item.accent}55`,
+                ["--card-bg-hover" as string]: `${item.accent}0e`,
               }}
             >
               <div style={{
@@ -270,13 +274,14 @@ export default function HomePage() {
               </p>
               <Link
                 href={item.href}
-                className="cta-lift"
+                className="service-card-cta"
                 style={{
                   display: "inline-flex", alignItems: "center", gap: 6,
                   fontSize: "0.88rem", fontWeight: 500,
                   color: item.textAccent, textDecoration: "none",
                   borderBottom: `1px solid ${item.accent}40`,
                   paddingBottom: "2px",
+                  transition: "gap 0.3s ease",
                 }}
               >
                 {item.cta}
