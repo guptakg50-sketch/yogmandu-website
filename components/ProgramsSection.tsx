@@ -167,7 +167,7 @@ export default function ProgramsSection() {
       </div>
       {/* vignette */}
       <div style={{ position:"absolute", inset:0, zIndex:1, pointerEvents:"none",
-        background:"radial-gradient(ellipse 60% 70% at 50% 50%, rgba(249,245,255,0.1) 0%, rgba(249,245,255,0.82) 100%)" }} />
+        background:"radial-gradient(ellipse 55% 65% at 50% 50%, rgba(249,245,255,0.05) 0%, rgba(249,245,255,0.92) 100%)" }} />
 
       {/* Content */}
       <div style={{ position:"relative", zIndex:2 }}>
@@ -199,7 +199,7 @@ export default function ProgramsSection() {
               <div style={{
                 borderRadius:"1.75rem",
                 overflow:"hidden",
-                background:"rgba(255,255,255,0.9)",
+                background:"#FFFFFF",
                 backdropFilter:"blur(16px)",
                 border:`1.5px solid ${card.accent}30`,
                 boxShadow:`0 24px 64px ${card.shadow}, 0 0 0 1px ${card.accent}18`,
