@@ -1803,6 +1803,189 @@ function AdminLogin({ onAuthenticated, passwordConfigured }) {
   );
 }
 
+// ── Bookings Manager ──────────────────────────────────────────────────────────
+const STATUS_COLORS = {
+  pending:   { bg: "rgba(247,148,29,0.1)",  text: "#B86010", border: "rgba(247,148,29,0.35)" },
+  confirmed: { bg: "rgba(141,198,63,0.1)",  text: "#5A7A20", border: "rgba(141,198,63,0.35)" },
+  cancelled: { bg: "rgba(204,51,51,0.08)",  text: "#CC3333", border: "rgba(204,51,51,0.25)" },
+};
+
+function BookingsManager({ toast }) {
+  const [bookings, setBookings] = React.useState([]);
+  const [loading,  setLoading]  = React.useState(true);
+  const [filter,   setFilter]   = React.useState("all"); // all | pending | confirmed | cancelled
+  const [search,   setSearch]   = React.useState("");
+
+  const load = React.useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/bookings");
+      const json = await res.json();
+      if (json.data) setBookings(json.data);
+    } catch { /* silently degrade */ }
+    finally { setLoading(false); }
+  }, []);
+
+  React.useEffect(() => { load(); }, [load]);
+
+  async function updateStatus(id, status) {
+    await fetch("/api/admin/bookings", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, status }),
+    });
+    setBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b));
+    toast(`Booking ${status}`);
+  }
+
+  async function deleteBooking(id) {
+    if (!confirm("Delete this booking permanently?")) return;
+    await fetch(`/api/admin/bookings?id=${id}`, { method: "DELETE" });
+    setBookings(prev => prev.filter(b => b.id !== id));
+    toast("Booking deleted");
+  }
+
+  const filtered = bookings.filter(b => {
+    if (filter !== "all" && b.status !== filter) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      return b.name?.toLowerCase().includes(q) ||
+             b.email?.toLowerCase().includes(q) ||
+             b.service_title?.toLowerCase().includes(q);
+    }
+    return true;
+  });
+
+  const counts = {
+    all:       bookings.length,
+    pending:   bookings.filter(b => b.status === "pending").length,
+    confirmed: bookings.filter(b => b.status === "confirmed").length,
+    cancelled: bookings.filter(b => b.status === "cancelled").length,
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Stats row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: "Total",     count: counts.all,       color: "#6B2D8B" },
+          { label: "Pending",   count: counts.pending,   color: "#F7941D" },
+          { label: "Confirmed", count: counts.confirmed, color: "#8DC63F" },
+          { label: "Cancelled", count: counts.cancelled, color: "#CC3333" },
+        ].map(s => (
+          <div key={s.label} className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+            <p className="text-xs font-medium uppercase tracking-wide text-stone-400">{s.label}</p>
+            <p className="mt-1 text-3xl font-semibold" style={{ color: s.color }}>{s.count}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" size={15} />
+          <input
+            value={search} onChange={e => setSearch(e.target.value)}
+            placeholder="Search name, email, service…"
+            className="w-full rounded-lg border border-stone-200 bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-violet-400"
+          />
+        </div>
+        <div className="flex gap-2">
+          {["all","pending","confirmed","cancelled"].map(f => (
+            <button key={f} onClick={() => setFilter(f)}
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold capitalize transition ${filter === f ? "bg-violet-700 text-white" : "border border-stone-200 bg-white text-stone-500 hover:bg-stone-50"}`}>
+              {f} {f === "all" ? `(${counts.all})` : ""}
+            </button>
+          ))}
+        </div>
+        <Button variant="secondary" onClick={load}><RefreshCw size={15} /> Refresh</Button>
+      </div>
+
+      {/* Table */}
+      <div className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
+        {loading ? (
+          <div className="py-16 text-center text-stone-400 text-sm">Loading bookings…</div>
+        ) : filtered.length === 0 ? (
+          <div className="py-16 text-center text-stone-400 text-sm">No bookings found.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-stone-100 bg-stone-50 text-xs font-semibold uppercase tracking-wide text-stone-400">
+                <tr>
+                  <th className="px-4 py-3">Name</th>
+                  <th className="px-4 py-3">Service</th>
+                  <th className="px-4 py-3">Date</th>
+                  <th className="px-4 py-3">Received</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-stone-50">
+                {filtered.map(b => {
+                  const sc = STATUS_COLORS[b.status] || STATUS_COLORS.pending;
+                  return (
+                    <tr key={b.id} className="hover:bg-stone-50 transition">
+                      <td className="px-4 py-3">
+                        <p className="font-medium text-stone-900">{b.name}</p>
+                        <a href={`mailto:${b.email}`} className="text-xs text-violet-600 hover:underline">{b.email}</a>
+                        {b.phone && <p className="text-xs text-stone-400">{b.phone}</p>}
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="text-stone-700 max-w-[200px]">{b.service_title}</p>
+                      </td>
+                      <td className="px-4 py-3 text-stone-500 text-xs whitespace-nowrap">
+                        {b.preferred_date
+                          ? new Date(b.preferred_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3 text-stone-400 text-xs whitespace-nowrap">
+                        {new Date(b.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize"
+                          style={{ background: sc.bg, color: sc.text, border: `1px solid ${sc.border}` }}>
+                          {b.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          {b.status !== "confirmed" && (
+                            <button onClick={() => updateStatus(b.id, "confirmed")}
+                              className="rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition">
+                              Confirm
+                            </button>
+                          )}
+                          {b.status !== "cancelled" && (
+                            <button onClick={() => updateStatus(b.id, "cancelled")}
+                              className="rounded-lg bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-600 hover:bg-red-100 transition">
+                              Cancel
+                            </button>
+                          )}
+                          {b.status === "pending" && (
+                            <a href={`mailto:${b.email}`}
+                              className="rounded-lg bg-violet-50 px-2.5 py-1 text-xs font-semibold text-violet-700 hover:bg-violet-100 transition">
+                              Reply
+                            </a>
+                          )}
+                          <button onClick={() => deleteBooking(b.id)}
+                            className="rounded-lg p-1 text-stone-300 hover:bg-red-50 hover:text-red-500 transition">
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+    </div>
+  );
+}
+
 function AdminWorkspace({ onLogout }) {
   const [state, setState, ready] = usePersistentAdminState();
   const [active, setActive] = useState("dashboard");
@@ -1878,6 +2061,7 @@ function AdminWorkspace({ onLogout }) {
 
   const nav = [
     ["dashboard",   "Dashboard",    LayoutDashboard],
+    ["bookings",    "Bookings",     FileText],
     ["siteLayout",  "Site Layout",  Globe2],
     ["seo",         "SEO Manager",  ShieldCheck],
     ["blog",        "Blog Manager", BookOpen],
@@ -1911,6 +2095,7 @@ function AdminWorkspace({ onLogout }) {
         </header>
         <main className="mx-auto max-w-7xl p-4 md:p-6">
           {active === "dashboard"  && <Dashboard data={state} setActive={setActive} toast={notify} />}
+          {active === "bookings"   && <BookingsManager toast={notify} />}
           {active === "siteLayout" && <SiteLayoutManager toast={notify} />}
           {active === "seo"        && <SeoManager pages={state.seoPages} setPages={setPart("seoPages")} toast={notify} />}
           {active === "blog" && <BlogManager blogs={state.blogs} setBlogs={setPart("blogs")} media={state.media} setMedia={setPart("media")} toast={notify} />}

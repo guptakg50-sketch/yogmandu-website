@@ -305,13 +305,13 @@ function Step1({
 
 // ── Step 2 — Details form ─────────────────────────────────────────────────────
 function Step2({
-  services, onBack, onSuccess,
-}: { services: BookingService[]; onBack: () => void; onSuccess: () => void }) {
+  services, onBack, onSuccess, prefillMessage = "",
+}: { services: BookingService[]; onBack: () => void; onSuccess: () => void; prefillMessage?: string }) {
   const service = services[0]; // primary accent colour comes from first selection
   const cardRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
 
-  const [form, setForm] = useState({ name: "", email: "", phone: "", preferredDate: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", preferredDate: "", message: prefillMessage });
   const [error,   setError]   = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -628,20 +628,33 @@ function Step3({ services }: { services: BookingService[] }) {
   );
 }
 
+// ── Parse ?cls= param (format: "Monday|06:30|Morning Hatha Flow|Arjun Rakhal Magar") ──
+function parseClassParam(cls: string | null): { day: string; time: string; name: string; instructor: string } | null {
+  if (!cls) return null;
+  const parts = cls.split("|");
+  if (parts.length < 3) return null;
+  return { day: parts[0], time: parts[1], name: parts[2], instructor: parts[3] ?? "" };
+}
+
 // ── Inner content (uses useSearchParams — must be inside Suspense) ─────────────
 function BookPageInner() {
   const searchParams  = useSearchParams();
   const preServiceId  = searchParams.get("service");
+  const clsParam      = searchParams.get("cls");
+  const parsedClass   = parseClassParam(clsParam);
 
   const [step,     setStep]     = useState<1 | 2 | 3>(1);
   const [selected, setSelected] = useState<BookingService[]>([]);
 
-  // Pre-select service from URL param
+  // Pre-select service; if a specific class is given, jump straight to step 2
   useEffect(() => {
     if (!preServiceId) return;
     const found = SERVICES.find(s => s.id === preServiceId);
-    if (found) setSelected([found]);
-  }, [preServiceId]);
+    if (!found) return;
+    setSelected([found]);
+    if (parsedClass) setStep(2); // skip service picker when coming from a class card
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preServiceId, clsParam]);
 
   function handleSelect(s: BookingService) {
     setSelected(prev =>
@@ -656,12 +669,39 @@ function BookPageInner() {
     <>
       <StepDots step={step} />
 
+      {/* Class context banner (shown when coming from schedule page) */}
+      {parsedClass && step !== 3 && (
+        <div style={{
+          maxWidth: 640, margin: "0 auto 24px",
+          padding: "12px 20px", borderRadius: 14,
+          background: "linear-gradient(135deg, rgba(107,45,139,0.08), rgba(247,148,29,0.06))",
+          border: "1.5px solid rgba(107,45,139,0.18)",
+          display: "flex", alignItems: "center", gap: 14,
+        }}>
+          <span style={{ fontSize: "1.5rem" }}>🗓</span>
+          <div>
+            <p style={{ margin: 0, fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em",
+              textTransform: "uppercase", color: "#6B2D8B" }}>Selected Class</p>
+            <p style={{ margin: 0, fontSize: "0.92rem", fontWeight: 600, color: "#2A1208" }}>
+              {parsedClass.name}
+            </p>
+            <p style={{ margin: 0, fontSize: "0.78rem", color: "#7A5840" }}>
+              {parsedClass.day} · {parsedClass.time}{parsedClass.instructor ? ` · ${parsedClass.instructor}` : ""}
+            </p>
+          </div>
+        </div>
+      )}
+
       <div style={{ maxWidth: step === 1 ? 900 : 640, margin: "0 auto", transition: "max-width 0.4s ease" }}>
         {step === 1 && (
           <Step1 selected={selected} onSelect={handleSelect} onNext={handleNext} />
         )}
         {step === 2 && selected.length > 0 && (
-          <Step2 services={selected} onBack={handleBack} onSuccess={handleSuccess} />
+          <Step2 services={selected} onBack={handleBack} onSuccess={handleSuccess} prefillMessage={
+            parsedClass
+              ? `I'd like to book: ${parsedClass.name} on ${parsedClass.day} at ${parsedClass.time}${parsedClass.instructor ? ` with ${parsedClass.instructor}` : ""}.`
+              : ""
+          } />
         )}
         {step === 3 && selected.length > 0 && (
           <Step3 services={selected} />

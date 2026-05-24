@@ -84,7 +84,7 @@ export default async function ClassSchedulePage() {
         <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.8)", maxWidth: 500, margin: "0 auto 28px", lineHeight: 1.7 }}>
           All classes are held at our Thamel studio in Kathmandu. Drop-ins welcome — no reservation required for most classes.
         </p>
-        <Link href="/contact" className="cta-lift" style={{
+        <Link href="/book?service=private" className="cta-lift" style={{
           display: "inline-block", padding: "0.8rem 2rem", borderRadius: 999,
           background: "#F7941D", color: "#fff", fontSize: "0.9rem", fontWeight: 500,
           boxShadow: "0 6px 20px rgba(247,148,29,0.4)", textDecoration: "none" }}>

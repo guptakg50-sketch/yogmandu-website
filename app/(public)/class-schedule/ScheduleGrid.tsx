@@ -85,50 +85,83 @@ const levelColor = (level: string) => {
   return                               { bg: "rgba(107,45,139,0.08)", text: "#6B2D8B",  border: "rgba(107,45,139,0.2)" };
 };
 
-function ScheduleCard({ cls }: { cls: { time: string; name: string; level: string; duration: string; instructor: string; accent: string } }) {
+function ScheduleCard({ cls, day }: {
+  cls: { time: string; name: string; level: string; duration: string; instructor: string; accent: string };
+  day: string;
+}) {
   const lc = levelColor(cls.level);
+  // Encode class context for the booking page
+  const cls_param = encodeURIComponent(`${day}|${cls.time}|${cls.name}|${cls.instructor}`);
+  const bookHref = `/book?service=drop-in&cls=${cls_param}`;
+
   return (
-    <div
-      style={{
-        padding: "1.25rem 1.4rem",
-        borderRadius: "1rem",
-        border: `1.5px solid ${cls.accent}20`,
-        background: "#FFFFFF",
-        boxShadow: "0 2px 12px rgba(42,18,8,0.05)",
-        position: "relative",
-        overflow: "hidden",
-        transition: "transform 0.2s, box-shadow 0.2s",
-        cursor: "default",
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)";
-        (e.currentTarget as HTMLDivElement).style.boxShadow = `0 8px 28px ${cls.accent}22`;
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
-        (e.currentTarget as HTMLDivElement).style.boxShadow = "0 2px 12px rgba(42,18,8,0.05)";
-      }}
-    >
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3,
-        background: `linear-gradient(90deg, ${cls.accent}, ${cls.accent}44)` }} />
-      <div style={{ fontSize: "1.1rem", fontFamily: "Cormorant Garamond, serif",
-        fontWeight: 400, color: cls.accent, marginBottom: 6, marginTop: 4 }}>
-        {cls.time}
+    <Link href={bookHref} style={{ textDecoration: "none", display: "block" }}>
+      <div
+        style={{
+          padding: "1.25rem 1.4rem",
+          borderRadius: "1rem",
+          border: `1.5px solid ${cls.accent}20`,
+          background: "#FFFFFF",
+          boxShadow: "0 2px 12px rgba(42,18,8,0.05)",
+          position: "relative",
+          overflow: "hidden",
+          transition: "transform 0.2s, box-shadow 0.2s",
+          cursor: "pointer",
+          height: "100%",
+        }}
+        onMouseEnter={(e) => {
+          const el = e.currentTarget as HTMLDivElement;
+          el.style.transform = "translateY(-3px)";
+          el.style.boxShadow = `0 10px 32px ${cls.accent}33`;
+          el.style.borderColor = `${cls.accent}55`;
+        }}
+        onMouseLeave={(e) => {
+          const el = e.currentTarget as HTMLDivElement;
+          el.style.transform = "translateY(0)";
+          el.style.boxShadow = "0 2px 12px rgba(42,18,8,0.05)";
+          el.style.borderColor = `${cls.accent}20`;
+        }}
+      >
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3,
+          background: `linear-gradient(90deg, ${cls.accent}, ${cls.accent}44)` }} />
+        {/* Hover book hint */}
+        <div style={{
+          position: "absolute", top: 10, right: 10,
+          fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.08em",
+          color: cls.accent, opacity: 0,
+          transition: "opacity 0.2s ease",
+          textTransform: "uppercase",
+        }} className="card-book-hint">
+          Book →
+        </div>
+        <div style={{ fontSize: "1.1rem", fontFamily: "Cormorant Garamond, serif",
+          fontWeight: 400, color: cls.accent, marginBottom: 6, marginTop: 4 }}>
+          {cls.time}
+        </div>
+        <div style={{ fontSize: "1rem", fontWeight: 500, color: "#2A1208", marginBottom: 8, lineHeight: 1.3 }}>
+          {cls.name}
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+          <span style={{ fontSize: "0.72rem", fontWeight: 500, padding: "2px 10px", borderRadius: 999,
+            background: lc.bg, color: lc.text, border: `1px solid ${lc.border}` }}>
+            {cls.level}
+          </span>
+          <span style={{ fontSize: "0.72rem", color: "#7A5840", display: "flex", alignItems: "center", gap: 3 }}>
+            ⏱ {cls.duration}
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ fontSize: "0.78rem", color: "#7A5840" }}>👤 {cls.instructor}</div>
+          <span style={{
+            fontSize: "0.7rem", fontWeight: 600, color: "#fff",
+            background: cls.accent, padding: "3px 10px", borderRadius: 999,
+            letterSpacing: "0.05em",
+          }}>
+            Book
+          </span>
+        </div>
       </div>
-      <div style={{ fontSize: "1rem", fontWeight: 500, color: "#2A1208", marginBottom: 8, lineHeight: 1.3 }}>
-        {cls.name}
-      </div>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
-        <span style={{ fontSize: "0.72rem", fontWeight: 500, padding: "2px 10px", borderRadius: 999,
-          background: lc.bg, color: lc.text, border: `1px solid ${lc.border}` }}>
-          {cls.level}
-        </span>
-        <span style={{ fontSize: "0.72rem", color: "#7A5840", display: "flex", alignItems: "center", gap: 3 }}>
-          ⏱ {cls.duration}
-        </span>
-      </div>
-      <div style={{ fontSize: "0.78rem", color: "#7A5840" }}>👤 {cls.instructor}</div>
-    </div>
+    </Link>
   );
 }
 
@@ -159,7 +192,7 @@ export default function ScheduleGrid({ sessions, instructorMap }: Props) {
               </span>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "1rem" }}>
-              {classes.map((cls, i) => <ScheduleCard key={i} cls={cls} />)}
+              {classes.map((cls, i) => <ScheduleCard key={i} cls={cls} day={day} />)}
             </div>
           </div>
         );
@@ -180,7 +213,7 @@ export default function ScheduleGrid({ sessions, instructorMap }: Props) {
           Drop in any time — or get in touch to reserve your spot.
         </p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-          <Link href="/contact" className="cta-lift" style={{
+          <Link href="/book?service=drop-in" className="cta-lift" style={{
             padding: "0.8rem 2rem", borderRadius: 999, background: "#FFFFFF",
             color: "#F7941D", fontSize: "0.9rem", fontWeight: 600, textDecoration: "none" }}>
             Book Now

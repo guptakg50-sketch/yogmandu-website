@@ -54,14 +54,14 @@ export const metadata: Metadata = {
     title: "Yogmandu | Yoga Teacher Training & Sound Healing Nepal",
     description:
       "Yoga Alliance certified teacher training & authentic Tibetan Sound Healing in Kathmandu, Nepal. 3,000+ teachers from 50+ countries since 2015.",
-    images: [{ url: "/logo.png", width: 470, height: 330, alt: "Yogmandu — Yoga & Sound Healing Nepal" }],
+    // images intentionally omitted — app/opengraph-image.png file convention provides it
   },
   twitter: {
     card: "summary_large_image",
     title: "Yogmandu | Yoga Teacher Training & Sound Healing Nepal",
     description:
       "Yoga Alliance certified teacher training & authentic Tibetan Sound Healing in Kathmandu, Nepal.",
-    images: ["/logo.png"],
+    // images intentionally omitted — app/twitter-image.png file convention provides it
     creator: "@yogmandu",
   },
   robots: {
