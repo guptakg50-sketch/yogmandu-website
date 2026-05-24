@@ -133,10 +133,10 @@ export default function ProgramsSection() {
   const cardStyle = (i: number): React.CSSProperties => {
     const off    = i - active;
     const absOff = Math.abs(off);
-    const rotY   = Math.max(-42, Math.min(42, off * 30));
-    const tx     = off * 420; // 480→420: side cards closer to centre
-    const scale  = Math.max(0.68, 1 - absOff * 0.13);
-    const op     = Math.max(0, 1 - absOff * 0.38);
+    const rotY   = Math.max(-50, Math.min(50, off * 35));
+    const tx     = off * 480;
+    const scale  = Math.max(0.62, 1 - absOff * 0.14);
+    const op     = Math.max(0, 1 - absOff * 0.42);
     const zIdx   = 20 - Math.round(absOff * 5);
     return {
       position: "absolute",
@@ -181,15 +181,14 @@ export default function ProgramsSection() {
           <div style={{ width:48, height:2, background:"linear-gradient(90deg,#6B2D8B,#F7941D)", margin:"1rem auto 0" }} />
         </div>
 
-        {/* Carousel viewport — mask fades edges softly; overflow:hidden prevents
-            Three.js BgScene from bleeding into the card area */}
+        {/* Carousel viewport */}
         <div style={{
-          position:"relative", height:580,
-          perspective:"1600px",
+          position:"relative", height:560,
+          perspective:"1400px",
           perspectiveOrigin:"50% 40%",
           overflow:"hidden",
-          WebkitMaskImage:"linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)",
-          maskImage:"linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)",
+          WebkitMaskImage:"linear-gradient(to right, transparent 0%, black 14%, black 86%, transparent 100%)",
+          maskImage:"linear-gradient(to right, transparent 0%, black 14%, black 86%, transparent 100%)",
         }}>
           {CARDS.map((card, i) => (
             <div
@@ -267,7 +266,7 @@ export default function ProgramsSection() {
         </div>
 
         {/* Navigation */}
-        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:20, marginTop:32, padding:"0 1.5rem" }}>
+        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:12, marginTop:20, padding:"0 1.5rem" }}>
           {/* Prev / Next arrows */}
           <div style={{ display:"flex", alignItems:"center", gap:16 }}>
             <button
@@ -309,7 +308,7 @@ export default function ProgramsSection() {
           </div>
 
           {/* Card counter */}
-          <p style={{ fontSize:"0.85rem", letterSpacing:"0.18em", color:"rgba(42,18,8,0.3)", textTransform:"uppercase" }}>
+          <p style={{ fontSize:"0.72rem", letterSpacing:"0.16em", color:"rgba(42,18,8,0.25)", textTransform:"uppercase", margin:0 }}>
             {active+1} / {CARDS.length} · use ← → keys
           </p>
         </div>
