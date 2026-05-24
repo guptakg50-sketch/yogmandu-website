@@ -181,9 +181,9 @@ export default function ProgramsSection() {
           <div style={{ width:48, height:2, background:"linear-gradient(90deg,#6B2D8B,#F7941D)", margin:"1rem auto 0" }} />
         </div>
 
-        {/* Carousel viewport */}
+        {/* Carousel viewport — height bumped from 560→640 to fit 18px-base card content */}
         <div style={{
-          position:"relative", height:560,
+          position:"relative", height:640,
           perspective:"1400px",
           perspectiveOrigin:"50% 40%",
           overflow:"hidden",
