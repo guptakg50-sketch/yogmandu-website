@@ -42,6 +42,7 @@ const LEVELS = ["All Levels", "Beginner", "Intermediate", "Advanced"];
 const STATUSES = ["Draft", "Published", "Scheduled", "Archived"];
 const SESSION_STATUSES = ["Active", "Paused", "Full", "Cancelled", "Upcoming", "Archived"];
 const STYLES = ["Vinyasa", "Hatha", "Ashtanga", "Yin", "Restorative", "Pranayama", "Meditation", "Sound Healing"];
+const COLORS = ["#6B2D8B", "#F7941D", "#2A7A4F", "#1D7AF7", "#A65808"];
 
 function uid(prefix = "id") {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
