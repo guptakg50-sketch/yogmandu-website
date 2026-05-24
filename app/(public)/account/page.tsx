@@ -244,7 +244,7 @@ export default function AccountDashboardPage() {
               onClick={() => avatarInput.current?.click()}
             >
               {displayAvatar ? (
-                <img src={displayAvatar} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                <img src={displayAvatar} alt="Avatar" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               ) : (
                 user.full_name.charAt(0).toUpperCase()
               )}

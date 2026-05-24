@@ -23,6 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/yoga-teacher-training`,         lastModified: mtime("app/(public)/yoga-teacher-training/page.tsx"), changeFrequency: "monthly", priority: 0.95 },
     { url: `${base}/sound-healing-therapy`,         lastModified: mtime("app/(public)/sound-healing-therapy/page.tsx"), changeFrequency: "monthly", priority: 0.9 },
     { url: `${base}/class-schedule`,                lastModified: mtime("app/(public)/class-schedule/page.tsx"),        changeFrequency: "weekly",  priority: 0.85 },
+    { url: `${base}/services`,                      lastModified: mtime("app/(public)/services/page.tsx"),              changeFrequency: "monthly", priority: 0.85 },
     { url: `${base}/about`,                         lastModified: mtime("app/(public)/about/page.tsx"),                 changeFrequency: "monthly", priority: 0.8 },
     { url: `${base}/contact`,                       lastModified: mtime("app/(public)/contact/page.tsx"),               changeFrequency: "yearly",  priority: 0.75 },
     { url: `${base}/gallery`,                       lastModified: mtime("app/(public)/gallery/page.tsx"),               changeFrequency: "monthly", priority: 0.65 },

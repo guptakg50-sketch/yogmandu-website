@@ -234,6 +234,91 @@ export function sendContactNotify(opts: { name: string; email: string; program: 
   });
 }
 
+// ─── Booking emails ─────────────────────────────────────────────────────────
+
+export function sendBookingNotify(opts: {
+  name: string; email: string; phone: string; serviceTitle: string;
+  preferredDate: string; message: string;
+}) {
+  const dateStr = opts.preferredDate
+    ? new Date(opts.preferredDate).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
+    : "Not specified";
+  return send({
+    to: NOTIFY_EMAIL,
+    replyTo: opts.email,
+    subject: `New booking request · ${opts.serviceTitle} · ${opts.name}`,
+    html: wrap({
+      title: "New booking request",
+      preheader: `${opts.name} wants to book: ${opts.serviceTitle}`,
+      bodyHtml: `
+        <p style="margin:0 0 4px;color:#9A7860;font-size:13px;text-transform:uppercase;letter-spacing:0.1em">From</p>
+        <p style="margin:0 0 16px;font-size:15px"><strong>${escapeHtml(opts.name)}</strong><br />
+          <a href="mailto:${opts.email}" style="color:#6B2D8B">${escapeHtml(opts.email)}</a>
+          ${opts.phone ? `&nbsp;·&nbsp;<a href="tel:${escapeHtml(opts.phone)}" style="color:#6B2D8B">${escapeHtml(opts.phone)}</a>` : ""}
+        </p>
+
+        <p style="margin:0 0 4px;color:#9A7860;font-size:13px;text-transform:uppercase;letter-spacing:0.1em">Service</p>
+        <p style="margin:0 0 16px;font-size:15px;font-weight:600;color:#6B2D8B">${escapeHtml(opts.serviceTitle)}</p>
+
+        <p style="margin:0 0 4px;color:#9A7860;font-size:13px;text-transform:uppercase;letter-spacing:0.1em">Preferred Date</p>
+        <p style="margin:0 0 16px;font-size:15px">${escapeHtml(dateStr)}</p>
+
+        ${opts.message ? `
+        <p style="margin:0 0 4px;color:#9A7860;font-size:13px;text-transform:uppercase;letter-spacing:0.1em">Notes</p>
+        <div style="padding:14px 18px;background:#FAF6F0;border-left:3px solid #F7941D;border-radius:8px;font-size:14px;color:#2A1208;white-space:pre-wrap">${escapeHtml(opts.message)}</div>
+        ` : ""}
+      `,
+      ctaHref: `mailto:${opts.email}`,
+      ctaLabel: "Reply to this booking",
+    }),
+    text:
+      `New booking request\n\n` +
+      `From: ${opts.name} <${opts.email}>${opts.phone ? ` · ${opts.phone}` : ""}\n` +
+      `Service: ${opts.serviceTitle}\n` +
+      `Preferred date: ${dateStr}\n` +
+      (opts.message ? `\nNotes:\n${opts.message}\n` : ""),
+  });
+}
+
+export function sendBookingAck(opts: {
+  to: string; name: string; serviceTitle: string; preferredDate: string;
+}) {
+  const greeting = opts.name.split(" ")[0] || "there";
+  const dateStr = opts.preferredDate
+    ? new Date(opts.preferredDate).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
+    : "";
+  return send({
+    to: opts.to,
+    subject: `Booking request received — ${opts.serviceTitle} | Yogmandu`,
+    html: wrap({
+      title: "We've received your booking",
+      preheader: "Our team will confirm your session within 24 hours.",
+      bodyHtml: `
+        <p style="margin:0 0 16px">Namaste ${escapeHtml(greeting)},</p>
+        <p style="margin:0 0 16px">Thank you for booking with Yogmandu. We've received your request and our team will confirm your session within 24 hours.</p>
+
+        <div style="margin:20px 0;padding:18px 20px;background:#FAF6F0;border-radius:12px;border:1px solid rgba(107,45,139,0.12)">
+          <p style="margin:0 0 6px;font-size:12px;color:#9A7860;text-transform:uppercase;letter-spacing:0.1em">Booking Summary</p>
+          <p style="margin:0 0 4px;font-size:16px;font-weight:600;color:#6B2D8B">${escapeHtml(opts.serviceTitle)}</p>
+          ${dateStr ? `<p style="margin:0;font-size:13px;color:#4A2E1A">${escapeHtml(dateStr)}</p>` : ""}
+        </div>
+
+        <p style="margin:0 0 16px">Need to confirm sooner or have a question? Reach us directly on <a href="https://wa.me/9779862909469" style="color:#6B2D8B">WhatsApp</a>.</p>
+        <p style="margin:0">We look forward to practising with you. 🙏</p>
+      `,
+      ctaHref: "https://wa.me/9779862909469",
+      ctaLabel: "Chat on WhatsApp",
+    }),
+    text:
+      `Namaste ${greeting},\n\n` +
+      `We've received your booking request for: ${opts.serviceTitle}\n` +
+      (dateStr ? `Preferred date: ${dateStr}\n` : "") +
+      `\nOur team will confirm within 24 hours.\n\n` +
+      `Faster response: https://wa.me/9779862909469\n\n` +
+      `— Yogmandu, Kathmandu, Nepal`,
+  });
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")

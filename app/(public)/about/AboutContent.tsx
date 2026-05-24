@@ -75,19 +75,45 @@ function AnimatedStat({ value, suffix, label, color, delay = 0 }: { value: numbe
   }, [visible, value, delay]);
 
   return (
-    <div ref={ref} style={{
-      padding: "1.5rem", borderRadius: "1.25rem",
-      background: `${color}0a`, border: `1px solid ${color}20`,
-      textAlign: "center",
-      opacity: visible ? 1 : 0,
-      transform: visible ? "translateY(0)" : "translateY(24px)",
-      transition: "opacity 0.6s ease, transform 0.6s ease",
-      transitionDelay: `${delay}ms`,
-    }}>
-      <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "2.8rem", fontWeight: 300, color, lineHeight: 1 }}>
+    <div ref={ref}
+      className="stat-3d"
+      style={{
+        padding: "1.75rem 1.25rem", borderRadius: "1.25rem",
+        background: `linear-gradient(160deg, ${color}10 0%, ${color}03 100%)`,
+        border: `1.5px solid ${color}33`,
+        textAlign: "center",
+        position: "relative",
+        overflow: "hidden",
+        boxShadow: `0 6px 22px ${color}10`,
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(24px)",
+        transitionDelay: `${delay}ms`,
+      }}>
+      {/* Corner orb */}
+      <div style={{
+        position: "absolute", top: -20, right: -20, width: 80, height: 80, borderRadius: "50%",
+        background: `radial-gradient(circle, ${color}22 0%, transparent 70%)`,
+        pointerEvents: "none",
+      }} />
+      <div style={{
+        position: "absolute", bottom: -30, left: -30, width: 100, height: 100, borderRadius: "50%",
+        background: `radial-gradient(circle, ${color}14 0%, transparent 70%)`,
+        pointerEvents: "none",
+      }} />
+      <div className="stat-num" style={{
+        fontFamily: "Cormorant Garamond, serif", fontSize: "2.8rem", fontWeight: 300,
+        color, lineHeight: 1, position: "relative",
+      }}>
         {count}{suffix}
       </div>
-      <div style={{ fontSize: "0.72rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "#7A5840", marginTop: 8 }}>{label}</div>
+      <div style={{
+        fontSize: "0.72rem", letterSpacing: "0.18em", textTransform: "uppercase",
+        color: "#7A5840", marginTop: 10, position: "relative", fontWeight: 500,
+      }}>{label}</div>
+      <div style={{
+        height: 2, width: 32, background: `linear-gradient(90deg, transparent, ${color}, transparent)`,
+        margin: "10px auto 0", position: "relative",
+      }} />
     </div>
   );
 }
@@ -350,18 +376,40 @@ export default function AboutContent() {
               "Virtual Live Yoga Classes", "Private & Corporate Yoga", "Children's Yoga",
               "Senior Citizen Yoga", "49-Day Weight Loss Bootcamp", "Diet & Nutrition Consultation",
               "Yoga Retreats & Trekking", "Reiki Healing",
-            ].map((s, i) => (
-              <div key={s} style={{
-                padding: "0.7rem 1rem", borderRadius: "0.65rem",
-                border: "1px solid rgba(107,45,139,0.1)",
-                background: i % 3 === 0 ? "rgba(247,148,29,0.04)" : i % 3 === 1 ? "rgba(107,45,139,0.04)" : "rgba(141,198,63,0.04)",
-                fontSize: "0.83rem", color: "#4A2E1A",
-                display: "flex", alignItems: "center", gap: 8,
-              }}>
-                <span style={{ width: 5, height: 5, borderRadius: "50%", background: i % 3 === 0 ? "#F7941D" : i % 3 === 1 ? "#6B2D8B" : "#8DC63F", flexShrink: 0 }} />
-                {s}
-              </div>
-            ))}
+            ].map((s, i) => {
+              const accent = i % 3 === 0 ? "#F7941D" : i % 3 === 1 ? "#6B2D8B" : "#8DC63F";
+              return (
+                <div key={s}
+                  className="pill-3d"
+                  style={{
+                    padding: "0.8rem 1.1rem", borderRadius: "0.85rem",
+                    border: `1.5px solid ${accent}28`,
+                    background: `linear-gradient(135deg, ${accent}12 0%, ${accent}04 100%)`,
+                    fontSize: "0.83rem", color: "#2A1208",
+                    display: "flex", alignItems: "center", gap: 10,
+                    cursor: "default",
+                    position: "relative", overflow: "hidden",
+                    fontWeight: 500,
+                  }}
+                  onMouseEnter={(e) => {
+                    const el = e.currentTarget;
+                    el.style.background = `linear-gradient(135deg, ${accent}28 0%, ${accent}10 100%)`;
+                    el.style.borderColor = `${accent}66`;
+                  }}
+                  onMouseLeave={(e) => {
+                    const el = e.currentTarget;
+                    el.style.background = `linear-gradient(135deg, ${accent}12 0%, ${accent}04 100%)`;
+                    el.style.borderColor = `${accent}28`;
+                  }}
+                >
+                  <span style={{
+                    width: 8, height: 8, borderRadius: "50%", background: accent,
+                    flexShrink: 0, boxShadow: `0 0 8px ${accent}80`,
+                  }} />
+                  {s}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

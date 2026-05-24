@@ -33,7 +33,7 @@ const DEFAULT_CONFIG = {
     { icon: "📍", text: "Miteri Marg, Mid-Baneshwor-31, Kathmandu, Nepal" },
     { icon: "📞", text: "+977-9862909469 / +977-9810263277" },
     { icon: "✉️", text: "info@yogmandu.com" },
-    { icon: "🕐", text: "Mon–Sun · 6:00–20:00" },
+    { icon: "🕐", text: "Sun–Fri · 5:30–18:30" },
   ],
   youtubeUrl:   "https://www.youtube.com/@yogmandu",
   instagramUrl: "https://instagram.com/yogmandu",
@@ -117,9 +117,9 @@ export default function Footer() {
         {/* Brand */}
         <div style={{ gridColumn: "span 2" }}>
           <div style={{ marginBottom: 16 }}>
-            <img src="/logo.png" alt="Yogmandu" style={{ height: 56, width: "auto", objectFit: "contain" }} />
+            <img src="/logo.png" alt="Yogmandu" width={140} height={56} loading="lazy" decoding="async" style={{ height: 56, width: "auto", objectFit: "contain" }} />
           </div>
-          <p style={{ fontSize: "0.85rem", lineHeight: 1.8, color: "#5C3D2E", maxWidth: 260, fontWeight: 400, marginBottom: 24 }}>
+          <p style={{ fontSize: "0.92rem", lineHeight: 1.75, color: "#5C3D2E", maxWidth: 280, fontWeight: 400, marginBottom: 24 }}>
             {cfg.description}
           </p>
           <NewsletterSignup />
@@ -156,7 +156,7 @@ export default function Footer() {
           <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 13 }}>
             {cfg.programs.map(l => (
               <li key={l.label}>
-                <Link href={l.href} style={{ fontSize: "0.85rem", fontWeight: 400, color: "#5C3D2E",
+                <Link href={l.href} style={{ fontSize: "0.92rem", fontWeight: 400, color: "#5C3D2E",
                   textDecoration: "none", display: "flex", alignItems: "center", gap: 8, transition: "color 0.2s" }}
                   onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = "#F7941D")}
                   onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = "#5C3D2E")}>
@@ -175,7 +175,7 @@ export default function Footer() {
           <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 13 }}>
             {cfg.company.map(l => (
               <li key={l.label}>
-                <Link href={l.href} style={{ fontSize: "0.85rem", fontWeight: 400, color: "#5C3D2E",
+                <Link href={l.href} style={{ fontSize: "0.92rem", fontWeight: 400, color: "#5C3D2E",
                   textDecoration: "none", display: "flex", alignItems: "center", gap: 8, transition: "color 0.2s" }}
                   onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = "#8DC63F")}
                   onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = "#5C3D2E")}>
@@ -184,6 +184,27 @@ export default function Footer() {
                 </Link>
               </li>
             ))}
+            <li>
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof window !== "undefined") {
+                    localStorage.removeItem("yogmandu_consent_v1");
+                    window.yogmanduOpenConsent?.();
+                  }
+                }}
+                style={{
+                  background: "transparent", border: "none", padding: 0, cursor: "pointer",
+                  fontFamily: "inherit", fontSize: "0.92rem", fontWeight: 400, color: "#5C3D2E",
+                  display: "flex", alignItems: "center", gap: 8, transition: "color 0.2s",
+                }}
+                onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = "#8DC63F")}
+                onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color = "#5C3D2E")}
+              >
+                <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#8DC63F", opacity: 0.7, flexShrink: 0 }} />
+                Cookie preferences
+              </button>
+            </li>
           </ul>
         </div>
 
@@ -194,8 +215,8 @@ export default function Footer() {
           <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 14 }}>
             {cfg.contact.map(c => (
               <li key={c.text} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                <span style={{ fontSize: "0.85rem" }}>{c.icon}</span>
-                <span style={{ fontSize: "0.83rem", fontWeight: 400, color: "#5C3D2E", lineHeight: 1.55 }}>{c.text}</span>
+                <span style={{ fontSize: "0.95rem" }}>{c.icon}</span>
+                <span style={{ fontSize: "0.9rem", fontWeight: 400, color: "#5C3D2E", lineHeight: 1.6 }}>{c.text}</span>
               </li>
             ))}
           </ul>
@@ -206,12 +227,12 @@ export default function Footer() {
       <div style={{ borderTop: "1px solid rgba(42,18,8,0.08)", padding: "1.2rem 2rem" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", flexWrap: "wrap",
           justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-          <p style={{ fontSize: "0.72rem", color: "#9A7860", fontWeight: 400, margin: 0 }}>
+          <p style={{ fontSize: "0.8rem", color: "#9A7860", fontWeight: 400, margin: 0 }}>
             © {new Date().getFullYear()} Yogmandu. All rights reserved.
           </p>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#8DC63F", opacity: 0.8 }} />
-            <span style={{ fontSize: "0.72rem", color: "#8DC63F", fontWeight: 400, letterSpacing: "0.08em" }}>
+            <span style={{ fontSize: "0.78rem", color: "#8DC63F", fontWeight: 400, letterSpacing: "0.08em" }}>
               {cfg.badge}
             </span>
           </div>

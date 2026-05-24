@@ -23,6 +23,34 @@ const FALLBACK_POSTS = [
   { slug: "sound-healing-trauma", category: "Sound Healing", title: "Sound Healing and Trauma: What to Know Before Your First Session", excerpt: "Sound baths can move deep material. What you should tell your practitioner before you begin.", readTime: "9 min", date: "November 2024", color: "#8DC63F", author: "Arjun Neupane", body: "" },
 ];
 
+// Render a single block of inline text with markdown links and bold/italic.
+function renderInline(text: string, keyPrefix: string): React.ReactNode[] {
+  const nodes: React.ReactNode[] = [];
+  const pattern = /\[([^\]]+)\]\(([^)\s]+)\)|\*\*([^*]+)\*\*|_([^_]+)_/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  let i = 0;
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > lastIndex) nodes.push(text.slice(lastIndex, match.index));
+    if (match[1] && match[2]) {
+      nodes.push(
+        <a key={`${keyPrefix}-${i++}`} href={match[2]} target={match[2].startsWith("http") ? "_blank" : undefined}
+          rel={match[2].startsWith("http") ? "noopener noreferrer" : undefined}
+          style={{ color: "#6B2D8B", textDecoration: "underline" }}>
+          {match[1]}
+        </a>,
+      );
+    } else if (match[3]) {
+      nodes.push(<strong key={`${keyPrefix}-${i++}`}>{match[3]}</strong>);
+    } else if (match[4]) {
+      nodes.push(<em key={`${keyPrefix}-${i++}`}>{match[4]}</em>);
+    }
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) nodes.push(text.slice(lastIndex));
+  return nodes;
+}
+
 type Params = Promise<{ slug: string }>;
 
 export async function generateStaticParams() {
@@ -168,17 +196,34 @@ export default async function BlogPostPage({ params }: { params: Params }) {
           {"body" in post && post.body ? (
             <div className="prose-yogmandu">
               {post.body.split(/\n\n+/).map((block, i) => {
+                const imageMatch = block.trim().match(/^!\[([^\]]*)\]\(([^)\s]+)\)$/);
+                if (imageMatch) {
+                  return (
+                    <figure key={i} style={{ margin: "2.5rem 0" }}>
+                      <img src={imageMatch[2]} alt={imageMatch[1]} loading="lazy"
+                        style={{ width: "100%", borderRadius: 14, display: "block", boxShadow: "0 8px 28px rgba(42,18,8,0.12)" }} />
+                      {imageMatch[1] && (
+                        <figcaption style={{ marginTop: 10, fontSize: "0.82rem", color: "rgba(42,18,8,0.55)", textAlign: "center", fontStyle: "italic" }}>
+                          {imageMatch[1]}
+                        </figcaption>
+                      )}
+                    </figure>
+                  );
+                }
                 if (block.startsWith("## ")) {
                   return <h2 key={i} style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.8rem", fontWeight: 400, color: "#2A1208", margin: "2.5rem 0 1rem" }}>{block.slice(3)}</h2>;
                 }
                 if (block.startsWith("# ")) {
                   return <h1 key={i} style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "2.2rem", fontWeight: 400, color: "#2A1208", margin: "2.5rem 0 1rem" }}>{block.slice(2)}</h1>;
                 }
+                if (block.startsWith("> ")) {
+                  return <blockquote key={i} style={{ margin: "2rem 0", padding: "0.5rem 1.5rem", borderLeft: `3px solid ${post.color}`, fontStyle: "italic", color: "#4A2E1A", fontSize: "1.1rem", lineHeight: 1.7 }}>{renderInline(block.slice(2), `bq-${i}`)}</blockquote>;
+                }
                 if (block.startsWith("- ")) {
                   const items = block.split("\n").filter(l => l.startsWith("- ")).map(l => l.slice(2));
-                  return <ul key={i} style={{ margin: "1.5rem 0", paddingLeft: "1.5rem" }}>{items.map((item, j) => <li key={j} style={{ fontSize: "1rem", lineHeight: 1.9, color: "#4A2E1A", marginBottom: "0.5rem" }}>{item}</li>)}</ul>;
+                  return <ul key={i} style={{ margin: "1.5rem 0", paddingLeft: "1.5rem" }}>{items.map((item, j) => <li key={j} style={{ fontSize: "1rem", lineHeight: 1.9, color: "#4A2E1A", marginBottom: "0.5rem" }}>{renderInline(item, `li-${i}-${j}`)}</li>)}</ul>;
                 }
-                return <p key={i} style={{ fontSize: "1.05rem", lineHeight: 1.9, color: "#4A2E1A", marginBottom: "1.5rem" }}>{block}</p>;
+                return <p key={i} style={{ fontSize: "1.05rem", lineHeight: 1.9, color: "#4A2E1A", marginBottom: "1.5rem" }}>{renderInline(block, `p-${i}`)}</p>;
               })}
             </div>
           ) : (

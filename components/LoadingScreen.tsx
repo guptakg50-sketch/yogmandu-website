@@ -59,7 +59,7 @@ export default function LoadingScreen() {
           alignItems: "center",
           justifyContent: "center",
         }}>
-          <img src="/logo.png" alt="Yogmandu" style={{ height: 72, width: "auto", objectFit: "contain" }} />
+          <img src="/logo.png" alt="Yogmandu" width={180} height={72} fetchPriority="high" decoding="async" style={{ height: 72, width: "auto", objectFit: "contain" }} />
         </div>
       </div>
 

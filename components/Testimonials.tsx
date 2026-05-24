@@ -62,6 +62,24 @@ const testimonials = [
     stars: 5,
     color: "#8DC63F",
   },
+  {
+    quote: "Yogmandu became part of my daily rhythm. The teachers meet you exactly where you are — beginner or returning practitioner.",
+    name: "Achitra Thieng",
+    origin: "Nepal",
+    flag: "🇳🇵",
+    program: "Yoga Classes",
+    stars: 5,
+    color: "#F7941D",
+  },
+  {
+    quote: "I left every session lighter than I arrived. The studio has a calm I haven't found anywhere else in Kathmandu.",
+    name: "Dolkar Sherpa",
+    origin: "Nepal",
+    flag: "🇳🇵",
+    program: "Yoga & Sound Healing",
+    stars: 5,
+    color: "#6B2D8B",
+  },
 ];
 
 

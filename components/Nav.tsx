@@ -10,15 +10,16 @@ const DEFAULT_CONFIG = {
     { href: "/class-schedule",        label: "Class Schedule",          icon: "🗓", desc: "Weekly yoga class timetable" },
     { href: "/yoga-teacher-training", label: "200hr Teacher Training",  icon: "🧘", desc: "Yoga Alliance RYS 200 certified" },
     { href: "/yoga-teacher-training", label: "300hr Advanced Training", icon: "⭐", desc: "Yoga Alliance RYS 300 certified" },
-    { href: "/sound-healing-therapy", label: "Sound Healing Sessions",  icon: "🎵", desc: "Individual & group sessions" },
-    { href: "/sound-healing-therapy", label: "Sound Healing Cert.",     icon: "📜", desc: "Become a certified practitioner" },
+    { href: "/sound-healing-therapy#sessions",      label: "Sound Healing Sessions", icon: "🎵", desc: "Individual & group sessions" },
+    { href: "/sound-healing-therapy#certification", label: "Sound Healing Cert.",    icon: "📜", desc: "Level I & II certification" },
+    { href: "/services",              label: "All Services",            icon: "✨", desc: "Yoga, retreats, therapy, corporate & more" },
   ],
   leftLinks:    [{ href: "/about", label: "About" }, { href: "/gallery", label: "Gallery" }],
   rightLinks:   [{ href: "/blog", label: "Blog" }, { href: "/contact", label: "Contact" }],
   youtubeUrl:   "https://www.youtube.com/@yogmandu",
   tagline:      "Yoga & Sound Healing · Nepal",
   bookNowLabel: "Book Now",
-  bookNowHref:  "/contact",
+  bookNowHref:  "/book",
 };
 
 export default function Nav() {
@@ -143,7 +144,7 @@ export default function Nav() {
           {/* Center logo */}
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10,
             textDecoration: "none", justifyContent: "center", padding: "0 2rem" }}>
-            <img src="/logo.png" alt="Yogmandu" style={{ height: 48, width: "auto", objectFit: "contain" }} />
+            <img src="/logo.png" alt="Yogmandu" width={120} height={48} fetchPriority="high" decoding="async" style={{ height: 48, width: "auto", objectFit: "contain" }} />
             <span style={{ fontSize: "0.5rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "#7A5840", whiteSpace: "nowrap" }}>
               {cfg.tagline}
             </span>
@@ -176,7 +177,7 @@ export default function Nav() {
                     fontSize: 13, fontWeight: 600, color: "#6B2D8B",
                   }}>
                     {navUser.avatar_url
-                      ? <img src={navUser.avatar_url} alt={navUser.full_name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      ? <img src={navUser.avatar_url} alt={navUser.full_name} loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                       : navUser.full_name.charAt(0).toUpperCase()
                     }
                   </div>
@@ -223,7 +224,7 @@ export default function Nav() {
         {/* ── Mobile ── */}
         <div className="md:hidden flex items-center justify-between">
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
-            <img src="/logo.png" alt="Yogmandu" style={{ height: 40, width: "auto", objectFit: "contain" }} />
+            <img src="/logo.png" alt="Yogmandu" width={100} height={40} decoding="async" style={{ height: 40, width: "auto", objectFit: "contain" }} />
           </Link>
           <button className="flex flex-col gap-1.5 p-2" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Toggle menu">
             <span className={`block w-6 h-px transition-all duration-300 ${mobileOpen ? "rotate-45 translate-y-2" : ""}`} style={{ background: "#2A1208" }} />
@@ -263,7 +264,7 @@ export default function Nav() {
               style={{ borderBottom: "1px solid rgba(42,18,8,0.06)", textDecoration: "none" }}>
               <div style={{ width: 32, height: 32, borderRadius: "50%", overflow: "hidden", border: "2px solid rgba(107,45,139,0.3)", background: "linear-gradient(135deg,#f0e8ff,#fff3e0)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600, color: "#6B2D8B", flexShrink: 0 }}>
                 {navUser.avatar_url
-                  ? <img src={navUser.avatar_url} alt={navUser.full_name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  ? <img src={navUser.avatar_url} alt={navUser.full_name} loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   : navUser.full_name.charAt(0).toUpperCase()
                 }
               </div>

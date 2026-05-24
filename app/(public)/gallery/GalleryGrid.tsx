@@ -2,9 +2,9 @@
 
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
-import type { DBMedia } from "@/lib/publicData";
+import type { DBGalleryItem } from "@/lib/publicData";
 import {
-  STATIC_PHOTOS, CATEGORIES, CAT_ACCENT, shuffleInterleaved,
+  STATIC_PHOTOS, CATEGORIES, CAT_ACCENT, shuffleInterleaved, toWebpSrc,
   type PhotoItem,
 } from "./galleryData";
 
@@ -50,6 +50,8 @@ export function TiltPhotoCard({ photo, onOpen }: { photo: PhotoItem; onOpen: () 
     el.style.boxShadow = "0 4px 24px rgba(0,0,0,0.10)";
   }, []);
 
+  const webp = toWebpSrc(photo.src);
+
   return (
     <div
       ref={cardRef}
@@ -65,9 +67,12 @@ export function TiltPhotoCard({ photo, onOpen }: { photo: PhotoItem; onOpen: () 
     >
       <div style={{ position:"absolute", top:0, left:"10%", right:"10%", height:2, zIndex:2,
         background:`linear-gradient(90deg, transparent, ${accent}, transparent)`, opacity:0.7 }} />
-      <img src={photo.src} alt={photo.title} loading="lazy"
-        style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
-        onError={e => { (e.target as HTMLImageElement).style.opacity = "0"; }} />
+      <picture>
+        {webp && <source type="image/webp" srcSet={webp} />}
+        <img src={photo.src} alt={photo.title} loading="lazy"
+          style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
+          onError={e => { (e.target as HTMLImageElement).style.opacity = "0"; }} />
+      </picture>
       <div style={{ position:"absolute", inset:0,
         background:"linear-gradient(to top, rgba(5,0,18,0.85) 0%, rgba(5,0,18,0.1) 40%, transparent 65%)",
         pointerEvents:"none" }} />
@@ -132,10 +137,13 @@ export function Lightbox({
         onClick={e => { e.stopPropagation(); onPrev(); }}>←</button>
       <div onClick={e => e.stopPropagation()}
         style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:"1.4rem", maxWidth:"90vw" }}>
-        <img key={photo.id} src={photo.src} alt={photo.title}
-          style={{ maxWidth:"82vw", maxHeight:"70vh", objectFit:"contain",
-            borderRadius:14, boxShadow:"0 30px 80px rgba(0,0,0,0.85)",
-            animation:"lbUp 0.25s ease", display:"block" }} />
+        <picture key={photo.id}>
+          {toWebpSrc(photo.src) && <source type="image/webp" srcSet={toWebpSrc(photo.src)!} />}
+          <img src={photo.src} alt={photo.title}
+            style={{ maxWidth:"82vw", maxHeight:"70vh", objectFit:"contain",
+              borderRadius:14, boxShadow:"0 30px 80px rgba(0,0,0,0.85)",
+              animation:"lbUp 0.25s ease", display:"block" }} />
+        </picture>
         <div style={{ textAlign:"center", animation:"lbUp 0.3s ease" }}>
           <span style={{ display:"inline-block", fontSize:"0.6rem", letterSpacing:"0.28em",
             textTransform:"uppercase", color:accent, background:`${accent}1a`,
@@ -167,9 +175,9 @@ export function Lightbox({
 }
 
 // ── Main export ───────────────────────────────────────────────────────────────
-interface GalleryGridProps { media?: DBMedia[] | null }
+interface GalleryGridProps { items?: DBGalleryItem[] | null }
 
-export default function GalleryGrid({ media }: GalleryGridProps) {
+export default function GalleryGrid({ items }: GalleryGridProps) {
   const [activeCategory, setActiveCategory] = useState("All");
   const [startIdx, setStartIdx]             = useState(0);
   const [lightboxIdx, setLightboxIdx]       = useState<number | null>(null);
@@ -179,11 +187,17 @@ export default function GalleryGrid({ media }: GalleryGridProps) {
 
   // Build photo list once on mount — interleaved so every window of 3 is mixed
   const allPhotos: PhotoItem[] = useMemo(() => {
-    const base = media && media.length > 0
-      ? media.map(m => ({ id: m.id, src: m.url, cat: "Yoga", title: m.caption || "Photo", desc: "" }))
+    const base = items && items.length > 0
+      ? items.map(it => ({
+          id:    it.id,
+          src:   it.url,
+          cat:   it.category || "Yoga",
+          title: it.title || "Photo",
+          desc:  "",
+        }))
       : STATIC_PHOTOS;
     return shuffleInterleaved(base);
-  }, [media]);
+  }, [items]);
 
   const filtered = useMemo(() =>
     activeCategory === "All" ? allPhotos : allPhotos.filter(p => p.cat === activeCategory),

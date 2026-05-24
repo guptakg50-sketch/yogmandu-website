@@ -109,7 +109,7 @@ export default function HomePage() {
                     padding: "0.7rem 1rem", borderRadius: "0.75rem",
                     background: item.bg, border: `1.5px solid ${item.border}`,
                     textDecoration: "none", color: item.color, fontWeight: 500,
-                    fontSize: "0.83rem", transition: "all 0.25s",
+                    fontSize: "0.9rem", transition: "all 0.25s",
                   }}
                 >
                   <span style={{ fontSize: "1.1rem" }}>{item.icon}</span>
@@ -189,12 +189,36 @@ export default function HomePage() {
               cta: "View Programs",
             },
             {
-              href: "/sound-healing-therapy",
+              href: "/book?service=sound",
               accent: "#8DC63F",
               icon: "🎵",
               title: "Sound Healing",
               desc: "Authentic Tibetan singing bowl therapy — individual sessions, group healing and full certification courses.",
               cta: "Book a Session",
+            },
+            {
+              href: "/services",
+              accent: "#6B2D8B",
+              icon: "✨",
+              title: "All Services",
+              desc: "Retreats, corporate yoga, weight-loss bootcamp, therapy, diet consultation, Reiki, prenatal & more — the full range.",
+              cta: "Explore Services",
+            },
+            {
+              href: "/about",
+              accent: "#F7941D",
+              icon: "🌅",
+              title: "Our Story",
+              desc: "Founded in 2015 by Dr. Chintamani Gautam (PhD Yogic Science, ERYT 500). Nepal's first Yoga Alliance registered school.",
+              cta: "Meet the Team",
+            },
+            {
+              href: "/gallery",
+              accent: "#8DC63F",
+              icon: "📷",
+              title: "Studio & Students",
+              desc: "Photos from classes, sound baths, retreats, and 200hr graduates from 50+ countries — see what awaits you in Kathmandu.",
+              cta: "View Gallery",
             },
           ].map(item => (
             <div
@@ -220,7 +244,7 @@ export default function HomePage() {
               }}>
                 {item.title}
               </h3>
-              <p style={{ fontSize: "0.85rem", lineHeight: 1.75, color: "#4A2E1A", fontWeight: 400, marginBottom: 18 }}>
+              <p style={{ fontSize: "0.95rem", lineHeight: 1.75, color: "#4A2E1A", fontWeight: 400, marginBottom: 18 }}>
                 {item.desc}
               </p>
               <Link
@@ -228,7 +252,7 @@ export default function HomePage() {
                 className="cta-lift"
                 style={{
                   display: "inline-flex", alignItems: "center", gap: 6,
-                  fontSize: "0.82rem", fontWeight: 500,
+                  fontSize: "0.88rem", fontWeight: 500,
                   color: item.accent, textDecoration: "none",
                   borderBottom: `1px solid ${item.accent}40`,
                   paddingBottom: "2px",

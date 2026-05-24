@@ -1,14 +1,54 @@
 import { getSupabaseAdmin, isSupabaseConfigured } from "./supabaseAdmin";
 
-// ── Instructor name lookup (IDs from admin panel) ─────────────────────────────
-export const INSTRUCTORS: Record<string, string> = {
+// ── Instructor lookup ─────────────────────────────────────────────────────────
+// Fallback used when Supabase is empty or not configured.
+const FALLBACK_INSTRUCTORS: Record<string, string> = {
   "inst-chintamani": "Dr. Chintamani Gautam",
   "inst-arjun":      "Arjun Rakhal Magar",
   "inst-dipika":     "Arjun Neupane",
 };
 
-export function resolveInstructor(id: string): string {
-  return INSTRUCTORS[id] ?? id;
+export const INSTRUCTORS: Record<string, string> = FALLBACK_INSTRUCTORS;
+
+export interface DBInstructor {
+  id:             string;
+  name:           string;
+  photo?:         string;
+  bio?:           string;
+  specialties?:   string[];
+  certifications?: string;
+  years?:         number;
+  status?:        string;
+  displayOrder?:  number;
+  social?:        { instagram?: string; facebook?: string; website?: string };
+}
+
+export async function getInstructors(): Promise<DBInstructor[] | null> {
+  if (!isSupabaseConfigured) return null;
+  try {
+    const supabase = getSupabaseAdmin();
+    const { data, error } = await supabase
+      .from("yogmandu_instructors")
+      .select("data")
+      .order("display_order", { ascending: true })
+      .order("name", { ascending: true });
+    if (error) return null;
+    return (data ?? []).map((row) => row.data as DBInstructor);
+  } catch {
+    return null;
+  }
+}
+
+export async function getInstructorMap(): Promise<Record<string, string>> {
+  const list = await getInstructors();
+  if (!list || list.length === 0) return FALLBACK_INSTRUCTORS;
+  const map: Record<string, string> = { ...FALLBACK_INSTRUCTORS };
+  for (const i of list) map[i.id] = i.name;
+  return map;
+}
+
+export function resolveInstructor(id: string, map: Record<string, string> = FALLBACK_INSTRUCTORS): string {
+  return map[id] ?? FALLBACK_INSTRUCTORS[id] ?? id;
 }
 
 // ── Style → accent colour ─────────────────────────────────────────────────────
@@ -120,6 +160,33 @@ export interface DBMedia {
   url: string;
   caption: string;
   usedBy: string;
+}
+
+// ── Gallery items (admin-managed) ────────────────────────────────────────────
+export interface DBGalleryItem {
+  id:           string;
+  url:          string;
+  path?:        string;
+  title:        string;
+  category:     string;
+  displayOrder: number;
+  createdAt?:   string;
+}
+
+export async function getGalleryItems(): Promise<DBGalleryItem[] | null> {
+  if (!isSupabaseConfigured) return null;
+  try {
+    const supabase = getSupabaseAdmin();
+    const { data, error } = await supabase
+      .from("yogmandu_gallery_items")
+      .select("data")
+      .order("display_order", { ascending: true })
+      .order("created_at", { ascending: false });
+    if (error) return null;
+    return (data ?? []).map((row) => row.data as DBGalleryItem);
+  } catch {
+    return null;
+  }
 }
 
 export async function getMediaItems(): Promise<DBMedia[] | null> {

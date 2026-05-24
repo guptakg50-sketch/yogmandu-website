@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ScheduleGrid from "./ScheduleGrid";
-import { getActiveSessions } from "@/lib/publicData";
+import { getActiveSessions, getInstructorMap } from "@/lib/publicData";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Yoga Class Schedule Kathmandu | Daily Classes at Yogmandu Nepal",
@@ -42,7 +44,10 @@ const levelColor = (level: string) => {
 };
 
 export default async function ClassSchedulePage() {
-  const sessions = await getActiveSessions();
+  const [sessions, instructorMap] = await Promise.all([
+    getActiveSessions(),
+    getInstructorMap(),
+  ]);
   return (
     <main style={{ background: "#FFFFFF", minHeight: "100vh" }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
@@ -61,7 +66,7 @@ export default async function ClassSchedulePage() {
 
         {/* Centered logo */}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, marginBottom: 24 }}>
-          <img src="/logo.png" alt="Yogmandu" style={{ height: 72, width: "auto", objectFit: "contain", filter: "brightness(0) invert(1)" }} />
+          <img src="/logo.png" alt="Yogmandu" width={180} height={72} fetchPriority="high" decoding="async" style={{ height: 72, width: "auto", objectFit: "contain", filter: "brightness(0) invert(1)" }} />
           <span style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.6rem", fontWeight: 400 }}>
             <span style={{ color: "#F7941D" }}>Yog</span>
             <span style={{ color: "#FFFFFF" }}>mandu</span>
@@ -107,7 +112,7 @@ export default async function ClassSchedulePage() {
       </div>
 
       {/* ── Interactive schedule grid (client component) ── */}
-      <ScheduleGrid sessions={sessions} />
+      <ScheduleGrid sessions={sessions} instructorMap={instructorMap} />
     </main>
   );
 }

@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
-import type { DBMedia } from "@/lib/publicData";
+import type { DBGalleryItem } from "@/lib/publicData";
 import {
-  STATIC_PHOTOS, CATEGORIES, CAT_ACCENT, shuffleInterleaved,
+  STATIC_PHOTOS, CATEGORIES, CAT_ACCENT, shuffleInterleaved, toWebpSrc,
   type PhotoItem,
 } from "../galleryData";
 import { Lightbox } from "../GalleryGrid";
@@ -55,13 +55,16 @@ function MasonryCard({ photo, onOpen }: { photo: PhotoItem; onOpen: () => void }
         opacity: 0.65,
       }} />
 
-      <img
-        src={photo.src}
-        alt={photo.title}
-        loading="lazy"
-        style={{ width: "100%", height: "auto", display: "block" }}
-        onError={e => { (e.target as HTMLImageElement).style.opacity = "0"; }}
-      />
+      <picture>
+        {toWebpSrc(photo.src) && <source type="image/webp" srcSet={toWebpSrc(photo.src)!} />}
+        <img
+          src={photo.src}
+          alt={photo.title}
+          loading="lazy"
+          style={{ width: "100%", height: "auto", display: "block" }}
+          onError={e => { (e.target as HTMLImageElement).style.opacity = "0"; }}
+        />
+      </picture>
 
       {/* gradient overlay */}
       <div style={{
@@ -97,19 +100,25 @@ function MasonryCard({ photo, onOpen }: { photo: PhotoItem; onOpen: () => void }
 }
 
 // ── Main component ─────────────────────────────────────────────────────────────
-interface Props { media?: DBMedia[] | null }
+interface Props { items?: DBGalleryItem[] | null }
 
-export default function GalleryAllGrid({ media }: Props) {
+export default function GalleryAllGrid({ items }: Props) {
   const [activeCategory, setActiveCategory] = useState("All");
   const [lightboxIdx,    setLightboxIdx]    = useState<number | null>(null);
 
   // shuffle once on mount
   const allPhotos = useMemo(() => {
-    const base = media && media.length > 0
-      ? media.map(m => ({ id: m.id, src: m.url, cat: "Yoga", title: m.caption || "Photo", desc: "" }))
+    const base = items && items.length > 0
+      ? items.map(it => ({
+          id:    it.id,
+          src:   it.url,
+          cat:   it.category || "Yoga",
+          title: it.title || "Photo",
+          desc:  "",
+        }))
       : STATIC_PHOTOS;
     return shuffleInterleaved(base);
-  }, [media]);
+  }, [items]);
 
   const filtered = useMemo(() =>
     activeCategory === "All" ? allPhotos : allPhotos.filter(p => p.cat === activeCategory),

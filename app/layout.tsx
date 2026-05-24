@@ -1,6 +1,23 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import { Cormorant_Garamond, DM_Sans } from "next/font/google";
+import CookieConsent from "@/components/CookieConsent";
 import "./globals.css";
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-cormorant",
+  display: "swap",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  variable: "--font-dm-sans",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://yogmandu.com"),
@@ -76,10 +93,10 @@ const localBusinessSchema = {
   },
   geo: {
     "@type": "GeoCoordinates",
-    latitude: 27.7172,
-    longitude: 85.324,
+    latitude: 27.6981324,
+    longitude: 85.3384591,
   },
-  openingHours: "Mo-Su 06:00-20:00",
+  openingHours: "Su-Fr 05:30-18:30",
   priceRange: "$$",
   sameAs: [
     "https://www.facebook.com/yogmandu",
@@ -113,19 +130,30 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full" data-scroll-behavior="smooth">
+    <html lang="en" className={`h-full ${cormorant.variable} ${dmSans.variable}`} data-scroll-behavior="smooth">
       <head>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
       </head>
       <body className="min-h-full flex flex-col">
-        {children}
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-JJL91Q27S5" strategy="afterInteractive" />
-        <Script id="gtag-init" strategy="afterInteractive">{`
+        <Script id="consent-default" strategy="beforeInteractive">{`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
+          window.gtag = gtag;
+          gtag('consent', 'default', {
+            ad_storage:         'denied',
+            ad_user_data:       'denied',
+            ad_personalization: 'denied',
+            analytics_storage:  'denied',
+            wait_for_update:    500
+          });
+        `}</Script>
+        {children}
+        <CookieConsent />
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-JJL91Q27S5" strategy="afterInteractive" />
+        <Script id="gtag-init" strategy="afterInteractive">{`
           gtag('js', new Date());
-          gtag('config', 'G-JJL91Q27S5');
+          gtag('config', 'G-JJL91Q27S5', { anonymize_ip: true });
         `}</Script>
       </body>
     </html>

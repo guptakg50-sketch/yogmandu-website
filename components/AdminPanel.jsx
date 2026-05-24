@@ -662,6 +662,7 @@ function makeInitialState() {
     instructors: initialInstructors,
     sessions: initialSessions,
     media: initialSessions.slice(0, 4).map((session) => ({ id: uid("media"), url: session.image, caption: session.name, usedBy: session.id })),
+    gallery: [],
     blogs: blogTopics.map(([title, author, category, tags, status, views], index) => ({
       id: uid("post"),
       title,
@@ -745,17 +746,21 @@ async function fetchJson(path, options) {
 }
 
 async function loadRemoteCms() {
-  const [blogs, sessions, media] = await Promise.all([
+  const [blogs, sessions, media, gallery, instructors] = await Promise.all([
     fetchJson("/api/admin/blogs"),
     fetchJson("/api/admin/sessions"),
     fetchJson("/api/admin/media"),
+    fetchJson("/api/admin/gallery").catch(()     => ({ data: [], configured: false })),
+    fetchJson("/api/admin/instructors").catch(() => ({ data: [], configured: false })),
   ]);
 
   return {
-    configured: blogs.configured || sessions.configured || media.configured,
+    configured: blogs.configured || sessions.configured || media.configured || gallery.configured || instructors.configured,
     blogs: blogs.data || [],
     sessions: sessions.data || [],
     media: media.data || [],
+    gallery: gallery.data || [],
+    instructors: instructors.data || [],
   };
 }
 
@@ -1012,7 +1017,11 @@ function SeoEditorFields({ value, onChange, allPages = [] }) {
 function Dashboard({ data, setActive, toast }) {
   const [range, setRange] = useState("30");
   const traffic = useMemo(() => generateTraffic(Number(range) || 30), [range]);
-  const topPages = useMemo(() => data.seoPages.slice(0, 5).map((page, index) => ({ page: page.pageName, views: [32100, 24100, 18600, 14200, 11900][index] })), [data.seoPages]);
+  const topPages = useMemo(() => data.seoPages.slice(0, 5).map((page, index) => {
+    const name = String(page.pageName || page.path || "Page");
+    const short = name.length > 22 ? `${name.slice(0, 20)}…` : name;
+    return { page: short, fullPage: name, views: [32100, 24100, 18600, 14200, 11900][index] };
+  }), [data.seoPages]);
   const sources = [
     { name: "Organic", value: 46 },
     { name: "Direct", value: 24 },
@@ -1066,12 +1075,12 @@ function Dashboard({ data, setActive, toast }) {
 
       <section className="rounded-xl border border-stone-200 bg-white p-4">
         <h3 className="mb-4 font-semibold text-stone-900">Sessions Overview</h3>
-        <div className="grid gap-3 md:grid-cols-5">
-          <div className="rounded-lg bg-emerald-50 p-3"><p className="text-xs text-emerald-700">Active this week</p><p className="text-2xl font-semibold text-emerald-900">{activeSessions.length}</p></div>
-          <div className="rounded-lg bg-teal-50 p-3"><p className="text-xs text-teal-700">Most popular</p><p className="truncate text-sm font-semibold text-teal-900">{mostPopular?.name}</p></div>
-          <div className="rounded-lg bg-amber-50 p-3"><p className="text-xs text-amber-700">Low spots</p><p className="text-2xl font-semibold text-amber-900">{lowSpots.length}</p></div>
-          <div className="rounded-lg bg-red-50 p-3"><p className="text-xs text-red-700">Fully booked</p><p className="text-2xl font-semibold text-red-900">{data.sessions.filter((item) => item.enrolled >= item.capacity).length}</p></div>
-          <div className="rounded-lg bg-stone-100 p-3"><p className="text-xs text-stone-600">Upcoming workshops</p><p className="text-2xl font-semibold text-stone-900">{data.sessions.filter((item) => item.status === "Upcoming").length}</p></div>
+        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="rounded-lg bg-emerald-50 p-3"><p className="text-xs text-emerald-700">Active this week</p><p className="mt-1 text-2xl font-semibold text-emerald-900">{activeSessions.length}</p></div>
+          <div className="rounded-lg bg-teal-50 p-3 min-w-0"><p className="text-xs text-teal-700">Most popular</p><p className="mt-1 truncate text-sm font-semibold text-teal-900" title={mostPopular?.name}>{mostPopular?.name}</p></div>
+          <div className="rounded-lg bg-amber-50 p-3"><p className="text-xs text-amber-700">Low spots</p><p className="mt-1 text-2xl font-semibold text-amber-900">{lowSpots.length}</p></div>
+          <div className="rounded-lg bg-red-50 p-3"><p className="text-xs text-red-700">Fully booked</p><p className="mt-1 text-2xl font-semibold text-red-900">{data.sessions.filter((item) => item.enrolled >= item.capacity).length}</p></div>
+          <div className="rounded-lg bg-stone-100 p-3"><p className="text-xs text-stone-600">Upcoming workshops</p><p className="mt-1 text-2xl font-semibold text-stone-900">{data.sessions.filter((item) => item.status === "Upcoming").length}</p></div>
         </div>
       </section>
 
@@ -1080,7 +1089,13 @@ function Dashboard({ data, setActive, toast }) {
           <LineChart data={traffic}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="date" /><YAxis /><Tooltip /><Legend /><Line type="monotone" dataKey="views" stroke="#059669" strokeWidth={2} dot={false} /><Line type="monotone" dataKey="visitors" stroke="#0f766e" strokeWidth={2} dot={false} /></LineChart>
         </ChartCard>
         <ChartCard title="Top 5 Pages by Views">
-          <BarChart data={topPages} layout="vertical"><CartesianGrid strokeDasharray="3 3" /><XAxis type="number" /><YAxis dataKey="page" type="category" width={110} /><Tooltip /><Bar dataKey="views" fill="#059669" radius={[0, 8, 8, 0]} /></BarChart>
+          <BarChart data={topPages} layout="vertical" margin={{ left: 4, right: 16, top: 8, bottom: 8 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis type="number" tick={{ fontSize: 11 }} />
+            <YAxis dataKey="page" type="category" width={160} tick={{ fontSize: 11 }} interval={0} />
+            <Tooltip formatter={(value, _, item) => [value, item.payload?.fullPage || item.payload?.page]} labelFormatter={(label, payload) => payload?.[0]?.payload?.fullPage || label} />
+            <Bar dataKey="views" fill="#059669" radius={[0, 8, 8, 0]} />
+          </BarChart>
         </ChartCard>
         <ChartCard title="Traffic Sources">
           <PieChart><Pie data={sources} dataKey="value" nameKey="name" innerRadius={58} outerRadius={90} paddingAngle={3}>{sources.map((_, index) => <Cell key={index} fill={COLORS[index]} />)}</Pie><Tooltip /><Legend /></PieChart>
@@ -1110,15 +1125,25 @@ function ChartCard({ title, children }) {
 
 function MiniTable({ title, columns, rows, action }) {
   return (
-    <section className="rounded-xl border border-stone-200 bg-white p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="font-semibold text-stone-900">{title}</h3>
+    <section className="rounded-xl border border-stone-200 bg-white p-4 overflow-hidden">
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <h3 className="truncate font-semibold text-stone-900">{title}</h3>
         <Button variant="ghost" onClick={action}>Open</Button>
       </div>
-      <table className="w-full text-left text-sm">
-        <thead className="text-xs uppercase text-stone-400"><tr>{columns.map((item) => <th key={item} className="py-2">{item}</th>)}</tr></thead>
-        <tbody className="divide-y divide-stone-100">{rows.map((row, index) => <tr key={index}>{row.map((cell, idx) => <td key={idx} className="py-2 text-stone-700">{cell}</td>)}</tr>)}</tbody>
-      </table>
+      <div className="overflow-x-auto">
+        <table className="w-full table-fixed text-left text-sm">
+          <thead className="text-xs uppercase text-stone-400">
+            <tr>{columns.map((item, idx) => <th key={item} className={classNames("py-2", idx === 0 ? "w-1/2" : "w-1/4")}>{item}</th>)}</tr>
+          </thead>
+          <tbody className="divide-y divide-stone-100">
+            {rows.map((row, index) => (
+              <tr key={index}>{row.map((cell, idx) => (
+                <td key={idx} className="truncate py-2 pr-2 text-stone-700" title={typeof cell === "string" ? cell : undefined}>{cell}</td>
+              ))}</tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }
@@ -1301,6 +1326,41 @@ function BlogEditor({ post, blogs, setBlogs, media, setMedia, onClose, toast }) 
     setDraft({ ...draft, body: `${draft.body}${draft.body ? "\n" : ""}${before}selected text${after}` });
   };
 
+  const insertAtEnd = (snippet) => {
+    setDraft({ ...draft, body: `${draft.body}${draft.body ? "\n\n" : ""}${snippet}` });
+  };
+
+  const insertImageByUrl = () => {
+    const url = window.prompt("Image URL (paste a direct link to a .jpg/.png/.webp)");
+    if (!url) return;
+    const alt = window.prompt("Alt text (describe the image)") || "Image";
+    insertAtEnd(`![${alt}](${url.trim()})`);
+  };
+
+  const insertImageByUpload = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("caption", draft.title || "Blog image");
+      formData.append("usedBy", draft.id);
+      const response = await fetch("/api/admin/media/upload", { method: "POST", body: formData });
+      const payload  = await response.json().catch(() => ({}));
+      if (response.ok && payload.data?.url) {
+        const alt = draft.title || file.name.replace(/\.[^.]+$/, "");
+        insertAtEnd(`![${alt}](${payload.data.url})`);
+        setMedia([payload.data, ...media]);
+        toast("Image inserted");
+      } else {
+        toast(payload.error || "Upload failed");
+      }
+    } catch (err) {
+      toast(err.message || "Upload failed");
+    }
+  };
+
   return (
     <Modal title={draft.title || "Post Editor"} onClose={onClose} wide>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -1322,7 +1382,13 @@ function BlogEditor({ post, blogs, setBlogs, media, setMedia, onClose, toast }) 
               <div className="mb-3 flex flex-wrap gap-2">
                 {[["B", "**", "**"], ["I", "_", "_"], ["U", "<u>", "</u>"], ["S", "~~", "~~"], ["H1", "# ", ""], ["H2", "## ", ""], ["H3", "### ", ""], ["H4", "#### ", ""], ["•", "- ", ""], ["1.", "1. ", ""], ["Quote", "> ", ""], ["Code", "`", "`"], ["Block", "```\n", "\n```"], ["HR", "\n---\n", ""]].map(([label, before, after]) => <Button key={label} variant="secondary" onClick={() => wrap(before, after)}>{label}</Button>)}
                 <Button variant="secondary" onClick={() => wrap("[link text](", ")") }><Link size={15} /> Link</Button>
+                <Button variant="secondary" onClick={insertImageByUrl}><Image size={15} /> Image URL</Button>
+                <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50">
+                  <Upload size={15} /> Upload
+                  <input type="file" accept="image/*" className="hidden" onChange={insertImageByUpload} />
+                </label>
               </div>
+              <p className="mb-2 text-xs text-stone-500">Insert images on their own line. Markdown: <code className="rounded bg-stone-100 px-1">![alt](url)</code></p>
               <TextArea rows={14} value={draft.body} onChange={(e) => setDraft({ ...draft, body: e.target.value })} />
             </div>
             <GalleryEditor items={draft.gallery} onChange={(gallery) => setDraft({ ...draft, gallery })} />
@@ -1535,6 +1601,134 @@ function MediaLibrary({ media, setMedia, blogs, sessions, toast }) {
   );
 }
 
+const GALLERY_CATEGORIES = ["Yoga", "Sound Healing", "Certificates"];
+
+function GalleryManager({ items, setItems, toast }) {
+  const [filter, setFilter]   = useState("All");
+  const [uploadCat, setUploadCat] = useState("Yoga");
+  const [busy, setBusy]       = useState(false);
+
+  const filtered = items.filter((it) => filter === "All" || it.category === filter);
+
+  const handleUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setBusy(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("title", file.name.replace(/\.[^.]+$/, ""));
+      formData.append("category", uploadCat);
+      const response = await fetch("/api/admin/gallery/upload", { method: "POST", body: formData });
+      const payload  = await response.json().catch(() => ({}));
+      if (response.ok && payload.data?.url) {
+        setItems([...items, payload.data]);
+        toast("Photo uploaded");
+      } else {
+        toast(payload.error || "Upload failed");
+      }
+    } catch (err) {
+      toast(err.message || "Upload failed");
+    } finally {
+      setBusy(false);
+      event.target.value = "";
+    }
+  };
+
+  const updateItem = (id, patch) => {
+    setItems(items.map((it) => it.id === id ? { ...it, ...patch } : it));
+  };
+
+  const removeItem = (id) => {
+    if (!confirm("Remove this photo from the gallery? This cannot be undone.")) return;
+    setItems(items.filter((it) => it.id !== id));
+    toast("Photo removed");
+  };
+
+  const move = (id, direction) => {
+    const index = items.findIndex((it) => it.id === id);
+    if (index < 0) return;
+    const target = index + direction;
+    if (target < 0 || target >= items.length) return;
+    const next = [...items];
+    [next[index], next[target]] = [next[target], next[index]];
+    setItems(next.map((it, i) => ({ ...it, displayOrder: i })));
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="rounded-xl border border-stone-200 bg-white p-4">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 className="font-semibold text-stone-900">Gallery Photos</h3>
+            <p className="text-sm text-stone-500">Photos shown on the public /gallery page. Categories: Yoga, Sound Healing, Certificates.</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Select value={uploadCat} onChange={(e) => setUploadCat(e.target.value)} className="w-44">
+              {GALLERY_CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
+            </Select>
+            <label className={classNames("inline-flex cursor-pointer items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700", busy && "pointer-events-none opacity-50")}>
+              <Upload size={16} /> {busy ? "Uploading…" : "Upload Photo"}
+              <input type="file" accept="image/*" className="hidden" onChange={handleUpload} disabled={busy} />
+            </label>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {["All", ...GALLERY_CATEGORIES].map((cat) => (
+            <Button key={cat} variant={filter === cat ? "primary" : "secondary"} onClick={() => setFilter(cat)}>
+              {cat} {cat !== "All" && `(${items.filter((it) => it.category === cat).length})`}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {filtered.length === 0 ? (
+        <EmptyState
+          icon={Image}
+          title="No gallery photos yet"
+          text="Upload your first photo. Pick a category, then upload — it will appear on the public Gallery page within ~1 minute."
+        />
+      ) : (
+        <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-4">
+          {filtered.map((item) => {
+            const realIndex = items.findIndex((it) => it.id === item.id);
+            return (
+              <article key={item.id} className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
+                <div className="relative">
+                  <img src={item.url} alt={item.title || ""} className="h-44 w-full object-cover" />
+                  <span className="absolute left-2 top-2 rounded-full bg-stone-950/70 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white">
+                    {item.category}
+                  </span>
+                </div>
+                <div className="space-y-2 p-3">
+                  <TextInput
+                    value={item.title || ""}
+                    onChange={(e) => updateItem(item.id, { title: e.target.value })}
+                    placeholder="Photo title"
+                  />
+                  <Select
+                    value={item.category}
+                    onChange={(e) => updateItem(item.id, { category: e.target.value })}
+                  >
+                    {GALLERY_CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
+                  </Select>
+                  <div className="flex items-center justify-between gap-1">
+                    <div className="flex gap-1">
+                      <Button variant="secondary" className="px-2" onClick={() => move(item.id, -1)} disabled={realIndex <= 0} aria-label="Move up">↑</Button>
+                      <Button variant="secondary" className="px-2" onClick={() => move(item.id, 1)} disabled={realIndex >= items.length - 1} aria-label="Move down">↓</Button>
+                    </div>
+                    <Button variant="danger" className="px-2" onClick={() => removeItem(item.id)} aria-label="Delete"><Trash2 size={16} /></Button>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function SettingsPage({ settings, setSettings, instructors, setInstructors, sessions, toast }) {
   const [xml, setXml] = useState("");
   const update = (key, value) => setSettings({ ...settings, [key]: value });
@@ -1624,7 +1818,13 @@ function AdminWorkspace({ onLogout }) {
     onLogout();
   };
   const saveRemote = async (key, value) => {
-    const endpoint = { blogs: "/api/admin/blogs", sessions: "/api/admin/sessions", media: "/api/admin/media" }[key];
+    const endpoint = {
+      blogs:       "/api/admin/blogs",
+      sessions:    "/api/admin/sessions",
+      media:       "/api/admin/media",
+      gallery:     "/api/admin/gallery",
+      instructors: "/api/admin/instructors",
+    }[key];
     if (!endpoint) return;
     try {
       setSyncStatus("Saving to Supabase");
@@ -1638,7 +1838,7 @@ function AdminWorkspace({ onLogout }) {
   const setPart = (key) => (valueOrUpdater) => {
     setState((current) => {
       const nextValue = typeof valueOrUpdater === "function" ? valueOrUpdater(current[key]) : valueOrUpdater;
-      if (["blogs", "sessions", "media"].includes(key)) {
+      if (["blogs", "sessions", "media", "gallery", "instructors"].includes(key)) {
         window.setTimeout(() => saveRemote(key, nextValue), 0);
       }
       return { ...current, [key]: nextValue };
@@ -1660,6 +1860,8 @@ function AdminWorkspace({ onLogout }) {
           blogs: remote.blogs.length ? remote.blogs : current.blogs,
           sessions: remote.sessions.length ? remote.sessions : current.sessions,
           media: remote.media.length ? remote.media : current.media,
+          gallery: remote.gallery,
+          instructors: remote.instructors.length ? remote.instructors : current.instructors,
         }));
         setSyncStatus("Connected to Supabase");
       })
@@ -1682,6 +1884,7 @@ function AdminWorkspace({ onLogout }) {
     ["sessions",    "Sessions",     CalendarDays],
     ["instructors", "Instructors",  Users],
     ["media",       "Media",        Camera],
+    ["gallery",     "Gallery",      Image],
     ["settings",    "Settings",     Settings],
   ];
   const title = nav.find(([id]) => id === active)?.[1] || "Dashboard";
@@ -1714,6 +1917,7 @@ function AdminWorkspace({ onLogout }) {
           {active === "sessions" && <SessionsManager sessions={state.sessions} setSessions={setPart("sessions")} instructors={state.instructors} setInstructors={setPart("instructors")} media={state.media} setMedia={setPart("media")} toast={notify} />}
           {active === "instructors" && <InstructorsManager instructors={state.instructors} setInstructors={setPart("instructors")} sessions={state.sessions} toast={notify} />}
           {active === "media" && <MediaLibrary media={state.media} setMedia={setPart("media")} blogs={state.blogs} sessions={state.sessions} toast={notify} />}
+          {active === "gallery" && <GalleryManager items={state.gallery} setItems={setPart("gallery")} toast={notify} />}
           {active === "settings" && <SettingsPage settings={state.settings} setSettings={setPart("settings")} instructors={state.instructors} setInstructors={setPart("instructors")} sessions={state.sessions} toast={notify} />}
         </main>
       </div>
@@ -1763,7 +1967,7 @@ const DEFAULT_FOOTER = {
     { icon: "📍", text: "Miteri Marg, Mid-Baneshwor-31, Kathmandu, Nepal" },
     { icon: "📞", text: "+977-9862909469 / +977-9810263277" },
     { icon: "✉️", text: "info@yogmandu.com" },
-    { icon: "🕐", text: "Mon–Sun · 6:00–20:00" },
+    { icon: "🕐", text: "Sun–Fri · 5:30–18:30" },
   ],
   youtubeUrl:   "https://www.youtube.com/@yogmandu",
   instagramUrl: "https://instagram.com/yogmandu",

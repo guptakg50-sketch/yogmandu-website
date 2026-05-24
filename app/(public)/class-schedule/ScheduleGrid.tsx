@@ -55,7 +55,7 @@ const FALLBACK: Record<string, { time: string; name: string; level: string; dura
 };
 
 // ── Convert DB sessions → schedule map ────────────────────────────────────────
-function buildSchedule(sessions: DBSession[]) {
+function buildSchedule(sessions: DBSession[], instructorMap: Record<string, string>) {
   const map: typeof FALLBACK = {};
   for (const s of sessions) {
     const abbrs = Array.isArray(s.days) ? s.days : [];
@@ -67,7 +67,7 @@ function buildSchedule(sessions: DBSession[]) {
         name:       s.name,
         level:      s.level,
         duration:   `${s.duration} min`,
-        instructor: resolveInstructor(s.instructorId),
+        instructor: resolveInstructor(s.instructorId, instructorMap),
         accent:     styleToAccent(s.styles),
       });
     }
@@ -133,11 +133,13 @@ function ScheduleCard({ cls }: { cls: { time: string; name: string; level: strin
 }
 
 interface Props {
-  sessions?: DBSession[] | null;
+  sessions?:     DBSession[] | null;
+  instructorMap?: Record<string, string>;
 }
 
-export default function ScheduleGrid({ sessions }: Props) {
-  const schedule = sessions && sessions.length > 0 ? buildSchedule(sessions) : FALLBACK;
+export default function ScheduleGrid({ sessions, instructorMap }: Props) {
+  const map = instructorMap || {};
+  const schedule = sessions && sessions.length > 0 ? buildSchedule(sessions, map) : FALLBACK;
 
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto", padding: "3rem 2rem" }}>
