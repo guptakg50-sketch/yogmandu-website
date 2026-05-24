@@ -155,7 +155,7 @@ export default function Nav() {
           </Link>
 
           {/* Right */}
-          <ul className="flex items-center gap-6 text-sm font-light justify-end">
+          <ul className="flex items-center gap-3 lg:gap-6 text-sm font-light justify-end">
             {cfg.rightLinks.map((l) => (
               <li key={l.href + l.label}>
                 <Link href={l.href} style={{
@@ -204,7 +204,7 @@ export default function Nav() {
               )}
             </li>
 
-            <li>
+            <li className="hidden lg:block">
               <a href={cfg.youtubeUrl} target="_blank" rel="noopener noreferrer" aria-label="Yogmandu on YouTube"
                 style={{ color: "#7A5840", display: "flex", alignItems: "center", transition: "color 0.2s" }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = "#FF0000")}
