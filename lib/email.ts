@@ -2,7 +2,11 @@ import { Resend } from "resend";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM_EMAIL     = process.env.EMAIL_FROM     || "Yogmandu <no-reply@yogmandu.com>";
-const NOTIFY_EMAIL   = process.env.EMAIL_NOTIFY   || "info@yogmandu.com";
+// EMAIL_NOTIFY accepts a single address or a comma-separated list — sends to all.
+const NOTIFY_EMAIL: string[] = (process.env.EMAIL_NOTIFY || "info@yogmandu.com")
+  .split(",")
+  .map(s => s.trim())
+  .filter(Boolean);
 const SITE_URL       = process.env.NEXT_PUBLIC_SITE_URL || "https://yogmandu.com";
 
 export const isEmailConfigured = Boolean(RESEND_API_KEY);
