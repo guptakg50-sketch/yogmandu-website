@@ -178,7 +178,7 @@ function StatOrb({ s, i }: { s: typeof stats[0]; i: number }) {
         }}>
           <span style={{
             fontFamily: "Cormorant Garamond, serif", fontSize: "1.9rem",
-            fontWeight: 300, color: s.color, lineHeight: 1,
+            fontWeight: 300, color: s.textColor ?? s.color, lineHeight: 1,
           }}>
             {s.numeric !== undefined ? `${count}${s.suffix ?? ""}` : s.value}
           </span>
@@ -226,10 +226,10 @@ const pillars = [
 ];
 
 const stats = [
-  { value: "3000+", numeric: 3000, suffix: "+", label: "Teachers trained",       color: "#F7941D" },
-  { value: "50+",   numeric: 50,   suffix: "+", label: "Countries represented",  color: "#6B2D8B" },
-  { value: "2018",  numeric: undefined,          label: "Established in Nepal",   color: "#8DC63F" },
-  { value: "RYS",   numeric: undefined,          label: "Yoga Alliance certified", color: "#F7941D" },
+  { value: "3000+", numeric: 3000, suffix: "+", label: "Teachers trained",        color: "#F7941D", textColor: "#A65808" },
+  { value: "50+",   numeric: 50,   suffix: "+", label: "Countries represented",   color: "#6B2D8B", textColor: "#6B2D8B" },
+  { value: "2018",  numeric: undefined,          label: "Established in Nepal",    color: "#8DC63F", textColor: "#4A6418" },
+  { value: "RYS",   numeric: undefined,          label: "Yoga Alliance certified", color: "#F7941D", textColor: "#A65808" },
 ];
 
 export default function WhySection() {
@@ -335,7 +335,7 @@ export default function WhySection() {
             fontSize: "clamp(2.2rem, 5vw, 3.2rem)",
             fontWeight: 300, color: "#2A1208", lineHeight: 1.15, marginBottom: 16,
           }}>
-            The difference you can <em style={{ color: "#F7941D" }}>feel</em>
+            The difference you can <em style={{ color: "#A65808" }}>feel</em>
           </h2>
           <div style={{ width: 48, height: 2, background: "linear-gradient(90deg,#6B2D8B,#F7941D)", margin: "0 auto" }} />
         </div>

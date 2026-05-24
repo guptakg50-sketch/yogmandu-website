@@ -66,7 +66,10 @@ export default async function ClassSchedulePage() {
 
         {/* Centered logo */}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, marginBottom: 24 }}>
-          <img src="/logo.png" alt="Yogmandu" width={180} height={72} fetchPriority="high" decoding="async" style={{ height: 72, width: "auto", objectFit: "contain", filter: "brightness(0) invert(1)" }} />
+          <picture>
+            <source srcSet="/logo-opt.webp" type="image/webp" />
+            <img src="/logo.png" alt="Yogmandu" width={180} height={72} fetchPriority="high" decoding="async" style={{ height: 72, width: "auto", objectFit: "contain", filter: "brightness(0) invert(1)" }} />
+          </picture>
           <span style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.6rem", fontWeight: 400 }}>
             <span style={{ color: "#F7941D" }}>Yog</span>
             <span style={{ color: "#FFFFFF" }}>mandu</span>
