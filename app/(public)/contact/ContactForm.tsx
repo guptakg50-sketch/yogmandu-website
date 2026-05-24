@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import type { FormEvent } from "react";
+import Spinner from "@/components/Spinner";
 
 const programs = [
   "200hr Yoga Teacher Training",
@@ -181,7 +182,7 @@ export default function ContactForm() {
 
                 <button type="submit" disabled={loading} className="cta-lift w-full py-3.5 rounded-full font-medium text-sm"
                   style={{ background: loading ? "rgba(247,148,29,0.55)" : "#F7941D", color: "#FFFFFF", cursor: loading ? "not-allowed" : "pointer" }}>
-                  {loading ? "Sending…" : "Send Message"}
+                  {loading ? (<><Spinner />Sending…</>) : "Send Message"}
                 </button>
 
                 <p className="text-xs text-center font-light" style={{ color: "#7A5840" }}>

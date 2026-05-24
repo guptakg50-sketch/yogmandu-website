@@ -3,6 +3,7 @@ import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import PasswordInput from "@/components/PasswordInput";
+import Spinner from "@/components/Spinner";
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -106,7 +107,7 @@ function ResetPasswordForm() {
               )}
 
               <button type="submit" disabled={loading} style={{ ...primaryButton, opacity: loading ? 0.6 : 1, cursor: loading ? "not-allowed" : "pointer" }}>
-                {loading ? "Updating…" : "Update password"}
+                {loading ? (<><Spinner />Updating…</>) : "Update password"}
               </button>
             </form>
           )}

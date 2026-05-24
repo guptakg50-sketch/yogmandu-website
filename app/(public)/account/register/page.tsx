@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import PasswordInput from "@/components/PasswordInput";
+import Spinner from "@/components/Spinner";
 
 const EXPERIENCE_LEVELS = ["Beginner", "Intermediate", "Advanced"] as const;
 
@@ -277,7 +278,7 @@ export default function AccountRegisterPage() {
                 transition: "all 0.2s",
               }}
             >
-              {loading ? "Creating account…" : "Create Account"}
+              {loading ? (<><Spinner />Creating account…</>) : "Create Account"}
             </button>
 
             <p style={{ fontSize: 11, color: "#9A7860", textAlign: "center", marginTop: 14 }}>

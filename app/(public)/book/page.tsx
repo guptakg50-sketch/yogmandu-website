@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Spinner from "@/components/Spinner";
 
 // ── Service catalogue (mirrors ServicesGrid) ──────────────────────────────────
 type BookingService = {
@@ -202,7 +203,7 @@ function StepDots({ step }: { step: number }) {
 // ── Step 1 — Service selector ─────────────────────────────────────────────────
 function Step1({
   selected, onSelect, onNext,
-}: { selected: BookingService | null; onSelect: (s: BookingService) => void; onNext: () => void }) {
+}: { selected: BookingService[]; onSelect: (s: BookingService) => void; onNext: () => void }) {
   const [activeGroup, setActiveGroup] = useState<string>("All");
   const filtered = activeGroup === "All" ? SERVICES : SERVICES.filter(s => s.group === activeGroup);
 
@@ -214,7 +215,7 @@ function Step1({
           What would you like to book?
         </h2>
         <p style={{ fontSize: "0.92rem", color: "#7A5840" }}>
-          Select a service to continue
+          Select one or more services — then continue
         </p>
       </div>
 
@@ -250,27 +251,52 @@ function Step1({
         marginBottom: 32,
       }}>
         {filtered.map(s => (
-          <ServiceCard key={s.id} s={s} selected={selected?.id === s.id} onSelect={onSelect} />
+          <ServiceCard key={s.id} s={s} selected={selected.some(sel => sel.id === s.id)} onSelect={onSelect} />
         ))}
       </div>
+
+      {/* Selected summary strip */}
+      {selected.length > 0 && (
+        <div style={{
+          display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center",
+          marginBottom: 20,
+        }}>
+          {selected.map(s => (
+            <div key={s.id} style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              padding: "5px 12px", borderRadius: 99,
+              background: `${s.color}18`, border: `1.5px solid ${s.color}55`,
+              fontSize: "0.75rem", fontWeight: 600, color: s.color,
+              animation: "bookCheckIn 0.2s ease",
+            }}>
+              <span>{s.icon}</span>
+              <span>{s.title}</span>
+              <span style={{ opacity: 0.6, fontSize: "0.8rem", cursor: "pointer", marginLeft: 2 }}
+                onClick={e => { e.stopPropagation(); onSelect(s); }}>×</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div style={{ display: "flex", justifyContent: "center" }}>
         <button
           onClick={onNext}
-          disabled={!selected}
+          disabled={selected.length === 0}
           style={{
             padding: "14px 44px", borderRadius: 99, fontWeight: 600, fontSize: "0.9rem",
-            letterSpacing: "0.06em", cursor: selected ? "pointer" : "not-allowed",
-            background: selected
+            letterSpacing: "0.06em", cursor: selected.length > 0 ? "pointer" : "not-allowed",
+            background: selected.length > 0
               ? "linear-gradient(135deg, #6B2D8B, #9B4DC0)"
               : "rgba(42,18,8,0.08)",
-            color: selected ? "#fff" : "#9A7860",
+            color: selected.length > 0 ? "#fff" : "#9A7860",
             border: "none",
-            boxShadow: selected ? "0 10px 28px rgba(107,45,139,0.40)" : "none",
+            boxShadow: selected.length > 0 ? "0 10px 28px rgba(107,45,139,0.40)" : "none",
             transition: "all 0.25s ease",
           }}
         >
-          {selected ? `Continue with ${selected.title} →` : "Select a service to continue"}
+          {selected.length > 0
+            ? `Continue with ${selected.length} service${selected.length > 1 ? "s" : ""} →`
+            : "Select a service to continue"}
         </button>
       </div>
     </div>
@@ -279,8 +305,9 @@ function Step1({
 
 // ── Step 2 — Details form ─────────────────────────────────────────────────────
 function Step2({
-  service, onBack, onSuccess,
-}: { service: BookingService; onBack: () => void; onSuccess: () => void }) {
+  services, onBack, onSuccess,
+}: { services: BookingService[]; onBack: () => void; onSuccess: () => void }) {
+  const service = services[0]; // primary accent colour comes from first selection
   const cardRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
 
@@ -322,8 +349,8 @@ function Step2({
           name:          form.name,
           email:         form.email,
           phone:         form.phone,
-          serviceId:     service.id,
-          serviceTitle:  service.title,
+          serviceId:     services.map(s => s.id).join(", "),
+          serviceTitle:  services.map(s => s.title).join(", "),
           preferredDate: form.preferredDate,
           message:       form.message,
         }),
@@ -362,21 +389,25 @@ function Step2({
         ← Back
       </button>
 
-      {/* Service badge */}
-      <div style={{
-        display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 28,
-        padding: "10px 18px", borderRadius: 99,
-        background: `linear-gradient(135deg, ${service.color}18, ${service.color}08)`,
-        border: `1.5px solid ${service.color}44`,
-        boxShadow: `0 4px 16px ${service.color}22`,
-      }}>
-        <span style={{ fontSize: "1.2rem" }}>{service.icon}</span>
-        <div>
-          <p style={{ margin: 0, fontSize: "0.8rem", fontWeight: 700, color: service.color, letterSpacing: "0.06em" }}>
-            {service.title}
-          </p>
-          <p style={{ margin: 0, fontSize: "0.7rem", color: "#9A7860" }}>{service.subtitle}</p>
-        </div>
+      {/* Service badges — one per selected service */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 28 }}>
+        {services.map(svc => (
+          <div key={svc.id} style={{
+            display: "inline-flex", alignItems: "center", gap: 10,
+            padding: "10px 18px", borderRadius: 99,
+            background: `linear-gradient(135deg, ${svc.color}18, ${svc.color}08)`,
+            border: `1.5px solid ${svc.color}44`,
+            boxShadow: `0 4px 16px ${svc.color}22`,
+          }}>
+            <span style={{ fontSize: "1.1rem" }}>{svc.icon}</span>
+            <div>
+              <p style={{ margin: 0, fontSize: "0.78rem", fontWeight: 700, color: svc.color, letterSpacing: "0.06em" }}>
+                {svc.title}
+              </p>
+              <p style={{ margin: 0, fontSize: "0.68rem", color: "#9A7860" }}>{svc.subtitle}</p>
+            </div>
+          </div>
+        ))}
       </div>
 
       <div
@@ -496,7 +527,7 @@ function Step2({
             }}
           >
             <span style={{ position: "relative", zIndex: 2 }}>
-              {loading ? "Sending your booking…" : "Confirm Booking →"}
+              {loading ? (<><Spinner />Sending your booking…</>) : "Confirm Booking →"}
             </span>
             {!loading && (
               <span style={{
@@ -522,14 +553,15 @@ function Step2({
 }
 
 // ── Step 3 — Confirmation ─────────────────────────────────────────────────────
-function Step3({ service }: { service: BookingService }) {
+function Step3({ services }: { services: BookingService[] }) {
+  const primary = services[0];
   return (
     <div style={{ textAlign: "center", padding: "20px 0 40px" }}>
       {/* Animated success ring */}
       <div style={{ position: "relative", width: 100, height: 100, margin: "0 auto 28px" }}>
         <div style={{
           position: "absolute", inset: 0, borderRadius: "50%",
-          background: `conic-gradient(from 0deg, ${service.color} 0%, #8DC63F 60%, transparent 100%)`,
+          background: `conic-gradient(from 0deg, ${primary.color} 0%, #8DC63F 60%, transparent 100%)`,
           animation: "bookRingSpin 1.2s ease-out forwards",
           opacity: 0.9,
         }} />
@@ -558,9 +590,15 @@ function Step3({ service }: { service: BookingService }) {
       }}>
         We'll be in touch soon 🙏
       </h2>
-      <p style={{ fontSize: "1rem", color: "#4A2E1A", maxWidth: 440, margin: "0 auto 10px" }}>
-        Your booking request for <strong style={{ color: service.color }}>{service.title}</strong> has been sent to our team.
-        We'll confirm your session within 24 hours by email.
+      <p style={{ fontSize: "1rem", color: "#4A2E1A", maxWidth: 480, margin: "0 auto 14px" }}>
+        Your booking request for{" "}
+        {services.map((s, i) => (
+          <span key={s.id}>
+            <strong style={{ color: s.color }}>{s.title}</strong>
+            {i < services.length - 2 ? ", " : i < services.length - 1 ? " & " : ""}
+          </span>
+        ))}{" "}
+        has been sent to our team. We'll confirm within 24 hours by email.
       </p>
       <p style={{ fontSize: "0.88rem", color: "#7A5840", maxWidth: 380, margin: "0 auto 36px" }}>
         Check your inbox for a confirmation. Need faster help?
@@ -596,17 +634,21 @@ function BookPageInner() {
   const preServiceId  = searchParams.get("service");
 
   const [step,     setStep]     = useState<1 | 2 | 3>(1);
-  const [selected, setSelected] = useState<BookingService | null>(null);
+  const [selected, setSelected] = useState<BookingService[]>([]);
 
   // Pre-select service from URL param
   useEffect(() => {
     if (!preServiceId) return;
     const found = SERVICES.find(s => s.id === preServiceId);
-    if (found) setSelected(found);
+    if (found) setSelected([found]);
   }, [preServiceId]);
 
-  function handleSelect(s: BookingService) { setSelected(s); }
-  function handleNext() { if (selected) setStep(2); }
+  function handleSelect(s: BookingService) {
+    setSelected(prev =>
+      prev.some(p => p.id === s.id) ? prev.filter(p => p.id !== s.id) : [...prev, s]
+    );
+  }
+  function handleNext() { if (selected.length > 0) setStep(2); }
   function handleBack() { setStep(1); }
   function handleSuccess() { setStep(3); }
 
@@ -618,11 +660,11 @@ function BookPageInner() {
         {step === 1 && (
           <Step1 selected={selected} onSelect={handleSelect} onNext={handleNext} />
         )}
-        {step === 2 && selected && (
-          <Step2 service={selected} onBack={handleBack} onSuccess={handleSuccess} />
+        {step === 2 && selected.length > 0 && (
+          <Step2 services={selected} onBack={handleBack} onSuccess={handleSuccess} />
         )}
-        {step === 3 && selected && (
-          <Step3 service={selected} />
+        {step === 3 && selected.length > 0 && (
+          <Step3 services={selected} />
         )}
       </div>
     </>

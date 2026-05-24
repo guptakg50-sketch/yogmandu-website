@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Turnstile from "@/components/Turnstile";
+import Spinner from "@/components/Spinner";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail]     = useState("");
@@ -81,7 +82,7 @@ export default function ForgotPasswordPage() {
               <Turnstile onVerify={setCaptchaToken} action="forgot-password" />
 
               <button type="submit" disabled={loading} style={{ ...primaryButton, opacity: loading ? 0.6 : 1, cursor: loading ? "not-allowed" : "pointer" }}>
-                {loading ? "Sending…" : "Send reset link"}
+                {loading ? (<><Spinner />Sending…</>) : "Send reset link"}
               </button>
             </form>
           )}

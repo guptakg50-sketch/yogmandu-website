@@ -583,6 +583,12 @@ export default function ServicesGrid() {
           0%   { background-position: -200% 0; }
           100% { background-position:  200% 0; }
         }
+        @keyframes ctaGemFloat {
+          0%   { transform: translateY(0)    rotate(0deg)   scale(1); }
+          33%  { transform: translateY(-18px) rotate(6deg)  scale(1.06); }
+          66%  { transform: translateY(-8px)  rotate(-4deg) scale(0.97); }
+          100% { transform: translateY(0)    rotate(0deg)   scale(1); }
+        }
         .svc-card .svc-icon { transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .svc-card:hover .svc-icon {
           transform: translateY(-2px) scale(1.08) rotate(-3deg);
@@ -759,24 +765,185 @@ export default function ServicesGrid() {
       {/* ── Closing CTA ──────────────────────────────────────────────── */}
       <section className="relative py-24 px-6 overflow-hidden"
         style={{ background: "linear-gradient(160deg, #1a0a2e 0%, #2d1060 50%, #1a0a2e 100%)" }}>
+
+        {/* ── Layer 1: deep volumetric orbs ── */}
         <div className="absolute inset-0 pointer-events-none">
-          <div style={{ position: "absolute", top: "20%", left: "10%", width: 320, height: 320, borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(247,148,29,0.18) 0%, transparent 70%)", filter: "blur(45px)",
-            animation: "svcOrbDrift 12s ease-in-out infinite" }} />
-          <div style={{ position: "absolute", bottom: "10%", right: "12%", width: 280, height: 280, borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(141,198,63,0.16) 0%, transparent 70%)", filter: "blur(45px)",
-            animation: "svcOrbDrift 14s ease-in-out infinite reverse" }} />
+          <div style={{ position:"absolute", top:"5%",  left:"-5%",  width:480, height:480, borderRadius:"50%",
+            background:"radial-gradient(circle, rgba(107,45,139,0.55) 0%, transparent 65%)", filter:"blur(60px)",
+            animation:"svcOrbDrift 18s ease-in-out infinite" }} />
+          <div style={{ position:"absolute", bottom:"0%", right:"-6%", width:440, height:440, borderRadius:"50%",
+            background:"radial-gradient(circle, rgba(247,148,29,0.22) 0%, transparent 65%)", filter:"blur(55px)",
+            animation:"svcOrbDrift 22s ease-in-out infinite reverse" }} />
+          <div style={{ position:"absolute", top:"35%",  left:"38%",  width:300, height:300, borderRadius:"50%",
+            background:"radial-gradient(circle, rgba(141,198,63,0.18) 0%, transparent 65%)", filter:"blur(50px)",
+            animation:"svcOrbDrift 14s ease-in-out 2s infinite" }} />
+          <div style={{ position:"absolute", top:"60%", left:"15%",  width:220, height:220, borderRadius:"50%",
+            background:"radial-gradient(circle, rgba(247,148,29,0.14) 0%, transparent 70%)", filter:"blur(40px)",
+            animation:"svcOrbDrift 16s ease-in-out 1s infinite reverse" }} />
+          <div style={{ position:"absolute", top:"10%", right:"18%", width:180, height:180, borderRadius:"50%",
+            background:"radial-gradient(circle, rgba(141,198,63,0.12) 0%, transparent 70%)", filter:"blur(35px)",
+            animation:"svcOrbDrift 11s ease-in-out 3s infinite" }} />
         </div>
-        <svg style={{
-          position: "absolute", top: "50%", left: "50%", opacity: 0.08, pointerEvents: "none",
-          animation: "svcMandalaSpin 90s linear infinite",
-        }} width="500" height="500" viewBox="0 0 500 500" fill="none">
-          <circle cx="250" cy="250" r="240" stroke="#8DC63F" strokeWidth="1" />
-          <circle cx="250" cy="250" r="180" stroke="#8DC63F" strokeWidth="1" />
-          <circle cx="250" cy="250" r="120" stroke="#8DC63F" strokeWidth="1" />
-          {Array.from({ length: 18 }).map((_, i) => (
-            <line key={i} x1="250" y1="10" x2="250" y2="490" stroke="#8DC63F" strokeWidth="0.4"
-              transform={`rotate(${i * 20} 250 250)`} />
+
+        {/* ── Layer 2: dual-spin mandala ── */}
+        <svg style={{ position:"absolute", top:"50%", left:"50%", opacity:0.11, pointerEvents:"none",
+          animation:"svcMandalaSpin 70s linear infinite" }}
+          width="620" height="620" viewBox="0 0 620 620" fill="none">
+          {/* outer petal ring */}
+          {Array.from({ length: 16 }).map((_, i) => {
+            const a = (i * 22.5) * Math.PI / 180;
+            return <ellipse key={i} cx={310 + Math.cos(a)*120} cy={310 + Math.sin(a)*120}
+              rx="150" ry="52" stroke="#8DC63F" strokeWidth="0.8"
+              transform={`rotate(${i*22.5} 310 310)`} />;
+          })}
+          <circle cx="310" cy="310" r="300" stroke="#8DC63F" strokeWidth="0.6" strokeDasharray="4 8" />
+          <circle cx="310" cy="310" r="240" stroke="#F7941D" strokeWidth="0.5" />
+          <circle cx="310" cy="310" r="165" stroke="#8DC63F" strokeWidth="0.8" />
+          <circle cx="310" cy="310" r="90"  stroke="#F7941D" strokeWidth="1" />
+          <circle cx="310" cy="310" r="36"  stroke="#8DC63F" strokeWidth="1.2" />
+          {Array.from({ length: 24 }).map((_, i) => (
+            <line key={i} x1="310" y1="10" x2="310" y2="610" stroke="#8DC63F" strokeWidth="0.3"
+              transform={`rotate(${i*15} 310 310)`} />
+          ))}
+        </svg>
+        {/* counter-rotating inner ring */}
+        <svg style={{ position:"absolute", top:"50%", left:"50%", opacity:0.08, pointerEvents:"none",
+          animation:"svcDecoSpinRev 50s linear infinite" }}
+          width="380" height="380" viewBox="0 0 380 380" fill="none">
+          {Array.from({ length: 8 }).map((_, i) => {
+            const a = (i*45) * Math.PI / 180;
+            return <ellipse key={i} cx={190 + Math.cos(a)*60} cy={190 + Math.sin(a)*60}
+              rx="90" ry="30" stroke="#F7941D" strokeWidth="1"
+              transform={`rotate(${i*45} 190 190)`} />;
+          })}
+          <circle cx="190" cy="190" r="175" stroke="#F7941D" strokeWidth="0.6" strokeDasharray="3 6" />
+          {Array.from({ length: 12 }).map((_, i) => {
+            const a = (i*30) * Math.PI / 180;
+            return <circle key={i} r="4" cx={190+Math.cos(a)*155} cy={190+Math.sin(a)*155} fill="#F7941D" opacity="0.7" />;
+          })}
+        </svg>
+
+        {/* ── Layer 3: floating 3-D gem shapes ── */}
+        {/* Top-left diamond */}
+        <svg style={{ position:"absolute", top:"8%", left:"6%", width:80, height:80, opacity:0.22, pointerEvents:"none",
+          animation:"ctaGemFloat 9s ease-in-out infinite", filter:"drop-shadow(0 0 8px rgba(141,198,63,0.6))" }}
+          viewBox="0 0 80 80" fill="none">
+          <polygon points="40,4 72,28 72,52 40,76 8,52 8,28" stroke="#8DC63F" strokeWidth="1.5" fill="rgba(141,198,63,0.08)" />
+          <polygon points="40,4 72,28 40,40 8,28" stroke="#8DC63F" strokeWidth="1" fill="rgba(141,198,63,0.05)" />
+          <polygon points="40,40 72,28 72,52 40,76" stroke="#8DC63F" strokeWidth="0.8" fill="rgba(141,198,63,0.04)" />
+          <line x1="8" y1="28" x2="72" y2="28" stroke="#8DC63F" strokeWidth="0.8" opacity="0.5" />
+          <line x1="40" y1="4" x2="40" y2="40" stroke="#8DC63F" strokeWidth="0.8" opacity="0.4" />
+        </svg>
+        {/* Top-right crystal */}
+        <svg style={{ position:"absolute", top:"12%", right:"7%", width:70, height:90, opacity:0.20, pointerEvents:"none",
+          animation:"ctaGemFloat 12s ease-in-out 1.5s infinite", filter:"drop-shadow(0 0 8px rgba(247,148,29,0.5))" }}
+          viewBox="0 0 70 90" fill="none">
+          <polygon points="35,4 66,24 66,66 35,86 4,66 4,24" stroke="#F7941D" strokeWidth="1.5" fill="rgba(247,148,29,0.07)" />
+          <polygon points="35,4 66,24 35,36 4,24" stroke="#F7941D" strokeWidth="1" fill="rgba(247,148,29,0.06)" />
+          <line x1="4" y1="24" x2="66" y2="24" stroke="#F7941D" strokeWidth="0.8" opacity="0.5" />
+          <line x1="35" y1="4" x2="35" y2="86" stroke="#F7941D" strokeWidth="0.6" opacity="0.35" />
+          {[0,1,2,3,4,5].map(i => {
+            const a = i*60*Math.PI/180; const r=10;
+            return <circle key={i} cx={35+Math.cos(a)*r} cy={45+Math.sin(a)*r} r="1.5" fill="#F7941D" opacity="0.6" />;
+          })}
+        </svg>
+        {/* Bottom-left tetrahedron */}
+        <svg style={{ position:"absolute", bottom:"14%", left:"8%", width:65, height:65, opacity:0.18, pointerEvents:"none",
+          animation:"ctaGemFloat 10s ease-in-out 3s infinite reverse", filter:"drop-shadow(0 0 6px rgba(107,45,139,0.7))" }}
+          viewBox="0 0 65 65" fill="none">
+          <polygon points="32,4 60,52 4,52" stroke="#9B6BDF" strokeWidth="1.5" fill="rgba(107,45,139,0.08)" />
+          <line x1="32" y1="4" x2="32" y2="52" stroke="#9B6BDF" strokeWidth="0.8" opacity="0.5" />
+          <line x1="18" y1="28" x2="46" y2="28" stroke="#9B6BDF" strokeWidth="0.8" opacity="0.4" />
+          <circle cx="32" cy="4" r="2.5" fill="#9B6BDF" opacity="0.7" />
+          <circle cx="60" cy="52" r="2.5" fill="#9B6BDF" opacity="0.7" />
+          <circle cx="4"  cy="52" r="2.5" fill="#9B6BDF" opacity="0.7" />
+        </svg>
+        {/* Bottom-right octahedron-ish */}
+        <svg style={{ position:"absolute", bottom:"10%", right:"9%", width:74, height:74, opacity:0.20, pointerEvents:"none",
+          animation:"ctaGemFloat 14s ease-in-out 0.8s infinite", filter:"drop-shadow(0 0 8px rgba(141,198,63,0.5))" }}
+          viewBox="0 0 74 74" fill="none">
+          <polygon points="37,4 70,37 37,70 4,37" stroke="#8DC63F" strokeWidth="1.5" fill="rgba(141,198,63,0.06)" />
+          <polygon points="37,4 70,37 37,37" stroke="#8DC63F" strokeWidth="0.8" fill="rgba(141,198,63,0.05)" />
+          <polygon points="37,70 4,37 37,37" stroke="#8DC63F" strokeWidth="0.8" fill="rgba(141,198,63,0.03)" />
+          <line x1="4"  y1="37" x2="70" y2="37" stroke="#8DC63F" strokeWidth="0.7" opacity="0.5" />
+          <line x1="37" y1="4"  x2="37" y2="70" stroke="#8DC63F" strokeWidth="0.7" opacity="0.4" />
+          {[0,1,2,3].map(i => {
+            const pts = [[37,4],[70,37],[37,70],[4,37]];
+            return <circle key={i} cx={pts[i][0]} cy={pts[i][1]} r="3" fill="#8DC63F" opacity="0.6" />;
+          })}
+        </svg>
+        {/* Mid-left small spinning square */}
+        <svg style={{ position:"absolute", top:"42%", left:"3%", width:44, height:44, opacity:0.16, pointerEvents:"none",
+          animation:"svcDecoSpin 20s linear infinite", filter:"drop-shadow(0 0 5px rgba(247,148,29,0.5))" }}
+          viewBox="0 0 44 44" fill="none">
+          <rect x="4" y="4" width="36" height="36" stroke="#F7941D" strokeWidth="1.2" fill="none" transform="rotate(15 22 22)" />
+          <rect x="10" y="10" width="24" height="24" stroke="#F7941D" strokeWidth="0.8" fill="rgba(247,148,29,0.06)" transform="rotate(30 22 22)" />
+          <circle cx="22" cy="22" r="3" fill="#F7941D" opacity="0.5" />
+        </svg>
+        {/* Mid-right small gem */}
+        <svg style={{ position:"absolute", top:"38%", right:"4%", width:48, height:48, opacity:0.15, pointerEvents:"none",
+          animation:"ctaGemFloat 8s ease-in-out 2s infinite reverse", filter:"drop-shadow(0 0 5px rgba(141,198,63,0.5))" }}
+          viewBox="0 0 48 48" fill="none">
+          <polygon points="24,4 44,18 44,30 24,44 4,30 4,18" stroke="#8DC63F" strokeWidth="1.2" fill="rgba(141,198,63,0.06)" />
+          <line x1="4" y1="18" x2="44" y2="18" stroke="#8DC63F" strokeWidth="0.7" opacity="0.5" />
+          <line x1="24" y1="4" x2="24" y2="44" stroke="#8DC63F" strokeWidth="0.7" opacity="0.35" />
+        </svg>
+
+        {/* ── Layer 4: light rays from center ── */}
+        <svg style={{ position:"absolute", top:"50%", left:"50%", opacity:0.06, pointerEvents:"none",
+          animation:"svcMandalaSpin 40s linear infinite" }}
+          width="900" height="900" viewBox="0 0 900 900" fill="none">
+          {Array.from({ length: 12 }).map((_, i) => {
+            const a = (i * 30) * Math.PI / 180;
+            return <line key={i}
+              x1="450" y1="450"
+              x2={450 + Math.cos(a) * 420} y2={450 + Math.sin(a) * 420}
+              stroke="url(#ctaRay)" strokeWidth={i%2===0 ? 2 : 1} />;
+          })}
+          <defs>
+            <linearGradient id="ctaRay" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stopColor="#ffffff" stopOpacity="0.9" />
+              <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+        </svg>
+
+        {/* ── Layer 5: floating dust particles ── */}
+        <div className="absolute inset-0 pointer-events-none">
+          {[
+            { left:"8%",  bot:"0", w:3, delay:0,   dur:14, c:"#F7941D" },
+            { left:"18%", bot:"0", w:2, delay:2.2, dur:18, c:"#8DC63F" },
+            { left:"29%", bot:"0", w:4, delay:0.8, dur:12, c:"#9B6BDF" },
+            { left:"41%", bot:"0", w:2, delay:3.1, dur:16, c:"#F7941D" },
+            { left:"53%", bot:"0", w:3, delay:1.4, dur:20, c:"#8DC63F" },
+            { left:"64%", bot:"0", w:2, delay:0.3, dur:15, c:"#F7941D" },
+            { left:"75%", bot:"0", w:4, delay:2.7, dur:13, c:"#9B6BDF" },
+            { left:"87%", bot:"0", w:3, delay:1.0, dur:17, c:"#8DC63F" },
+            { left:"13%", bot:"0", w:2, delay:4.0, dur:19, c:"#F7941D" },
+            { left:"46%", bot:"0", w:3, delay:1.8, dur:11, c:"#9B6BDF" },
+          ].map((p, i) => (
+            <div key={i} style={{
+              position:"absolute", left:p.left, bottom:0,
+              width:p.w, height:p.w*2, borderRadius:"50% 50% 50% 0",
+              background:p.c, opacity:0,
+              animation:`floatUpServ ${p.dur}s ease-in-out ${p.delay}s infinite`,
+              filter:"blur(0.5px)",
+            }} />
+          ))}
+        </div>
+
+        {/* ── Layer 6: perspective grid floor ── */}
+        <svg style={{ position:"absolute", bottom:0, left:0, right:0, width:"100%", height:180,
+          opacity:0.06, pointerEvents:"none" }}
+          viewBox="0 0 1440 180" preserveAspectRatio="none" fill="none">
+          {Array.from({ length: 13 }).map((_, i) => (
+            <line key={`v${i}`}
+              x1={720} y1={0}
+              x2={i*(1440/12)} y2={180}
+              stroke="#8DC63F" strokeWidth="0.8" />
+          ))}
+          {[40,80,120,160].map((y, i) => (
+            <line key={`h${i}`} x1="0" y1={y} x2="1440" y2={y} stroke="#8DC63F" strokeWidth="0.5" />
           ))}
         </svg>
 

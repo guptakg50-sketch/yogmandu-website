@@ -3,6 +3,7 @@ import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import PasswordInput from "@/components/PasswordInput";
+import Spinner from "@/components/Spinner";
 
 // Reject anything that isn't an internal, single-leading-slash path.
 // Blocks open-redirect via `?from=//evil.com` or `?from=https://evil.com`.
@@ -104,7 +105,7 @@ function LoginForm() {
             )}
 
             <button type="submit" disabled={loading} style={{ width: "100%", padding: "14px", background: loading ? "rgba(107,45,139,0.5)" : "linear-gradient(135deg, #6B2D8B 0%, #8B3DAB 100%)", border: "none", borderRadius: 12, color: "#fff", fontSize: 15, fontWeight: 500, cursor: loading ? "not-allowed" : "pointer", letterSpacing: "0.02em", fontFamily: "'DM Sans', sans-serif", boxShadow: "0 6px 20px rgba(107,45,139,0.35)", transition: "all 0.2s" }}>
-              {loading ? "Signing in…" : "Sign In"}
+              {loading ? (<><Spinner />Signing in…</>) : "Sign In"}
             </button>
           </form>
 
