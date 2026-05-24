@@ -133,6 +133,7 @@ export function Lightbox({
         .lb-nav:disabled { opacity:.18 !important; cursor:default !important; }
       `}</style>
       <button className="lb-nav" disabled={index === 0}
+        aria-label="Previous photo"
         style={{ ...navStyle, left:20 }}
         onClick={e => { e.stopPropagation(); onPrev(); }}>←</button>
       <div onClick={e => e.stopPropagation()}
@@ -158,9 +159,11 @@ export function Lightbox({
         </div>
       </div>
       <button className="lb-nav" disabled={index === photos.length - 1}
+        aria-label="Next photo"
         style={{ ...navStyle, right:20 }}
         onClick={e => { e.stopPropagation(); onNext(); }}>→</button>
       <button onClick={onClose}
+        aria-label="Close lightbox"
         style={{ position:"absolute", top:20, right:24, background:"none", border:"none",
           color:"rgba(255,255,255,0.35)", fontSize:28, cursor:"pointer", lineHeight:1 }}
         onMouseEnter={e => (e.currentTarget.style.color="#fff")}
@@ -348,11 +351,13 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
             </p>
             <div style={{ display:"flex", gap:10, alignItems:"center" }}>
               <button className="ym-nav-btn" disabled={!canPrev} onClick={() => slide(-1)}
+                aria-label="Previous photos"
                 style={{ width:44, height:44, borderRadius:"50%", border:"1px solid #ddd5c8",
                   background:"#fff", color:"#5a4a38", fontSize:18, cursor:"pointer",
                   display:"flex", alignItems:"center", justifyContent:"center",
                   boxShadow:"0 2px 8px rgba(0,0,0,0.07)" }}>←</button>
               <button className="ym-nav-btn" disabled={!canNext} onClick={() => slide(1)}
+                aria-label="Next photos"
                 style={{ width:44, height:44, borderRadius:"50%", border:"1px solid #ddd5c8",
                   background:"#fff", color:"#5a4a38", fontSize:18, cursor:"pointer",
                   display:"flex", alignItems:"center", justifyContent:"center",

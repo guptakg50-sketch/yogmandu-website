@@ -5,6 +5,7 @@ import SingingBowl from "@/components/SingingBowlClient";
 import MountainScene from "@/components/MountainSceneClient";
 import ProgramsSection from "@/components/ProgramsSectionClient";
 import WhySection from "@/components/WhySection";
+import { DeferUntilIdle, DeferUntilVisible } from "@/components/DeferredHeavy";
 
 export const metadata: Metadata = {
   title: "Yoga Teacher Training Nepal | Yogmandu Kathmandu",
@@ -146,10 +147,19 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* 3D Bowl */}
+          {/* 3D Bowl — deferred until browser is idle so it doesn't block TBT */}
           <div className="flex flex-col items-center justify-center animate-fade-in" style={{ animationDelay: "0.4s", opacity: 0 }}>
             <div className="relative w-full max-w-xs h-72 animate-pulse-glow rounded-full">
-              <SingingBowl />
+              <DeferUntilIdle
+                fallback={
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="w-24 h-24 rounded-full border-2 animate-pulse"
+                      style={{ borderColor: "rgba(107,45,139,0.3)" }} />
+                  </div>
+                }
+              >
+                <SingingBowl />
+              </DeferUntilIdle>
             </div>
             <p className="mt-3 text-xs tracking-[0.25em] uppercase font-medium"
               style={{ color: "rgba(247,148,29,0.6)" }}>
@@ -268,8 +278,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── PROGRAMS — 3D interactive section ── */}
-      <ProgramsSection />
+      {/* ── PROGRAMS — 3D interactive section, lazy when in view ── */}
+      <DeferUntilVisible fallback={<div style={{ minHeight: 600 }} />}>
+        <ProgramsSection />
+      </DeferUntilVisible>
 
       {/* ── NEPAL — deep purple bg, white text ── */}
       <section className="relative overflow-hidden" style={{ background: "#3D1560" }}>
@@ -321,7 +333,9 @@ export default function HomePage() {
         </div>
 
         <div className="relative">
-          <MountainScene />
+          <DeferUntilVisible fallback={<div style={{ minHeight: 420 }} />}>
+            <MountainScene />
+          </DeferUntilVisible>
           <div className="absolute inset-x-0 bottom-0 h-20 pointer-events-none"
             style={{ background: "linear-gradient(to top, #3D1560, transparent)" }} />
         </div>
@@ -330,8 +344,10 @@ export default function HomePage() {
       {/* ── WHY YOGMANDU ── */}
       <WhySection />
 
-      {/* ── TESTIMONIALS ── */}
-      <Testimonials />
+      {/* ── TESTIMONIALS — heavy 3D bg, defer until visible ── */}
+      <DeferUntilVisible fallback={<div style={{ minHeight: 600 }} />}>
+        <Testimonials />
+      </DeferUntilVisible>
     </>
   );
 }

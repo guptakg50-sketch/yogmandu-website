@@ -117,7 +117,7 @@ export default function Footer() {
         {/* Brand */}
         <div style={{ gridColumn: "span 2" }}>
           <div style={{ marginBottom: 16 }}>
-            <img src="/logo.png" alt="Yogmandu" width={140} height={56} loading="lazy" decoding="async" style={{ height: 56, width: "auto", objectFit: "contain" }} />
+            <img src="/logo-sm.png" alt="Yogmandu" width={140} height={56} loading="lazy" decoding="async" style={{ height: 56, width: "auto", objectFit: "contain" }} />
           </div>
           <p style={{ fontSize: "0.92rem", lineHeight: 1.75, color: "#5C3D2E", maxWidth: 280, fontWeight: 400, marginBottom: 24 }}>
             {cfg.description}

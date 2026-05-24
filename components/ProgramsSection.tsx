@@ -271,6 +271,7 @@ export default function ProgramsSection() {
           <div style={{ display:"flex", alignItems:"center", gap:16 }}>
             <button
               onClick={prev} disabled={active === 0}
+              aria-label="Previous program"
               style={{ width:44, height:44, borderRadius:"50%", border:"1.5px solid rgba(107,45,139,0.25)",
                 background:"rgba(255,255,255,0.8)", display:"flex", alignItems:"center", justifyContent:"center",
                 cursor:active===0?"not-allowed":"pointer", opacity:active===0?0.35:1,
@@ -294,6 +295,7 @@ export default function ProgramsSection() {
 
             <button
               onClick={next} disabled={active === CARDS.length - 1}
+              aria-label="Next program"
               style={{ width:44, height:44, borderRadius:"50%", border:"1.5px solid rgba(107,45,139,0.25)",
                 background:"rgba(255,255,255,0.8)", display:"flex", alignItems:"center", justifyContent:"center",
                 cursor:active===CARDS.length-1?"not-allowed":"pointer", opacity:active===CARDS.length-1?0.35:1,

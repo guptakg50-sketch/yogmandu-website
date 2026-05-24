@@ -1,0 +1,9 @@
+# Target modern browsers so SWC skips legacy polyfills (Array.at, flat,
+# Object.hasOwn, Object.fromEntries, String.trimStart/End, etc.).
+# Anyone on an older browser is < 0.3% of global traffic and won't be
+# meaningfully degraded.
+>0.3%
+last 2 versions
+not dead
+not ie 11
+not op_mini all
