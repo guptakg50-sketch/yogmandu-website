@@ -1,315 +1,351 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import {
+  motion, AnimatePresence,
+  useMotionValue, useTransform, useSpring,
+} from "framer-motion";
 import type { DBSession } from "@/lib/publicData";
 import { resolveInstructor, styleToAccent } from "@/lib/publicData";
 
-const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 
-const DAY_MAP: Record<string, string> = {
-  Mon: "Monday", Tue: "Tuesday", Wed: "Wednesday", Thu: "Thursday",
-  Fri: "Friday", Sat: "Saturday", Sun: "Sunday",
+const DAY_MAP: Record<string,string> = {
+  Mon:"Monday", Tue:"Tuesday", Wed:"Wednesday", Thu:"Thursday",
+  Fri:"Friday", Sat:"Saturday", Sun:"Sunday",
 };
 
-// ── Hardcoded fallback ─────────────────────────────────────────────────────────
-const FALLBACK: Record<string, { time: string; name: string; level: string; duration: string; instructor: string; accent: string }[]> = {
-  Monday: [
-    { time: "5:30 - 6:30 AM",  name: "Flexibility Yoga",          level: "All levels",   duration: "60 min", instructor: "Baikuntha Paudel",      accent: "#F7941D" },
-    { time: "6:30 - 7:30 AM",  name: "Ashtanga Vinyasa Yoga",     level: "Intermediate", duration: "60 min", instructor: "Baikuntha Paudel",      accent: "#F7941D" },
-    { time: "6:30 - 7:30 AM",  name: "Asana & Meditation",        level: "All levels",   duration: "60 min", instructor: "Sudha Rajouria",         accent: "#6B2D8B" },
-    { time: "6:30 - 9:00 AM",  name: "Yoga Teacher's Training",   level: "Advanced",     duration: "150 min",instructor: "Dr. Chintamani Gautam", accent: "#4A6418" },
-    { time: "9:30 - 10:30 AM", name: "Power Yoga",                level: "Intermediate", duration: "60 min", instructor: "Soniya Shahi",          accent: "#F7941D" },
-    { time: "3:00 - 5:30 PM",  name: "Yoga Teacher's Training",   level: "Advanced",     duration: "150 min",instructor: "Arjun Rakhal",          accent: "#4A6418" },
+const FALLBACK: Record<string,{ time:string; name:string; level:string; duration:string; instructor:string; accent:string }[]> = {
+  Monday:[
+    { time:"5:30 – 6:30 AM",  name:"Flexibility Yoga",        level:"All levels",   duration:"60 min",  instructor:"Baikuntha Paudel",       accent:"#F7941D" },
+    { time:"6:30 – 7:30 AM",  name:"Ashtanga Vinyasa Yoga",   level:"Intermediate", duration:"60 min",  instructor:"Baikuntha Paudel",       accent:"#F7941D" },
+    { time:"6:30 – 7:30 AM",  name:"Asana & Meditation",      level:"All levels",   duration:"60 min",  instructor:"Sudha Rajouria",          accent:"#6B2D8B" },
+    { time:"6:30 – 9:00 AM",  name:"Yoga Teacher's Training", level:"Advanced",     duration:"150 min", instructor:"Dr. Chintamani Gautam",  accent:"#4A6418" },
+    { time:"9:30 – 10:30 AM", name:"Power Yoga",              level:"Intermediate", duration:"60 min",  instructor:"Soniya Shahi",           accent:"#F7941D" },
+    { time:"3:00 – 5:30 PM",  name:"Yoga Teacher's Training", level:"Advanced",     duration:"150 min", instructor:"Arjun Rakhal",           accent:"#4A6418" },
   ],
-  Tuesday: [
-    { time: "5:30 - 6:30 AM",  name: "Flexibility Yoga",          level: "All levels",   duration: "60 min", instructor: "Baikuntha Paudel",      accent: "#F7941D" },
-    { time: "6:30 - 7:30 AM",  name: "Ashtanga Vinyasa Yoga",     level: "Intermediate", duration: "60 min", instructor: "Baikuntha Paudel",      accent: "#F7941D" },
-    { time: "6:30 - 9:00 AM",  name: "Yoga Teacher's Training",   level: "Advanced",     duration: "150 min",instructor: "Dr. Chintamani Gautam", accent: "#4A6418" },
-    { time: "9:30 - 10:30 AM", name: "Power Yoga",                level: "Intermediate", duration: "60 min", instructor: "Soniya Shahi",          accent: "#F7941D" },
-    { time: "3:00 - 5:30 PM",  name: "Yoga Teacher's Training",   level: "Advanced",     duration: "150 min",instructor: "Arjun Rakhal",          accent: "#4A6418" },
+  Tuesday:[
+    { time:"5:30 – 6:30 AM",  name:"Flexibility Yoga",        level:"All levels",   duration:"60 min",  instructor:"Baikuntha Paudel",       accent:"#F7941D" },
+    { time:"6:30 – 7:30 AM",  name:"Ashtanga Vinyasa Yoga",   level:"Intermediate", duration:"60 min",  instructor:"Baikuntha Paudel",       accent:"#F7941D" },
+    { time:"6:30 – 9:00 AM",  name:"Yoga Teacher's Training", level:"Advanced",     duration:"150 min", instructor:"Dr. Chintamani Gautam",  accent:"#4A6418" },
+    { time:"9:30 – 10:30 AM", name:"Power Yoga",              level:"Intermediate", duration:"60 min",  instructor:"Soniya Shahi",           accent:"#F7941D" },
+    { time:"3:00 – 5:30 PM",  name:"Yoga Teacher's Training", level:"Advanced",     duration:"150 min", instructor:"Arjun Rakhal",           accent:"#4A6418" },
   ],
-  Wednesday: [
-    { time: "5:30 - 6:30 AM",  name: "Flexibility Yoga",          level: "All levels",   duration: "60 min", instructor: "Baikuntha Paudel",      accent: "#F7941D" },
-    { time: "6:30 - 7:30 AM",  name: "Ashtanga Vinyasa Yoga",     level: "Intermediate", duration: "60 min", instructor: "Baikuntha Paudel",      accent: "#F7941D" },
-    { time: "6:30 - 7:30 AM",  name: "Asana & Meditation",        level: "All levels",   duration: "60 min", instructor: "Sudha Rajouria",         accent: "#6B2D8B" },
-    { time: "6:30 - 9:00 AM",  name: "Yoga Teacher's Training",   level: "Advanced",     duration: "150 min",instructor: "Dr. Chintamani Gautam", accent: "#4A6418" },
-    { time: "9:30 - 10:30 AM", name: "Power Yoga",                level: "Intermediate", duration: "60 min", instructor: "Soniya Shahi",          accent: "#F7941D" },
-    { time: "3:00 - 5:30 PM",  name: "Yoga Teacher's Training",   level: "Advanced",     duration: "150 min",instructor: "Arjun Rakhal",          accent: "#4A6418" },
+  Wednesday:[
+    { time:"5:30 – 6:30 AM",  name:"Flexibility Yoga",        level:"All levels",   duration:"60 min",  instructor:"Baikuntha Paudel",       accent:"#F7941D" },
+    { time:"6:30 – 7:30 AM",  name:"Ashtanga Vinyasa Yoga",   level:"Intermediate", duration:"60 min",  instructor:"Baikuntha Paudel",       accent:"#F7941D" },
+    { time:"6:30 – 7:30 AM",  name:"Asana & Meditation",      level:"All levels",   duration:"60 min",  instructor:"Sudha Rajouria",          accent:"#6B2D8B" },
+    { time:"6:30 – 9:00 AM",  name:"Yoga Teacher's Training", level:"Advanced",     duration:"150 min", instructor:"Dr. Chintamani Gautam",  accent:"#4A6418" },
+    { time:"9:30 – 10:30 AM", name:"Power Yoga",              level:"Intermediate", duration:"60 min",  instructor:"Soniya Shahi",           accent:"#F7941D" },
+    { time:"3:00 – 5:30 PM",  name:"Yoga Teacher's Training", level:"Advanced",     duration:"150 min", instructor:"Arjun Rakhal",           accent:"#4A6418" },
   ],
-  Thursday: [
-    { time: "5:30 - 6:30 AM",  name: "Flexibility Yoga",          level: "All levels",   duration: "60 min", instructor: "Baikuntha Paudel",      accent: "#F7941D" },
-    { time: "6:30 - 7:30 AM",  name: "Ashtanga Vinyasa Yoga",     level: "Intermediate", duration: "60 min", instructor: "Baikuntha Paudel",      accent: "#F7941D" },
-    { time: "6:30 - 9:00 AM",  name: "Yoga Teacher's Training",   level: "Advanced",     duration: "150 min",instructor: "Dr. Chintamani Gautam", accent: "#4A6418" },
-    { time: "9:30 - 10:30 AM", name: "Power Yoga",                level: "Intermediate", duration: "60 min", instructor: "Soniya Shahi",          accent: "#F7941D" },
-    { time: "3:00 - 5:30 PM",  name: "Yoga Teacher's Training",   level: "Advanced",     duration: "150 min",instructor: "Arjun Rakhal",          accent: "#4A6418" },
+  Thursday:[
+    { time:"5:30 – 6:30 AM",  name:"Flexibility Yoga",        level:"All levels",   duration:"60 min",  instructor:"Baikuntha Paudel",       accent:"#F7941D" },
+    { time:"6:30 – 7:30 AM",  name:"Ashtanga Vinyasa Yoga",   level:"Intermediate", duration:"60 min",  instructor:"Baikuntha Paudel",       accent:"#F7941D" },
+    { time:"6:30 – 9:00 AM",  name:"Yoga Teacher's Training", level:"Advanced",     duration:"150 min", instructor:"Dr. Chintamani Gautam",  accent:"#4A6418" },
+    { time:"9:30 – 10:30 AM", name:"Power Yoga",              level:"Intermediate", duration:"60 min",  instructor:"Soniya Shahi",           accent:"#F7941D" },
+    { time:"3:00 – 5:30 PM",  name:"Yoga Teacher's Training", level:"Advanced",     duration:"150 min", instructor:"Arjun Rakhal",           accent:"#4A6418" },
   ],
-  Friday: [
-    { time: "5:30 - 6:30 AM",  name: "Flexibility Yoga",          level: "All levels",   duration: "60 min", instructor: "Baikuntha Paudel",      accent: "#F7941D" },
-    { time: "6:30 - 7:30 AM",  name: "Ashtanga Vinyasa Yoga",     level: "Intermediate", duration: "60 min", instructor: "Baikuntha Paudel",      accent: "#F7941D" },
-    { time: "6:30 - 7:30 AM",  name: "Asana & Meditation",        level: "All levels",   duration: "60 min", instructor: "Sudha Rajouria",         accent: "#6B2D8B" },
-    { time: "6:30 - 9:00 AM",  name: "Yoga Teacher's Training",   level: "Advanced",     duration: "150 min",instructor: "Dr. Chintamani Gautam", accent: "#4A6418" },
-    { time: "9:30 - 10:30 AM", name: "Power Yoga",                level: "Intermediate", duration: "60 min", instructor: "Soniya Shahi",          accent: "#F7941D" },
+  Friday:[
+    { time:"5:30 – 6:30 AM",  name:"Flexibility Yoga",        level:"All levels",   duration:"60 min",  instructor:"Baikuntha Paudel",       accent:"#F7941D" },
+    { time:"6:30 – 7:30 AM",  name:"Ashtanga Vinyasa Yoga",   level:"Intermediate", duration:"60 min",  instructor:"Baikuntha Paudel",       accent:"#F7941D" },
+    { time:"6:30 – 7:30 AM",  name:"Asana & Meditation",      level:"All levels",   duration:"60 min",  instructor:"Sudha Rajouria",          accent:"#6B2D8B" },
+    { time:"6:30 – 9:00 AM",  name:"Yoga Teacher's Training", level:"Advanced",     duration:"150 min", instructor:"Dr. Chintamani Gautam",  accent:"#4A6418" },
+    { time:"9:30 – 10:30 AM", name:"Power Yoga",              level:"Intermediate", duration:"60 min",  instructor:"Soniya Shahi",           accent:"#F7941D" },
   ],
-  Saturday: [
-    { time: "7:00 - 8:30 AM",  name: "Weekend Ashtanga",          level: "All levels",   duration: "90 min", instructor: "Arjun Rakhal",          accent: "#F7941D" },
-    { time: "10:00 - 11:30 AM",name: "Group Sound Healing",       level: "All levels",   duration: "90 min", instructor: "Dr. Chintamani Gautam", accent: "#6B2D8B" },
-    { time: "4:00 - 5:00 PM",  name: "Gentle Yoga & Stretch",     level: "Beginner",     duration: "60 min", instructor: "Sudha Rajouria",         accent: "#8DC63F" },
+  Saturday:[
+    { time:"7:00 – 8:30 AM",   name:"Weekend Ashtanga",       level:"All levels",   duration:"90 min",  instructor:"Arjun Rakhal",           accent:"#F7941D" },
+    { time:"10:00 – 11:30 AM", name:"Group Sound Healing",    level:"All levels",   duration:"90 min",  instructor:"Dr. Chintamani Gautam",  accent:"#6B2D8B" },
+    { time:"4:00 – 5:00 PM",   name:"Gentle Yoga & Stretch",  level:"Beginner",     duration:"60 min",  instructor:"Sudha Rajouria",          accent:"#8DC63F" },
   ],
-  Sunday: [
-    { time: "7:30 - 8:15 AM",  name: "Sunrise Meditation",        level: "All levels",   duration: "45 min", instructor: "Arjun Rakhal",          accent: "#6B2D8B" },
-    { time: "9:00 - 10:30 AM", name: "Slow Flow Hatha",           level: "All levels",   duration: "90 min", instructor: "Baikuntha Paudel",      accent: "#F7941D" },
-    { time: "3:00 - 4:30 PM",  name: "Tibetan Bowl Healing",      level: "All levels",   duration: "90 min", instructor: "Dr. Chintamani Gautam", accent: "#6B2D8B" },
+  Sunday:[
+    { time:"7:30 – 8:15 AM",  name:"Sunrise Meditation",      level:"All levels",   duration:"45 min",  instructor:"Arjun Rakhal",           accent:"#6B2D8B" },
+    { time:"9:00 – 10:30 AM", name:"Slow Flow Hatha",         level:"All levels",   duration:"90 min",  instructor:"Baikuntha Paudel",        accent:"#F7941D" },
+    { time:"3:00 – 4:30 PM",  name:"Tibetan Bowl Healing",    level:"All levels",   duration:"90 min",  instructor:"Dr. Chintamani Gautam",  accent:"#6B2D8B" },
   ],
 };
 
-function buildSchedule(sessions: DBSession[], instructorMap: Record<string, string>) {
+function buildSchedule(sessions: DBSession[], instructorMap: Record<string,string>) {
   const map: typeof FALLBACK = {};
   for (const s of sessions) {
     const abbrs = Array.isArray(s.days) ? s.days : [];
     for (const abbr of abbrs) {
       const day = DAY_MAP[abbr] ?? abbr;
       if (!map[day]) map[day] = [];
-      map[day].push({
-        time:       s.startTime,
-        name:       s.name,
-        level:      s.level,
-        duration:   `${s.duration} min`,
-        instructor: resolveInstructor(s.instructorId, instructorMap),
-        accent:     styleToAccent(s.styles),
-      });
+      map[day].push({ time:s.startTime, name:s.name, level:s.level,
+        duration:`${s.duration} min`, instructor:resolveInstructor(s.instructorId, instructorMap),
+        accent:styleToAccent(s.styles) });
     }
   }
-  for (const day of Object.keys(map)) {
-    map[day].sort((a, b) => a.time.localeCompare(b.time));
-  }
+  for (const day of Object.keys(map)) map[day].sort((a,b)=>a.time.localeCompare(b.time));
   return map;
 }
 
-interface Props {
-  sessions?:     DBSession[] | null;
-  instructorMap?: Record<string, string>;
-}
+interface Props { sessions?: DBSession[]|null; instructorMap?: Record<string,string> }
 
-const HEADER_BG  = "#3D1560";   // deep purple — matches site brand
-const ACTIVE_BG  = "#3D1560";   // deep purple — active day pill
-const PILL_COLOR = "#6B2D8B";   // purple — inactive pill text/border
+/* ─── Spring config ─────────────────────────────────────────────────────────── */
+const TILT_SPRING = { stiffness: 120, damping: 22 };
+const ROW_VARIANTS = {
+  hidden: { opacity:0, x:-24, filter:"blur(6px)" },
+  show:   (i:number) => ({
+    opacity:1, x:0, filter:"blur(0px)",
+    transition:{ delay: i * 0.06, duration:0.38, ease:[0.25,0.46,0.45,0.94] as const },
+  }),
+  exit: { opacity:0, x:16, filter:"blur(4px)", transition:{ duration:0.22 } },
+};
 
 export default function ScheduleGrid({ sessions, instructorMap }: Props) {
   const map      = instructorMap || {};
   const schedule = sessions && sessions.length > 0 ? buildSchedule(sessions, map) : FALLBACK;
 
-  const todayIndex = new Date().getDay();
-  const todayName  = DAYS[todayIndex];
-
+  const todayIdx  = new Date().getDay();
+  const todayName = DAYS[todayIdx];
   const [activeDay, setActiveDay] = useState<string>(todayName);
 
-  useEffect(() => {
-    setActiveDay(DAYS[new Date().getDay()]);
-  }, []);
+  useEffect(() => { setActiveDay(DAYS[new Date().getDay()]); }, []);
+
+  /* ── 3-D tilt tracking ─────────────────────────────────────────────────── */
+  const cardRef = useRef<HTMLDivElement>(null);
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const rotateX = useSpring(useTransform(rawY, [-1,1],  [ 4,-4]), TILT_SPRING);
+  const rotateY = useSpring(useTransform(rawX, [-1,1],  [-5, 5]), TILT_SPRING);
+  const glowX   = useSpring(useTransform(rawX, [-1,1],  [10,90]), TILT_SPRING);
+  const glowY   = useSpring(useTransform(rawY, [-1,1],  [10,90]), TILT_SPRING);
+
+  const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const r = cardRef.current?.getBoundingClientRect();
+    if (!r) return;
+    rawX.set(((e.clientX - r.left) / r.width  - 0.5) * 2);
+    rawY.set(((e.clientY - r.top)  / r.height - 0.5) * 2);
+  };
+  const onMouseLeave = () => { rawX.set(0); rawY.set(0); };
 
   const classes = schedule[activeDay] ?? [];
 
   return (
-    <div style={{ maxWidth: 860, margin: "0 auto", padding: "2rem 1rem 3rem" }}>
+    <div style={{ maxWidth:860, margin:"0 auto", padding:"2rem 1rem 3rem" }}>
 
-      {/* ── Day tab pills ── */}
-      <div style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "0.6rem",
-        justifyContent: "center",
-        marginBottom: "2rem",
-      }}>
+      {/* ── Day tabs ──────────────────────────────────────────────────────── */}
+      <div style={{ display:"flex", flexWrap:"wrap", gap:"0.55rem",
+        justifyContent:"center", marginBottom:"2.25rem" }}>
         {DAYS.map((day) => {
           const isActive = activeDay === day;
           const isToday  = day === todayName;
           return (
-            <button
+            <motion.button
               key={day}
               onClick={() => setActiveDay(day)}
+              whileHover={isActive ? {} : { y:-5, boxShadow:"0 12px 28px rgba(107,45,139,0.35)" }}
+              whileTap={{ scale:0.93, y:0 }}
+              transition={{ type:"spring", stiffness:420, damping:18 }}
               style={{
-                padding: "0.5rem 1.25rem",
-                borderRadius: 999,
-                border: isActive ? "none" : `1.5px solid rgba(107,45,139,0.3)`,
+                padding:"0.48rem 1.2rem",
+                borderRadius:999,
+                border: isActive ? "none" : "1.5px solid rgba(107,45,139,0.3)",
                 background: isActive
-                  ? ACTIVE_BG
-                  : isToday
-                    ? "rgba(107,45,139,0.08)"
-                    : "transparent",
-                color: isActive ? "#FFFFFF" : PILL_COLOR,
-                fontSize: "0.9rem",
-                fontWeight: isActive ? 600 : isToday ? 500 : 400,
-                cursor: "pointer",
-                transition: "all 0.18s",
-                letterSpacing: "0.01em",
-                position: "relative",
-              }}
-              onMouseEnter={e => {
-                if (!isActive) (e.currentTarget as HTMLButtonElement).style.background = "rgba(107,45,139,0.12)";
-              }}
-              onMouseLeave={e => {
-                if (!isActive) (e.currentTarget as HTMLButtonElement).style.background = isToday
-                  ? "rgba(107,45,139,0.08)"
-                  : "transparent";
+                  ? "linear-gradient(135deg,#4A1A72 0%,#3D1560 60%,#2E0F4A 100%)"
+                  : isToday ? "rgba(107,45,139,0.09)" : "transparent",
+                color: isActive ? "#FFFFFF" : "#6B2D8B",
+                fontSize:"0.88rem",
+                fontWeight: isActive ? 650 : isToday ? 500 : 400,
+                cursor:"pointer",
+                letterSpacing:"0.01em",
+                position:"relative",
+                boxShadow: isActive
+                  ? "0 8px 24px rgba(61,21,96,0.45), inset 0 1px 0 rgba(255,255,255,0.12)"
+                  : "0 2px 8px rgba(107,45,139,0.1)",
               }}
             >
               {day}
-              {isToday && !isActive && (
-                <span style={{
-                  position: "absolute", bottom: -3, left: "50%",
-                  transform: "translateX(-50%)",
-                  width: 4, height: 4, borderRadius: "50%",
-                  background: PILL_COLOR,
-                }} />
+              {isToday && (
+                <motion.span
+                  layoutId="today-dot"
+                  style={{
+                    position:"absolute", bottom:-5, left:"50%",
+                    transform:"translateX(-50%)",
+                    width:5, height:5, borderRadius:"50%",
+                    background: isActive ? "#F7941D" : "#6B2D8B",
+                    boxShadow: isActive ? "0 0 6px #F7941D" : "none",
+                  }}
+                />
               )}
-            </button>
+            </motion.button>
           );
         })}
       </div>
 
-      {/* ── Table ── */}
-      <div style={{
-        borderRadius: "0.75rem",
-        overflow: "hidden",
-        border: "1px solid rgba(107,45,139,0.18)",
-        boxShadow: "0 4px 24px rgba(42,18,8,0.07)",
-      }}>
-        {/* Header */}
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr 1fr",
-          background: HEADER_BG,
-          padding: "0.85rem 1.25rem",
-        }}>
-          {["Time", "Teacher", "Class Type"].map((h) => (
-            <span key={h} style={{
-              color: "#FFFFFF",
-              fontSize: "0.95rem",
-              fontWeight: 600,
-              letterSpacing: "0.04em",
-            }}>{h}</span>
-          ))}
-        </div>
+      {/* ── 3-D table card ────────────────────────────────────────────────── */}
+      <div style={{ perspective:"1400px" }}>
+        <motion.div
+          ref={cardRef}
+          onMouseMove={onMouseMove}
+          onMouseLeave={onMouseLeave}
+          style={{
+            rotateX, rotateY,
+            borderRadius:"1rem",
+            overflow:"hidden",
+            boxShadow:"0 20px 60px rgba(61,21,96,0.2), 0 4px 16px rgba(61,21,96,0.12)",
+            border:"1px solid rgba(107,45,139,0.22)",
+            position:"relative",
+          }}
+          transition={{ type:"spring", ...TILT_SPRING }}
+        >
+          {/* Specular gloss that follows the mouse */}
+          <motion.div
+            style={{
+              position:"absolute", inset:0, pointerEvents:"none", zIndex:10,
+              background: useTransform(
+                [glowX, glowY] as const,
+                ([x,y]: number[]) =>
+                  `radial-gradient(ellipse 60% 40% at ${x}% ${y}%,rgba(255,255,255,0.07) 0%,transparent 70%)`
+              ),
+            }}
+          />
 
-        {/* Rows */}
-        {classes.length === 0 ? (
+          {/* Header */}
           <div style={{
-            textAlign: "center", padding: "3rem 1rem",
-            color: "#9A7860", background: "#FFFFFF",
+            display:"grid", gridTemplateColumns:"1fr 1fr 1fr",
+            padding:"1rem 1.5rem",
+            background:"linear-gradient(135deg, #4A1A72 0%, #3D1560 50%, #2E0F4A 100%)",
+            position:"relative", overflow:"hidden",
           }}>
-            <p style={{ fontSize: "1.6rem", marginBottom: 8 }}>🌿</p>
-            <p>No classes scheduled for {activeDay}.</p>
+            {/* Shimmer sweep */}
+            <motion.div
+              animate={{ x:["−100%","200%"] }}
+              transition={{ duration:3.5, repeat:Infinity, repeatDelay:4, ease:"easeInOut" }}
+              style={{
+                position:"absolute", top:0, bottom:0, width:"40%",
+                background:"linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent)",
+                pointerEvents:"none",
+              }}
+            />
+            {["Time","Teacher","Class Type"].map((h) => (
+              <span key={h} style={{
+                color:"#FFFFFF", fontSize:"1rem", fontWeight:650,
+                letterSpacing:"0.07em", textTransform:"uppercase",
+                fontFamily:"Cormorant Garamond, serif",
+              }}>{h}</span>
+            ))}
           </div>
-        ) : (
-          classes.map((cls, i) => {
-            const bookHref = `/book?service=drop-in&cls=${encodeURIComponent(`${activeDay}|${cls.time}|${cls.name}|${cls.instructor}`)}`;
-            const isEven   = i % 2 === 0;
-            return (
-              <Link
-                key={i}
-                href={bookHref}
-                style={{ textDecoration: "none", display: "block" }}
-              >
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr 1fr",
-                    padding: "1rem 1.25rem",
-                    background: isEven ? "#FFFFFF" : "#F7F4F0",
-                    borderTop: "1px solid rgba(107,45,139,0.1)",
-                    transition: "background 0.15s",
-                    cursor: "pointer",
-                    alignItems: "center",
-                  }}
-                  onMouseEnter={e => {
-                    (e.currentTarget as HTMLDivElement).style.background = "rgba(247,148,29,0.07)";
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLDivElement).style.background = isEven ? "#FFFFFF" : "#F7F4F0";
-                  }}
-                >
-                  {/* Time */}
-                  <span style={{
-                    fontSize: "0.9rem",
-                    color: "#2A1208",
-                    fontWeight: 500,
-                    lineHeight: 1.4,
-                  }}>
-                    {cls.time}
-                  </span>
 
-                  {/* Teacher */}
-                  <span style={{
-                    fontSize: "0.9rem",
-                    color: "#4A3020",
-                    lineHeight: 1.4,
-                  }}>
-                    {cls.instructor}
-                  </span>
-
-                  {/* Class Type */}
-                  <span style={{
-                    fontSize: "0.9rem",
-                    color: cls.accent,
-                    fontWeight: 500,
-                    lineHeight: 1.4,
-                  }}>
-                    {cls.name}
-                  </span>
-                </div>
-              </Link>
-            );
-          })
-        )}
+          {/* Rows */}
+          <AnimatePresence mode="wait">
+            <motion.div key={activeDay}>
+              {classes.length === 0 ? (
+                <motion.div
+                  initial={{ opacity:0 }} animate={{ opacity:1 }}
+                  style={{ textAlign:"center", padding:"3.5rem 1rem",
+                    color:"#9A7860", background:"#FFFFFF" }}>
+                  <p style={{ fontSize:"2rem", marginBottom:8 }}>🌿</p>
+                  <p>No classes scheduled for {activeDay}.</p>
+                </motion.div>
+              ) : (
+                classes.map((cls, i) => {
+                  const isEven   = i % 2 === 0;
+                  const bookHref = `/book?service=drop-in&cls=${encodeURIComponent(`${activeDay}|${cls.time}|${cls.name}|${cls.instructor}`)}`;
+                  return (
+                    <motion.div
+                      key={`${activeDay}-${i}`}
+                      custom={i}
+                      variants={ROW_VARIANTS}
+                      initial="hidden"
+                      animate="show"
+                      exit="exit"
+                      whileHover={{
+                        x: 6,
+                        backgroundColor: "rgba(247,148,29,0.055)",
+                        boxShadow: `inset 4px 0 0 ${cls.accent}`,
+                        transition:{ duration:0.18 },
+                      }}
+                      style={{
+                        display:"grid", gridTemplateColumns:"1fr 1fr 1fr",
+                        padding:"0.95rem 1.5rem",
+                        background: isEven ? "#FFFFFF" : "rgba(249,245,255,0.6)",
+                        borderTop:"1px solid rgba(107,45,139,0.09)",
+                        cursor:"pointer",
+                        position:"relative",
+                      }}
+                    >
+                      <Link href={bookHref} style={{ display:"contents", textDecoration:"none" }}>
+                        <span style={{ fontSize:"0.9rem", color:"#2A1208",
+                          fontWeight:500, lineHeight:1.45 }}>
+                          {cls.time}
+                        </span>
+                        <span style={{ fontSize:"0.9rem", color:"#4A3020", lineHeight:1.45 }}>
+                          {cls.instructor}
+                        </span>
+                        <motion.span
+                          style={{ fontSize:"0.9rem", color:cls.accent,
+                            fontWeight:600, lineHeight:1.45 }}
+                          whileHover={{ letterSpacing:"0.03em" }}
+                          transition={{ duration:0.2 }}
+                        >
+                          {cls.name}
+                        </motion.span>
+                      </Link>
+                    </motion.div>
+                  );
+                })
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </motion.div>
       </div>
 
       {/* Row count */}
       {classes.length > 0 && (
-        <p style={{
-          textAlign: "center", marginTop: "0.75rem",
-          fontSize: "0.82rem", color: "#9A7860",
-        }}>
+        <motion.p
+          key={activeDay}
+          initial={{ opacity:0, y:4 }} animate={{ opacity:1, y:0 }}
+          transition={{ delay:0.3 }}
+          style={{ textAlign:"center", marginTop:"0.75rem",
+            fontSize:"0.82rem", color:"#9A7860" }}
+        >
           {classes.length} {classes.length === 1 ? "class" : "classes"} on {activeDay}
           {activeDay === todayName && " · Today"}
-        </p>
+        </motion.p>
       )}
 
       {/* CTA strip */}
-      <div style={{
-        background: "linear-gradient(135deg, #F7941D 0%, #E07800 100%)",
-        padding: "3rem 2rem", textAlign: "center",
-        borderRadius: "1.25rem", marginTop: "2.5rem",
-      }}>
-        <h2 style={{
-          fontFamily: "Cormorant Garamond, serif",
-          fontSize: "clamp(1.7rem, 4vw, 2.4rem)", fontWeight: 300,
-          color: "#FFFFFF", margin: "0 0 10px",
-        }}>
+      <motion.div
+        initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }}
+        viewport={{ once:true }} transition={{ duration:0.5, ease:"easeOut" }}
+        style={{
+          background:"linear-gradient(135deg,#F7941D 0%,#E07800 100%)",
+          padding:"3rem 2rem", textAlign:"center",
+          borderRadius:"1.25rem", marginTop:"2.5rem",
+          boxShadow:"0 16px 48px rgba(247,148,29,0.3)",
+        }}
+      >
+        <h2 style={{ fontFamily:"Cormorant Garamond, serif",
+          fontSize:"clamp(1.7rem,4vw,2.4rem)", fontWeight:300,
+          color:"#FFFFFF", margin:"0 0 10px" }}>
           Ready to join a class?
         </h2>
-        <p style={{ color: "rgba(255,255,255,0.9)", fontSize: "0.95rem", marginBottom: 22 }}>
+        <p style={{ color:"rgba(255,255,255,0.9)", fontSize:"0.95rem", marginBottom:22 }}>
           Drop in any time — or get in touch to reserve your spot.
         </p>
-        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-          <Link href="/book?service=drop-in" className="cta-lift" style={{
-            padding: "0.75rem 1.8rem", borderRadius: 999, background: "#FFFFFF",
-            color: "#F7941D", fontSize: "0.9rem", fontWeight: 600, textDecoration: "none" }}>
-            Book Now
-          </Link>
-          <Link href="/yoga-teacher-training" className="cta-lift" style={{
-            padding: "0.75rem 1.8rem", borderRadius: 999,
-            border: "2px solid rgba(255,255,255,0.6)", color: "#FFFFFF",
-            fontSize: "0.9rem", fontWeight: 400, textDecoration: "none" }}>
-            Teacher Training
-          </Link>
-          <Link href="/sound-healing-therapy" className="cta-lift" style={{
-            padding: "0.75rem 1.8rem", borderRadius: 999,
-            border: "2px solid rgba(255,255,255,0.6)", color: "#FFFFFF",
-            fontSize: "0.9rem", fontWeight: 400, textDecoration: "none" }}>
-            Sound Healing
-          </Link>
+        <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
+          {[
+            { href:"/book?service=drop-in", label:"Book Now",
+              style:{ background:"#FFFFFF", color:"#F7941D", fontWeight:600 } },
+            { href:"/yoga-teacher-training", label:"Teacher Training",
+              style:{ border:"2px solid rgba(255,255,255,0.6)", color:"#FFFFFF" } },
+            { href:"/sound-healing-therapy", label:"Sound Healing",
+              style:{ border:"2px solid rgba(255,255,255,0.6)", color:"#FFFFFF" } },
+          ].map(b => (
+            <motion.div key={b.label} whileHover={{ scale:1.05, y:-2 }} whileTap={{ scale:0.97 }}
+              transition={{ type:"spring", stiffness:380, damping:18 }}>
+              <Link href={b.href} style={{
+                display:"block", padding:"0.75rem 1.8rem", borderRadius:999,
+                fontSize:"0.9rem", fontWeight:400, textDecoration:"none", ...b.style }}>
+                {b.label}
+              </Link>
+            </motion.div>
+          ))}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
