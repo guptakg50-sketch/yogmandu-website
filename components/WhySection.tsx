@@ -226,10 +226,12 @@ const pillars = [
 ];
 
 const stats = [
-  { value: "3000+", numeric: 3000, suffix: "+", label: "Teachers trained",        color: "#F7941D", textColor: "#A65808" },
-  { value: "50+",   numeric: 50,   suffix: "+", label: "Countries represented",   color: "#6B2D8B", textColor: "#6B2D8B" },
-  { value: "2018",  numeric: undefined,          label: "Established in Nepal",    color: "#8DC63F", textColor: "#4A6418" },
-  { value: "RYS",   numeric: undefined,          label: "Yoga Alliance certified", color: "#F7941D", textColor: "#A65808" },
+  { value: "50k+",  numeric: 50000, suffix: "+", label: "Satisfied Yoga Students", color: "#6B2D8B", textColor: "#6B2D8B" },
+  { value: "3000+", numeric: 3000,  suffix: "+", label: "Teachers trained",         color: "#F7941D", textColor: "#A65808" },
+  { value: "50+",   numeric: 50,    suffix: "+", label: "Countries represented",    color: "#8DC63F", textColor: "#4A6418" },
+  { value: "2018",  numeric: undefined,           label: "Established in Nepal",    color: "#F7941D", textColor: "#A65808" },
+  { value: "RYS",   numeric: undefined,           label: "Yoga Alliance certified", color: "#6B2D8B", textColor: "#6B2D8B" },
+  { value: "Yesma", numeric: undefined,           label: "Nepali for 'In This'",    color: "#8DC63F", textColor: "#4A6418" },
 ];
 
 export default function WhySection() {
@@ -342,8 +344,8 @@ export default function WhySection() {
 
         {/* Stats */}
         <div style={{
-          display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "1.5rem",
-          maxWidth: 680, margin: "0 auto 4.5rem",
+          display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "1.25rem",
+          maxWidth: 920, margin: "0 auto 4.5rem",
         }}>
           {stats.map((s, i) => <StatOrb key={s.value} s={s} i={i} />)}
         </div>
