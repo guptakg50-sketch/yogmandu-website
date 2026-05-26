@@ -227,7 +227,22 @@ export default function Footer() {
             {cfg.contact.map(c => (
               <li key={c.text} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                 <span style={{ fontSize: "0.95rem" }}>{c.icon}</span>
-                <span style={{ fontSize: "0.9rem", fontWeight: 400, color: "#5C3D2E", lineHeight: 1.6 }}>{c.text}</span>
+                {c.icon === "📍" ? (
+                  <a
+                    href="https://www.google.com/maps?q=31+Miteri+Marg,+Mid-Baneshwor-31,+Kathmandu+44600,+Nepal&geocode=KXmrYpZQGes5MVNIqRARKuxM"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ fontSize: "0.9rem", fontWeight: 400, color: "#5C3D2E", lineHeight: 1.6,
+                      textDecoration: "underline", textDecorationColor: "rgba(166,88,8,0.4)",
+                      textUnderlineOffset: 3, transition: "color 0.2s" }}
+                    onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = "#A65808")}
+                    onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = "#5C3D2E")}
+                  >
+                    {c.text}
+                  </a>
+                ) : (
+                  <span style={{ fontSize: "0.9rem", fontWeight: 400, color: "#5C3D2E", lineHeight: 1.6 }}>{c.text}</span>
+                )}
               </li>
             ))}
           </ul>
