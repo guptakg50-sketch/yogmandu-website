@@ -142,13 +142,14 @@ export default function HomePage() {
             </div>
 
             {/* Stats */}
-            <div className="flex items-center gap-6 mt-12">
+            <div className="flex items-center gap-5 mt-12 flex-wrap">
               {[
-                { value: "3,000+", label: "Teachers Trained", color: "#A65808" },
-                { value: "50+",    label: "Countries",         color: "#6B2D8B" },
-                { value: "RYS",    label: "Yoga Alliance",     color: "#4A6418" },
+                { value: "3,000+", label: "Teachers Trained",      color: "#A65808" },
+                { value: "50+",    label: "Countries Represented",  color: "#6B2D8B" },
+                { value: "2018",   label: "Est. in Nepal",          color: "#4A6418" },
+                { value: "RYS",    label: "Yoga Alliance",          color: "#A65808" },
               ].map((b) => (
-                <div key={b.value} className="flex flex-col">
+                <div key={b.label} className="flex flex-col">
                   <span className="text-2xl font-light" style={{ fontFamily: "Cormorant Garamond, serif", color: b.color }}>{b.value}</span>
                   <span className="text-xs font-medium" style={{ color: "#7A5840" }}>{b.label}</span>
                 </div>
