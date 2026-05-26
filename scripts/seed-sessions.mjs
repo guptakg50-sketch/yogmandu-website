@@ -1,7 +1,10 @@
 /**
  * Seed script — pushes the correct Yogmandu class schedule into Supabase.
- * Run once (or whenever the schedule changes):
- *   node scripts/seed-sessions.mjs
+ * Re-run whenever the schedule changes (upserts by ID — no duplicates):
+ *   SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... node scripts/seed-sessions.mjs
+ *
+ * startTime / endTime use 24-hour HH:MM so they work with the admin editor's
+ * <input type="time"> fields. The schedule page formats them for display automatically.
  */
 import { createClient } from "@supabase/supabase-js";
 
@@ -18,8 +21,6 @@ const sb = createClient(SUPABASE_URL, SERVICE_KEY, {
 });
 
 // ── helpers ───────────────────────────────────────────────────────────────────
-function slug(id) { return id; }
-
 function styleFor(name) {
   if (name.includes("Hatha"))               return ["Hatha"];
   if (name.includes("Ashtanga Vinyasa"))    return ["Ashtanga Vinyasa"];
@@ -37,104 +38,117 @@ function styleFor(name) {
   return ["Yoga"];
 }
 
-function typeFor(name) {
+function typeFor(name, location) {
   if (name.includes("Training"))            return "Training";
-  if (name.includes("Online"))              return "Online";
+  if (location === "Online")                return "Online";
   return "Drop-in";
 }
 
-function levelFor(name, instructor) {
+function levelFor(name) {
   if (name.includes("Training"))            return "Advanced";
   if (name.includes("Ashtanga") || name.includes("Power")) return "Intermediate";
   return "All levels";
 }
 
-function make(id, day, timeDisplay, name, instructor, duration, priority) {
+/**
+ * @param {string} id        unique session ID
+ * @param {string} day       "Sun" | "Mon" | ... | "Sat"
+ * @param {string} startTime HH:MM 24-hour (e.g. "05:30")
+ * @param {string} endTime   HH:MM 24-hour (e.g. "06:30")
+ * @param {string} name      class name
+ * @param {string} instructor full instructor name (used as instructorId)
+ * @param {number} duration  minutes
+ * @param {string} location  "In-studio" | "Online"
+ * @param {number} priority  display order within the day
+ */
+function make(id, day, startTime, endTime, name, instructor, duration, location, priority) {
   return {
     id,
-    slug: id,
+    slug:             id,
     name,
     shortDescription: `${name} with ${instructor}`,
-    type: typeFor(name),
-    styles: styleFor(name),
-    level: levelFor(name),
-    days: [day],
-    startTime: timeDisplay,   // full range string for display
-    endTime: "",
+    type:             typeFor(name, location),
+    styles:           styleFor(name),
+    level:            levelFor(name),
+    days:             [day],
+    startTime,        // HH:MM — admin editor <input type="time"> compatible
+    endTime,          // HH:MM
     duration,
-    instructorId: instructor, // resolveInstructor falls back to the raw string
-    price: name.includes("Training") ? 0 : 500,
-    status: "Active",
-    featured: false,
-    homepage: false,
+    instructorId:     instructor, // resolveInstructor() shows name directly as fallback
+    location,
+    price:            name.includes("Training") ? 0 : 500,
+    status:           "Active",
+    featured:         false,
+    homepage:         false,
     priority,
   };
 }
 
-// ── Schedule data (from yogmandu.com/book-a-class, May 2026) ─────────────────
+// ── Schedule data — from yogmandu.com/book-a-class (May 2026) ─────────────────
+// Times are 24-hour HH:MM.  Online classes have location="Online".
 const sessions = [
   // ── Sunday ─────────────────────────────────────────────────────────────────
-  make("sun-0530-flexibility",      "Sun", "5:30 – 6:30 AM",          "Flexibility Yoga",           "Baikuntha Paudel",      60,  10),
-  make("sun-0630-ashtanga",         "Sun", "6:30 – 7:30 AM",          "Ashtanga Vinyasa Yoga",      "Baikuntha Paudel",      60,  20),
-  make("sun-0630-asana-online",     "Sun", "6:30 – 7:30 AM (Online)", "Asana & Meditation",         "Sudha Rajouria",        60,  25),
-  make("sun-0630-training",         "Sun", "6:30 – 9:00 AM",          "Yoga Teacher's Training",    "Dr. Chintamani Gautam", 150, 30),
-  make("sun-0930-power",            "Sun", "9:30 – 10:30 AM",         "Power Yoga",                 "Soniya Shahi",          60,  40),
-  make("sun-1500-training",         "Sun", "3:00 – 5:30 PM",          "Yoga Teacher's Training",    "Arjun Rakhal Magar",    150, 50),
-  make("sun-1730-hatha",            "Sun", "5:30 – 6:30 PM",          "Hatha Yoga",                 "Love Thakur",           60,  60),
-  make("sun-2030-meditation",       "Sun", "8:30 – 9:30 PM",          "Online Zoom Meditation",     "Bhadra Rana",           60,  70),
+  make("sun-0530-flexibility",      "Sun", "05:30","06:30", "Flexibility Yoga",           "Baikuntha Paudel",      60, "In-studio", 10),
+  make("sun-0630-ashtanga",         "Sun", "06:30","07:30", "Ashtanga Vinyasa Yoga",      "Baikuntha Paudel",      60, "In-studio", 20),
+  make("sun-0630-asana-online",     "Sun", "06:30","07:30", "Asana & Meditation",         "Sudha Rajouria",        60, "Online",    25),
+  make("sun-0630-training",         "Sun", "06:30","09:00", "Yoga Teacher's Training",    "Dr. Chintamani Gautam", 150,"In-studio", 30),
+  make("sun-0930-power",            "Sun", "09:30","10:30", "Power Yoga",                 "Soniya Shahi",          60, "In-studio", 40),
+  make("sun-1500-training",         "Sun", "15:00","17:30", "Yoga Teacher's Training",    "Arjun Rakhal Magar",    150,"In-studio", 50),
+  make("sun-1730-hatha",            "Sun", "17:30","18:30", "Hatha Yoga",                 "Love Thakur",           60, "In-studio", 60),
+  make("sun-2030-meditation",       "Sun", "20:30","21:30", "Online Zoom Meditation",     "Bhadra Rana",           60, "Online",    70),
 
   // ── Monday ─────────────────────────────────────────────────────────────────
-  make("mon-0530-hatha",            "Mon", "5:30 – 6:30 AM",          "Hatha Yoga",                 "Soniya Shahi",          60,  10),
-  make("mon-0630-flexibility",      "Mon", "6:30 – 7:30 AM",          "Flexibility Yoga",           "Soniya Shahi",          60,  20),
-  make("mon-0630-power-online",     "Mon", "6:30 – 7:30 AM (Online)", "Power Yoga",                 "Kanchan Manandhar",     60,  25),
-  make("mon-0630-training",         "Mon", "6:30 – 9:00 AM",          "Yoga Teachers Training",     "Dr. Chintamani Gautam", 150, 30),
-  make("mon-0930-pranayama",        "Mon", "9:30 – 10:30 AM",         "Pranayama & Surya Namaskar", "Sushmita Lama",         60,  40),
-  make("mon-1500-training",         "Mon", "3:00 – 5:30 PM",          "Yoga Teachers Training",     "Arjun Rakhal Magar",    150, 50),
-  make("mon-1730-pranayama",        "Mon", "5:30 – 6:30 PM",          "Pranayama & Surya Namaskar", "Baikuntha Paudel",      60,  60),
-  make("mon-2030-meditation",       "Mon", "8:30 – 9:30 PM",          "Online Zoom Meditation",     "Paribesh Malla",        60,  70),
+  make("mon-0530-hatha",            "Mon", "05:30","06:30", "Hatha Yoga",                 "Soniya Shahi",          60, "In-studio", 10),
+  make("mon-0630-flexibility",      "Mon", "06:30","07:30", "Flexibility Yoga",           "Soniya Shahi",          60, "In-studio", 20),
+  make("mon-0630-power-online",     "Mon", "06:30","07:30", "Power Yoga",                 "Kanchan Manandhar",     60, "Online",    25),
+  make("mon-0630-training",         "Mon", "06:30","09:00", "Yoga Teachers Training",     "Dr. Chintamani Gautam", 150,"In-studio", 30),
+  make("mon-0930-pranayama",        "Mon", "09:30","10:30", "Pranayama & Surya Namaskar", "Sushmita Lama",         60, "In-studio", 40),
+  make("mon-1500-training",         "Mon", "15:00","17:30", "Yoga Teachers Training",     "Arjun Rakhal Magar",    150,"In-studio", 50),
+  make("mon-1730-pranayama",        "Mon", "17:30","18:30", "Pranayama & Surya Namaskar", "Baikuntha Paudel",      60, "In-studio", 60),
+  make("mon-2030-meditation",       "Mon", "20:30","21:30", "Online Zoom Meditation",     "Paribesh Malla",        60, "Online",    70),
 
   // ── Tuesday ────────────────────────────────────────────────────────────────
-  make("tue-0530-power",            "Tue", "5:30 – 6:30 AM",          "Power Yoga",                 "Arjun Neupane",         60,  10),
-  make("tue-0630-hatha",            "Tue", "6:30 – 7:30 AM",          "Hatha Yoga",                 "Arjun Neupane",         60,  20),
-  make("tue-0630-ashtanga-online",  "Tue", "6:30 – 7:30 AM (Online)", "Ashtanga Vinyasa",           "Soniya Shahi",          60,  25),
-  make("tue-0630-training",         "Tue", "6:30 – 9:00 AM",          "Yoga Teachers Training",     "Arjun Rakhal Magar",    150, 30),
-  make("tue-0930-flexibility",      "Tue", "9:30 – 10:30 AM",         "Flexibility Yoga",           "Biku Magar",            60,  40),
-  make("tue-1500-training",         "Tue", "3:00 – 5:30 PM",          "Yoga Teachers Training",     "Dr. Chintamani Gautam", 150, 50),
-  make("tue-1730-asana-flow",       "Tue", "5:30 – 6:30 PM",          "Asana Flow & Meditation",    "Arjun Rakhal Magar",    60,  60),
-  make("tue-2030-meditation",       "Tue", "8:30 – 9:30 PM",          "Online Zoom Meditation",     "Sweta Thieng",          60,  70),
+  make("tue-0530-power",            "Tue", "05:30","06:30", "Power Yoga",                 "Arjun Neupane",         60, "In-studio", 10),
+  make("tue-0630-hatha",            "Tue", "06:30","07:30", "Hatha Yoga",                 "Arjun Neupane",         60, "In-studio", 20),
+  make("tue-0630-ashtanga-online",  "Tue", "06:30","07:30", "Ashtanga Vinyasa",           "Soniya Shahi",          60, "Online",    25),
+  make("tue-0630-training",         "Tue", "06:30","09:00", "Yoga Teachers Training",     "Arjun Rakhal Magar",    150,"In-studio", 30),
+  make("tue-0930-flexibility",      "Tue", "09:30","10:30", "Flexibility Yoga",           "Biku Magar",            60, "In-studio", 40),
+  make("tue-1500-training",         "Tue", "15:00","17:30", "Yoga Teachers Training",     "Dr. Chintamani Gautam", 150,"In-studio", 50),
+  make("tue-1730-asana-flow",       "Tue", "17:30","18:30", "Asana Flow & Meditation",    "Arjun Rakhal Magar",    60, "In-studio", 60),
+  make("tue-2030-meditation",       "Tue", "20:30","21:30", "Online Zoom Meditation",     "Sweta Thieng",          60, "Online",    70),
 
   // ── Wednesday ──────────────────────────────────────────────────────────────
-  make("wed-0530-vinyasa",          "Wed", "5:30 – 6:30 AM",          "Vinyasa Flow",               "Neelina Nakarmi",       60,  10),
-  make("wed-0630-power",            "Wed", "6:30 – 7:30 AM",          "Power Yoga",                 "Neelina Nakarmi",       60,  20),
-  make("wed-0630-hatha-online",     "Wed", "6:30 – 7:30 AM (Online)", "Hatha Yoga",                 "Bandana Thapa",         60,  25),
-  make("wed-0630-training",         "Wed", "6:30 – 9:00 AM",          "Yoga Teachers Training",     "Dr. Dipika Hada",       150, 30),
-  make("wed-0930-asana-flow",       "Wed", "9:30 – 10:30 AM",         "Asana Flow & Meditation",    "Arjun Rakhal Magar",    60,  40),
-  make("wed-1500-training",         "Wed", "3:00 – 5:30 PM",          "Yoga Teachers Training",     "Dr. Geeta K.C",         150, 50),
-  make("wed-1730-flexibility",      "Wed", "5:30 – 6:30 PM",          "Flexibility Yoga",           "Biku Magar",            60,  60),
-  make("wed-2030-meditation",       "Wed", "8:30 – 9:30 PM",          "Online Zoom Meditation",     "Arjun Rakhal Magar",    60,  70),
+  make("wed-0530-vinyasa",          "Wed", "05:30","06:30", "Vinyasa Flow",               "Neelina Nakarmi",       60, "In-studio", 10),
+  make("wed-0630-power",            "Wed", "06:30","07:30", "Power Yoga",                 "Neelina Nakarmi",       60, "In-studio", 20),
+  make("wed-0630-hatha-online",     "Wed", "06:30","07:30", "Hatha Yoga",                 "Bandana Thapa",         60, "Online",    25),
+  make("wed-0630-training",         "Wed", "06:30","09:00", "Yoga Teachers Training",     "Dr. Dipika Hada",       150,"In-studio", 30),
+  make("wed-0930-asana-flow",       "Wed", "09:30","10:30", "Asana Flow & Meditation",    "Arjun Rakhal Magar",    60, "In-studio", 40),
+  make("wed-1500-training",         "Wed", "15:00","17:30", "Yoga Teachers Training",     "Dr. Geeta K.C",         150,"In-studio", 50),
+  make("wed-1730-flexibility",      "Wed", "17:30","18:30", "Flexibility Yoga",           "Biku Magar",            60, "In-studio", 60),
+  make("wed-2030-meditation",       "Wed", "20:30","21:30", "Online Zoom Meditation",     "Arjun Rakhal Magar",    60, "Online",    70),
 
   // ── Thursday ───────────────────────────────────────────────────────────────
-  make("thu-0530-pranayama",        "Thu", "5:30 – 6:30 AM",          "Pranayama & Surya Namaskar", "Arjun Rakhal Magar",    60,  10),
-  make("thu-0630-asana-flow",       "Thu", "6:30 – 7:30 AM",          "Asana Flow & Meditation",    "Arjun Rakhal Magar",    60,  20),
-  make("thu-0630-asana-online",     "Thu", "6:30 – 7:30 AM (Online)", "Asana & Pranayama",          "Sandhya Gyawali",       60,  25),
-  make("thu-0630-training",         "Thu", "6:30 – 9:00 AM",          "Yoga Teachers Training",     "Dr. Geeta K.C",         150, 30),
-  make("thu-0930-ashtanga",         "Thu", "9:30 – 10:30 AM",         "Ashtanga Vinyasa",           "Ushma Pandey",          60,  40),
-  make("thu-1500-training",         "Thu", "3:00 – 5:30 PM",          "Yoga Teachers Training",     "Dr. Dipika Hada",       150, 50),
-  make("thu-1730-vinyasa",          "Thu", "5:30 – 6:30 PM",          "Vinyasa Flow",               "Manju Lama",            60,  60),
-  make("thu-2030-meditation",       "Thu", "8:30 – 9:30 PM",          "Online Zoom Meditation",     "Bandana Thapa",         60,  70),
+  make("thu-0530-pranayama",        "Thu", "05:30","06:30", "Pranayama & Surya Namaskar", "Arjun Rakhal Magar",    60, "In-studio", 10),
+  make("thu-0630-asana-flow",       "Thu", "06:30","07:30", "Asana Flow & Meditation",    "Arjun Rakhal Magar",    60, "In-studio", 20),
+  make("thu-0630-asana-online",     "Thu", "06:30","07:30", "Asana & Pranayama",          "Sandhya Gyawali",       60, "Online",    25),
+  make("thu-0630-training",         "Thu", "06:30","09:00", "Yoga Teachers Training",     "Dr. Geeta K.C",         150,"In-studio", 30),
+  make("thu-0930-ashtanga",         "Thu", "09:30","10:30", "Ashtanga Vinyasa",           "Ushma Pandey",          60, "In-studio", 40),
+  make("thu-1500-training",         "Thu", "15:00","17:30", "Yoga Teachers Training",     "Dr. Dipika Hada",       150,"In-studio", 50),
+  make("thu-1730-vinyasa",          "Thu", "17:30","18:30", "Vinyasa Flow",               "Manju Lama",            60, "In-studio", 60),
+  make("thu-2030-meditation",       "Thu", "20:30","21:30", "Online Zoom Meditation",     "Bandana Thapa",         60, "Online",    70),
 
   // ── Friday ─────────────────────────────────────────────────────────────────
-  make("fri-0530-asana-flow",       "Fri", "5:30 – 6:30 AM",          "Asana Flow & Meditation",    "Arjun Rakhal Magar",    60,  10),
-  make("fri-0630-pranayama",        "Fri", "6:30 – 7:30 AM",          "Pranayama & Surya Namaskar", "Arjun Rakhal Magar",    60,  20),
-  make("fri-0630-power-online",     "Fri", "6:30 – 7:30 AM (Online)", "Power Yoga",                 "Mukesh Shrestha",       60,  25),
-  make("fri-0630-training",         "Fri", "6:30 – 9:00 AM",          "Yoga Teachers Training",     "Arjun Neupane",         150, 30),
-  make("fri-0930-hatha",            "Fri", "9:30 – 10:30 AM",         "Hatha Yoga",                 "Baikuntha Paudel",      60,  40),
-  make("fri-1500-training",         "Fri", "3:00 – 5:30 PM",          "Yoga Teachers Training",     "Arjun Neupane",         150, 50),
-  make("fri-1730-power",            "Fri", "5:30 – 6:30 PM",          "Power Yoga",                 "Ushma Pandey",          60,  60),
-  make("fri-2030-meditation",       "Fri", "8:30 – 9:30 PM",          "Online Zoom Meditation",     "Baikuntha Paudel",      60,  70),
+  make("fri-0530-asana-flow",       "Fri", "05:30","06:30", "Asana Flow & Meditation",    "Arjun Rakhal Magar",    60, "In-studio", 10),
+  make("fri-0630-pranayama",        "Fri", "06:30","07:30", "Pranayama & Surya Namaskar", "Arjun Rakhal Magar",    60, "In-studio", 20),
+  make("fri-0630-power-online",     "Fri", "06:30","07:30", "Power Yoga",                 "Mukesh Shrestha",       60, "Online",    25),
+  make("fri-0630-training",         "Fri", "06:30","09:00", "Yoga Teachers Training",     "Arjun Neupane",         150,"In-studio", 30),
+  make("fri-0930-hatha",            "Fri", "09:30","10:30", "Hatha Yoga",                 "Baikuntha Paudel",      60, "In-studio", 40),
+  make("fri-1500-training",         "Fri", "15:00","17:30", "Yoga Teachers Training",     "Arjun Neupane",         150,"In-studio", 50),
+  make("fri-1730-power",            "Fri", "17:30","18:30", "Power Yoga",                 "Ushma Pandey",          60, "In-studio", 60),
+  make("fri-2030-meditation",       "Fri", "20:30","21:30", "Online Zoom Meditation",     "Baikuntha Paudel",      60, "Online",    70),
 
   // ── Saturday ───────────────────────────────────────────────────────────────
-  make("sat-2030-meditation",       "Sat", "8:30 – 9:30 PM",          "Online Meditation",          "Paribesh Malla",        60,  10),
+  make("sat-2030-meditation",       "Sat", "20:30","21:30", "Online Meditation",          "Paribesh Malla",        60, "Online",    10),
 ];
 
 // ── Upsert into Supabase ──────────────────────────────────────────────────────
@@ -160,7 +174,7 @@ async function seed() {
   }
 
   console.log(`✅ ${sessions.length} sessions written to Supabase.`);
-  console.log("   The admin panel can now edit them at /admin → Sessions.");
+  console.log("   Start/end times are now HH:MM — admin editor time fields work correctly.");
 }
 
 seed();

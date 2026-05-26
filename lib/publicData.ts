@@ -80,10 +80,11 @@ export interface DBSession {
   styles: string[];
   level: string;
   days: string[];
-  startTime: string;
-  endTime: string;
+  startTime: string;   // HH:MM (24-hour) — e.g. "06:30"
+  endTime: string;     // HH:MM (24-hour) — e.g. "07:30"
   duration: number;
   instructorId: string;
+  location?: string;   // "In-studio" | "Online" | "Both"
   price: number;
   status: string;
   featured: boolean;

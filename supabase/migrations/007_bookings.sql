@@ -25,4 +25,5 @@ create index if not exists yogmandu_bookings_status_idx
   on public.yogmandu_bookings(status);
 
 -- RLS — only service role can read/write (admin API)
-alter table public.yogmandu_bookings enable row level security;
+alter table public.yogmandu_bookings enable row level security;i
+as

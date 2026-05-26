@@ -81,6 +81,29 @@ const FALLBACK: Record<string,{ time:string; name:string; level:string; duration
   ],
 };
 
+/**
+ * Converts a 24-hour HH:MM string + optional end time into a display range.
+ * e.g. ("06:30", "07:30")          → "6:30 – 7:30 AM"
+ *      ("15:00", "17:30")          → "3:00 – 5:30 PM"
+ *      ("06:30", "07:30", "Online") → "6:30 – 7:30 AM (Online)"
+ * Legacy strings (already contain AM/PM or –) are returned unchanged.
+ */
+function formatTimeRange(start: string, end: string, location?: string): string {
+  if (!start) return "";
+  // Legacy full-range string — already formatted, return as-is
+  if (start.includes("AM") || start.includes("PM") || start.includes("–")) return start;
+
+  const parse = (t: string) => { const [h,m] = t.split(":").map(Number); return {h,m}; };
+  const fmt   = (h: number, m: number) => `${h % 12 || 12}:${String(m).padStart(2,"0")}`;
+
+  const s    = parse(start);
+  const e    = end ? parse(end) : null;
+  const ampm = s.h >= 12 ? "PM" : "AM";
+  let out    = e ? `${fmt(s.h,s.m)} – ${fmt(e.h,e.m)} ${ampm}` : `${fmt(s.h,s.m)} ${ampm}`;
+  if (location === "Online") out += " (Online)";
+  return out;
+}
+
 function buildSchedule(sessions: DBSession[], instructorMap: Record<string,string>) {
   const map: typeof FALLBACK = {};
   for (const s of sessions) {
@@ -88,9 +111,14 @@ function buildSchedule(sessions: DBSession[], instructorMap: Record<string,strin
     for (const abbr of abbrs) {
       const day = DAY_MAP[abbr] ?? abbr;
       if (!map[day]) map[day] = [];
-      map[day].push({ time:s.startTime, name:s.name, level:s.level,
-        duration:`${s.duration} min`, instructor:resolveInstructor(s.instructorId, instructorMap),
-        accent:styleToAccent(s.styles) });
+      map[day].push({
+        time:       formatTimeRange(s.startTime, s.endTime, s.location),
+        name:       s.name,
+        level:      s.level,
+        duration:   `${s.duration} min`,
+        instructor: resolveInstructor(s.instructorId, instructorMap),
+        accent:     styleToAccent(s.styles),
+      });
     }
   }
   for (const day of Object.keys(map)) map[day].sort((a,b)=>a.time.localeCompare(b.time));
