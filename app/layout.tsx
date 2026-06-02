@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
   alternates: { canonical: "https://yogmandu.com" },
-  verification: { google: "google721fc082e09cdcb6" },
+  verification: { google: "dekG000tycDZUvYh02z3znFcQ5NiPa8UkcSmCggUWfU" },
 };
 
 const localBusinessSchema = {
