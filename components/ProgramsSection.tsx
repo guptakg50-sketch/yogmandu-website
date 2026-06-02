@@ -148,8 +148,8 @@ export default function ProgramsSection() {
       opacity: op,
       zIndex: zIdx,
       pointerEvents: absOff > 1.5 ? "none" : "auto",
-      transition: "transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.55s ease",
-      willChange: "transform, opacity",
+      transition: "transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.42s ease",
+      willChange: "transform",
       backfaceVisibility: "hidden",
       cursor: absOff > 0.4 ? "pointer" : "default",
     };
@@ -160,7 +160,8 @@ export default function ProgramsSection() {
 
       {/* 3-D canvas */}
       <div style={{ position:"absolute", inset:0, zIndex:0, pointerEvents:"none" }}>
-        <Canvas camera={{ position:[0,0,7], fov:46 }} gl={{ alpha:true, antialias:true }}
+        <Canvas camera={{ position:[0,0,7], fov:46 }} gl={{ alpha:true, antialias:false }}
+          dpr={[1, 1.5]}
           style={{ width:"100%", height:"100%" }}>
           <BgScene />
         </Canvas>
@@ -200,7 +201,6 @@ export default function ProgramsSection() {
                 borderRadius:"1.75rem",
                 overflow:"hidden",
                 background:"#FFFFFF",
-                backdropFilter:"blur(16px)",
                 border:`1.5px solid ${card.accent}30`,
                 boxShadow:`0 24px 64px ${card.shadow}, 0 0 0 1px ${card.accent}18`,
                 padding:"2.25rem 2.25rem 2rem",
