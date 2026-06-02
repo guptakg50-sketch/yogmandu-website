@@ -286,7 +286,7 @@ export default function GalleryAllGrid({ items }: Props) {
         }}>
           Come practice with us in <em style={{ color: "#A65808" }}>Kathmandu</em>
         </p>
-        <a href="https://wa.me/9779862909469" style={{
+        <a href="https://wa.me/9779810263277" style={{
           display: "inline-block", padding: "0.8rem 2.2rem",
           borderRadius: 999, background: "#A65808",
           color: "#fff", fontSize: "0.88rem", fontWeight: 500,

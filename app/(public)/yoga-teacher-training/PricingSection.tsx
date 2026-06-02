@@ -39,7 +39,7 @@ const TIERS: Tier[] = [
       "Morning & afternoon sessions",
     ],
     ctaLabel:  "Apply Now",
-    ctaHref:   "https://wa.me/9779862909469",
+    ctaHref:   "https://wa.me/9779810263277",
   },
   {
     id:        "residential",
@@ -62,7 +62,7 @@ const TIERS: Tier[] = [
       "Training manual & notebook",
     ],
     ctaLabel:  "Apply Now",
-    ctaHref:   "https://wa.me/9779862909469",
+    ctaHref:   "https://wa.me/9779810263277",
     featured:  true,
   },
   {

@@ -293,7 +293,7 @@ function ServiceCard({ s, idx }: { s: Service; idx: number }) {
           style={{ background: s.color, boxShadow: `0 6px 18px ${s.color}55` }}>
           {s.bookLabel || "Book"}
         </Link>
-        <a href="https://wa.me/9779862909469" target="_blank" rel="noopener noreferrer"
+        <a href="https://wa.me/9779810263277" target="_blank" rel="noopener noreferrer"
           className="cta-lift text-center px-4 py-2 rounded-full text-xs font-medium"
           style={{ border: `1.5px solid ${s.color}`, color: s.color }}>
           WhatsApp
@@ -963,7 +963,7 @@ export default function ServicesGrid() {
             Message us on WhatsApp — we&apos;ll listen to where you are and suggest the right starting point.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <a href="https://wa.me/9779862909469" target="_blank" rel="noopener noreferrer"
+            <a href="https://wa.me/9779810263277" target="_blank" rel="noopener noreferrer"
               className="cta-lift px-8 py-3.5 rounded-full font-medium text-sm text-white"
               style={{ background: "linear-gradient(135deg, #6B2D8B, #F7941D)",
                 boxShadow: "0 10px 28px rgba(247,148,29,0.45)" }}>

@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PricingSection from "./PricingSection";
+import IntakeMonths from "./IntakeMonths";
 
 export const metadata: Metadata = {
   title: "200hr Yoga Teacher Training Nepal | Yogmandu — Yoga Alliance RYS 200",
   description:
-    "Yoga Alliance RYS 200 certified teacher training in Kathmandu, Nepal. Residential USD 1,400 · Non-residential USD 600. 2026 dates: June 15, July 15, August 15. Hatha, Ashtanga, anatomy, philosophy & more.",
+    "Yoga Alliance RYS 200 certified teacher training in Kathmandu, Nepal. Residential USD 1,400 · Non-residential USD 600. 2026 batches: June, July, August. Hatha, Ashtanga, anatomy, philosophy & more.",
   keywords: [
     "200hr yoga teacher training Nepal",
     "yoga teacher training Kathmandu",
@@ -87,7 +88,7 @@ const faqSchema = {
       name: "When are the 2026 yoga teacher training start dates?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "2026 batches start on June 15, July 15, and August 15. Each cohort is limited to 12 students. Contact us on WhatsApp (+977-9862909469) to reserve your place.",
+        text: "2026 batches run in June, July, and August. Each cohort is limited to 12 students. Contact us on WhatsApp (+977-9810263277) to reserve your place.",
       },
     },
     {
@@ -215,7 +216,7 @@ export default function YogaTeacherTrainingPage() {
               style={{ background: "#6B2D8B", boxShadow: "0 6px 20px rgba(107,45,139,0.35)" }}>
               Reserve Your Spot
             </Link>
-            <a href="https://wa.me/9779862909469" target="_blank" rel="noopener noreferrer"
+            <a href="https://wa.me/9779810263277" target="_blank" rel="noopener noreferrer"
               className="cta-lift px-8 py-3.5 rounded-full font-medium text-sm"
               style={{ border: "1.5px solid #6B2D8B", color: "#6B2D8B" }}>
               Ask on WhatsApp
@@ -256,39 +257,13 @@ export default function YogaTeacherTrainingPage() {
       <section className="py-16 px-6" style={{ background: "#F9F5FF" }}>
         <div className="max-w-5xl mx-auto text-center">
           <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#6B2D8B" }}>Plan Ahead</p>
-          <h2 className="text-3xl font-light mb-10" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>
-            2026 Intake Dates
+          <h2 className="text-3xl font-light mb-3" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>
+            Choose Your Intake Month
           </h2>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", justifyContent: "center" }}>
-            {["June 15, 2026","July 15, 2026","August 15, 2026"].map((d, i) => {
-              const accents = ["#F7941D", "#6B2D8B", "#8DC63F"];
-              const a = accents[i];
-              return (
-                <div key={d} className="lift-3d lift-3d-purple"
-                  style={{
-                    padding: "1.5rem 2rem", borderRadius: "1rem",
-                    border: `1.5px solid ${a}33`,
-                    background: `linear-gradient(160deg, ${a}10 0%, #FFFFFF 80%)`,
-                    boxShadow: `0 6px 22px ${a}14`,
-                    textAlign: "center", minWidth: 200,
-                    position: "relative", overflow: "hidden",
-                  }}>
-                  <div style={{
-                    position: "absolute", top: -25, right: -25, width: 80, height: 80, borderRadius: "50%",
-                    background: `radial-gradient(circle, ${a}22 0%, transparent 70%)`, pointerEvents: "none",
-                  }} />
-                  <div style={{
-                    fontFamily: "Cormorant Garamond, serif", fontSize: "1.4rem", fontWeight: 400,
-                    color: "#2A1208", marginBottom: 4, position: "relative",
-                  }}>{d}</div>
-                  <div style={{
-                    fontSize: "0.88rem", color: a, fontWeight: 600,
-                    letterSpacing: "0.12em", textTransform: "uppercase", position: "relative",
-                  }}>Limited Spots</div>
-                </div>
-              );
-            })}
-          </div>
+          <p className="text-sm mb-10" style={{ color: "#7A5840" }}>
+            Tap a month to reserve your place — each cohort is limited to 12 students.
+          </p>
+          <IntakeMonths />
           <p className="text-sm mt-6" style={{ color: "#7A5840" }}>Secure your place with a USD 200 deposit · Full balance due on arrival</p>
         </div>
       </section>

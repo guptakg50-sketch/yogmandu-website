@@ -237,7 +237,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
               <p className="text-sm font-light mb-6" style={{ color: "rgba(42,18,8,0.5)" }}>
                 Full article coming soon. In the meantime, reach out to our teaching team directly.
               </p>
-              <a href="https://wa.me/9779862909469"
+              <a href="https://wa.me/9779810263277"
                 className="inline-block px-6 py-2.5 rounded-full text-sm font-medium text-white"
                 style={{ background: post.color }}>
                 Ask on WhatsApp

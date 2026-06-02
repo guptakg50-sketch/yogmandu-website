@@ -231,7 +231,6 @@ const stats = [
   { value: "50+",   numeric: 50,    suffix: "+", label: "Countries represented",    color: "#8DC63F", textColor: "#4A6418" },
   { value: "2018",  numeric: undefined,           label: "Established in Nepal",    color: "#F7941D", textColor: "#A65808" },
   { value: "RYS",   numeric: undefined,           label: "Yoga Alliance certified", color: "#6B2D8B", textColor: "#6B2D8B" },
-  { value: "Yesma", numeric: undefined,           label: "Nepali for 'In This'",    color: "#8DC63F", textColor: "#4A6418" },
 ];
 
 export default function WhySection() {

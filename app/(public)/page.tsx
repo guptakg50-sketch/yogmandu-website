@@ -231,7 +231,7 @@ export default function HomePage() {
               accent: "#F7941D", textAccent: "#A65808",
               icon: "🌅",
               title: "Our Story",
-              desc: "Founded in 2018 by the teams of experts in the yoga and wellness industry. Led by Dr. Chintamani Gautam (PhD Yogic Science, ERYT 500). Nepal's first Yoga Alliance registered school.",
+              desc: "Founded in 2018 by the teams of experts in the yoga and wellness industry. Led by Yogi Arjun Rakhal and Dr. Chintamani Gautam (PhD Yogic Science, ERYT 500). Nepal's first Yoga Alliance registered school.",
               cta: "Meet the Team",
             },
             {
@@ -341,7 +341,7 @@ export default function HomePage() {
               The ancient temples, the mountain air, the living tradition of yoga lineage — Nepal carries a
               frequency that deepens every session and accelerates every transformation.
             </p>
-            <a href="https://wa.me/9779862909469"
+            <a href="https://wa.me/9779810263277"
               className="cta-lift inline-block px-10 py-4 rounded-full font-medium text-sm"
               style={{ background: "#A65808", color: "white" }}>
               Plan Your Journey to Nepal

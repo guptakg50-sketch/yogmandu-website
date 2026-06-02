@@ -198,7 +198,7 @@ export default function SoundHealingPage() {
                 Book a Session
               </a>
               <a
-                href="https://wa.me/9779862909469"
+                href="https://wa.me/9779810263277"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="cta-lift px-8 py-3.5 rounded-full font-medium text-sm"
@@ -553,7 +553,7 @@ export default function SoundHealingPage() {
 
           <p className="text-center mt-12 text-sm font-light" style={{ color: "#6B5240" }}>
             Course schedules are flexible — message us on{" "}
-            <a href="https://wa.me/9779862909469" style={{ color: "#6B2D8B", textDecoration: "underline" }}>WhatsApp</a>{" "}
+            <a href="https://wa.me/9779810263277" style={{ color: "#6B2D8B", textDecoration: "underline" }}>WhatsApp</a>{" "}
             with your preferred dates and Level.
           </p>
         </div>

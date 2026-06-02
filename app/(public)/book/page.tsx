@@ -541,7 +541,7 @@ function Step2({
 
           <p style={{ textAlign: "center", fontSize: "0.92rem", color: "#9A7860", marginTop: 14 }}>
             Need a faster reply?{" "}
-            <a href="https://wa.me/9779862909469" target="_blank" rel="noopener noreferrer"
+            <a href="https://wa.me/9779810263277" target="_blank" rel="noopener noreferrer"
               style={{ color: "#6B2D8B", fontWeight: 600 }}>
               Message us on WhatsApp
             </a>
@@ -605,7 +605,7 @@ function Step3({ services }: { services: BookingService[] }) {
       </p>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "center" }}>
-        <a href="https://wa.me/9779862909469" target="_blank" rel="noopener noreferrer"
+        <a href="https://wa.me/9779810263277" target="_blank" rel="noopener noreferrer"
           className="cta-lift"
           style={{
             padding: "13px 28px", borderRadius: 99, fontWeight: 600, fontSize: "0.88rem",
@@ -641,6 +641,7 @@ function BookPageInner() {
   const searchParams  = useSearchParams();
   const preServiceId  = searchParams.get("service");
   const clsParam      = searchParams.get("cls");
+  const monthParam    = searchParams.get("month");
   const parsedClass   = parseClassParam(clsParam);
 
   const [step,     setStep]     = useState<1 | 2 | 3>(1);
@@ -652,9 +653,9 @@ function BookPageInner() {
     const found = SERVICES.find(s => s.id === preServiceId);
     if (!found) return;
     setSelected([found]);
-    if (parsedClass) setStep(2); // skip service picker when coming from a class card
+    if (parsedClass || monthParam) setStep(2); // skip service picker when coming from a class card or an intake month
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preServiceId, clsParam]);
+  }, [preServiceId, clsParam, monthParam]);
 
   function handleSelect(s: BookingService) {
     setSelected(prev =>
@@ -668,6 +669,29 @@ function BookPageInner() {
   return (
     <>
       <StepDots step={step} />
+
+      {/* Intake-month banner (shown when coming from a Teacher Training month card) */}
+      {monthParam && !parsedClass && step !== 3 && (
+        <div style={{
+          maxWidth: 640, margin: "0 auto 24px",
+          padding: "12px 20px", borderRadius: 14,
+          background: "linear-gradient(135deg, rgba(107,45,139,0.08), rgba(247,148,29,0.06))",
+          border: "1.5px solid rgba(107,45,139,0.18)",
+          display: "flex", alignItems: "center", gap: 14,
+        }}>
+          <span style={{ fontSize: "1.5rem" }}>🗓</span>
+          <div>
+            <p style={{ margin: 0, fontSize: "0.88rem", fontWeight: 700, letterSpacing: "0.1em",
+              textTransform: "uppercase", color: "#6B2D8B" }}>Selected Intake</p>
+            <p style={{ margin: 0, fontSize: "0.92rem", fontWeight: 600, color: "#2A1208" }}>
+              200-Hour Yoga Teacher Training
+            </p>
+            <p style={{ margin: 0, fontSize: "0.95rem", color: "#7A5840" }}>
+              {monthParam} batch
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Class context banner (shown when coming from schedule page) */}
       {parsedClass && step !== 3 && (
@@ -700,6 +724,8 @@ function BookPageInner() {
           <Step2 services={selected} onBack={handleBack} onSuccess={handleSuccess} prefillMessage={
             parsedClass
               ? `I'd like to book: ${parsedClass.name} on ${parsedClass.day} at ${parsedClass.time}${parsedClass.instructor ? ` with ${parsedClass.instructor}` : ""}.`
+              : monthParam
+              ? `I'd like to book the 200-Hour Yoga Teacher Training — ${monthParam} batch.`
               : ""
           } />
         )}

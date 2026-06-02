@@ -52,7 +52,7 @@ export const defaultFooterConfig = {
   youtubeUrl:   "https://www.youtube.com/@yogmandu",
   instagramUrl: "https://instagram.com/yogmandu",
   facebookUrl:  "https://facebook.com/yogmandu",
-  whatsappUrl:  "https://wa.me/9779862909469",
+  whatsappUrl:  "https://wa.me/9779810263277",
   badge:        "Yoga Alliance RYS 200 & 300 · Kathmandu, Nepal",
   ctaTagline:   "Begin your journey",
 };

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
-const PHONE = "9779862909469";
+const PHONE = "9779810263277";
 const MESSAGE = "Hi Yogmandu, I'd like to know more about your programs.";
 
 // Don't show on these route prefixes — would clash with their own chrome.

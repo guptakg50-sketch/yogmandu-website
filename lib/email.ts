@@ -124,7 +124,7 @@ export function sendWelcomeEmail(opts: { to: string; fullName: string; verifyUrl
         <p style="margin:0 0 16px">Your Yogmandu account is ready. We're delighted to have you with us.</p>
         ${verifyBlock}
         <p style="margin:0 0 16px">From here you can explore our class schedule, learn about our Yoga Alliance certified 200hr and 300hr teacher training, and book Tibetan sound-healing sessions.</p>
-        <p style="margin:0">Questions? Just reply to this email or <a href="https://wa.me/9779862909469" style="color:#6B2D8B">message us on WhatsApp</a>.</p>
+        <p style="margin:0">Questions? Just reply to this email or <a href="https://wa.me/9779810263277" style="color:#6B2D8B">message us on WhatsApp</a>.</p>
       `,
       ctaHref: opts.verifyUrl || `${SITE_URL}/account`,
       ctaLabel: opts.verifyUrl ? "Verify email address" : "Go to your account",
@@ -133,7 +133,7 @@ export function sendWelcomeEmail(opts: { to: string; fullName: string; verifyUrl
       `Namaste ${greeting},\n\n` +
       `Your Yogmandu account is ready.\n\n` +
       (opts.verifyUrl ? `Please confirm your email: ${opts.verifyUrl}\n\n` : `Visit your account: ${SITE_URL}/account\n\n`) +
-      `Questions? Reply here or message us on WhatsApp: https://wa.me/9779862909469\n\n` +
+      `Questions? Reply here or message us on WhatsApp: https://wa.me/9779810263277\n\n` +
       `— Yogmandu, Kathmandu, Nepal`,
   });
 }
@@ -197,7 +197,7 @@ export function sendContactAck(opts: { to: string; name: string; program: string
         <p style="margin:0 0 16px">Thank you for getting in touch with Yogmandu. We've received your message and will reply within 24 hours.</p>
         ${opts.program ? `<p style="margin:0 0 8px;color:#9A7860;font-size:13px">Interested in: <strong style="color:#6B2D8B">${escapeHtml(opts.program)}</strong></p>` : ""}
         <div style="margin:16px 0;padding:14px 18px;background:#FAF6F0;border-left:3px solid #F7941D;border-radius:8px;font-size:14px;color:#5C3D2E;white-space:pre-wrap">${escapeHtml(opts.message)}</div>
-        <p style="margin:0">Need a faster reply? Message us directly on <a href="https://wa.me/9779862909469" style="color:#6B2D8B">WhatsApp</a>.</p>
+        <p style="margin:0">Need a faster reply? Message us directly on <a href="https://wa.me/9779810263277" style="color:#6B2D8B">WhatsApp</a>.</p>
       `,
     }),
     text:
@@ -205,7 +205,7 @@ export function sendContactAck(opts: { to: string; name: string; program: string
       `Thank you for getting in touch. We'll reply within 24 hours.\n\n` +
       (opts.program ? `Interested in: ${opts.program}\n\n` : "") +
       `Your message:\n${opts.message}\n\n` +
-      `Faster reply: https://wa.me/9779862909469\n\n— Yogmandu`,
+      `Faster reply: https://wa.me/9779810263277\n\n— Yogmandu`,
   });
 }
 
@@ -307,10 +307,10 @@ export function sendBookingAck(opts: {
           ${dateStr ? `<p style="margin:0;font-size:13px;color:#4A2E1A">${escapeHtml(dateStr)}</p>` : ""}
         </div>
 
-        <p style="margin:0 0 16px">Need to confirm sooner or have a question? Reach us directly on <a href="https://wa.me/9779862909469" style="color:#6B2D8B">WhatsApp</a>.</p>
+        <p style="margin:0 0 16px">Need to confirm sooner or have a question? Reach us directly on <a href="https://wa.me/9779810263277" style="color:#6B2D8B">WhatsApp</a>.</p>
         <p style="margin:0">We look forward to practising with you. 🙏</p>
       `,
-      ctaHref: "https://wa.me/9779862909469",
+      ctaHref: "https://wa.me/9779810263277",
       ctaLabel: "Chat on WhatsApp",
     }),
     text:
@@ -318,7 +318,7 @@ export function sendBookingAck(opts: {
       `We've received your booking request for: ${opts.serviceTitle}\n` +
       (dateStr ? `Preferred date: ${dateStr}\n` : "") +
       `\nOur team will confirm within 24 hours.\n\n` +
-      `Faster response: https://wa.me/9779862909469\n\n` +
+      `Faster response: https://wa.me/9779810263277\n\n` +
       `— Yogmandu, Kathmandu, Nepal`,
   });
 }
