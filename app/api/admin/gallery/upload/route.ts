@@ -1,5 +1,6 @@
 import { requireAdminSession } from "@/lib/adminAuth";
 import { getStorageBucket, getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabaseAdmin";
+import { optimizeImage } from "@/lib/imageOptimize";
 
 export const dynamic = "force-dynamic";
 
@@ -28,14 +29,18 @@ export async function POST(request: Request) {
 
   const supabase  = getSupabaseAdmin();
   const bucket    = getStorageBucket();
-  const extension = file.name.split(".").pop() || "jpg";
-  const path      = `gallery/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+
+  // Compress to WebP before storing — keeps Supabase usage low and the site fast.
+  const inputBuffer = Buffer.from(await file.arrayBuffer());
+  const fallbackExt = file.name.split(".").pop() || "jpg";
+  const optimized   = await optimizeImage(inputBuffer, file.type, fallbackExt);
+  const path        = `gallery/${Date.now()}-${crypto.randomUUID()}.${optimized.extension}`;
 
   const { error: uploadError } = await supabase.storage
     .from(bucket)
-    .upload(path, file, {
+    .upload(path, optimized.buffer, {
       cacheControl: "31536000",
-      contentType:  file.type,
+      contentType:  optimized.contentType,
       upsert:       false,
     });
 

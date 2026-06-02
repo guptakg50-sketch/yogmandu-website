@@ -1,6 +1,7 @@
 import { getUserSession } from "@/lib/userAuth";
 import { updateUserProfile } from "@/lib/supabaseUsers";
 import { getSupabaseAdmin, getStorageBucket } from "@/lib/supabaseAdmin";
+import { optimizeImage } from "@/lib/imageOptimize";
 
 export const dynamic = "force-dynamic";
 
@@ -72,19 +73,22 @@ export async function POST(request: Request) {
   const supabase = getSupabaseAdmin();
   const bucket   = getStorageBucket();
 
+  // Compress to WebP (avatars never need to be large) before storing.
+  const optimized = await optimizeImage(buffer, realMime, realExt, { maxDimension: 512, quality: 82 });
+
   // Remove any old avatar files with different extensions to avoid leaking storage.
   const stalePaths = ALL_EXTS
-    .filter(ext => ext !== realExt)
+    .filter(ext => ext !== optimized.extension)
     .map(ext => `avatars/${session.userId}.${ext}`);
   if (stalePaths.length > 0) {
     await supabase.storage.from(bucket).remove(stalePaths).catch(() => {});
   }
 
-  const path = `avatars/${session.userId}.${realExt}`;
+  const path = `avatars/${session.userId}.${optimized.extension}`;
   const { error } = await supabase.storage
     .from(bucket)
-    .upload(path, buffer, {
-      contentType: realMime,
+    .upload(path, optimized.buffer, {
+      contentType: optimized.contentType,
       upsert: true,
     });
 
