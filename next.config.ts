@@ -32,6 +32,11 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Self-contained server bundle for cPanel / non-Vercel Node hosting.
+  // Bundles only the needed node_modules into .next/standalone so the
+  // server runs without a separate `npm install` step.
+  output: "standalone",
+
   async headers() {
     return [
       {
