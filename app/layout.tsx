@@ -1,23 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import CookieConsent from "@/components/CookieConsent";
 import "./globals.css";
-
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  style: ["normal", "italic"],
-  variable: "--font-cormorant",
-  display: "swap",
-});
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  weight: ["300", "400", "500"],
-  variable: "--font-dm-sans",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://yogmandu.com"),
@@ -130,8 +114,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`h-full ${cormorant.variable} ${dmSans.variable}`} data-scroll-behavior="smooth">
+    <html lang="en" className="h-full" data-scroll-behavior="smooth">
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
       </head>

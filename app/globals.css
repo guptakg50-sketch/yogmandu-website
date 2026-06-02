@@ -7,8 +7,8 @@
   --color-bg: #FFFFFF;
   --color-surface: #F5F0FA;
   --color-brown: #5C3317;
-  --font-display: var(--font-cormorant, "Cormorant Garamond"), Georgia, serif;
-  --font-body: var(--font-dm-sans, "DM Sans"), sans-serif;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "DM Sans", sans-serif;
 }
 
 :root {
