@@ -150,10 +150,10 @@ export default function RootLayout({
         `}</Script>
         {children}
         <CookieConsent />
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-JJL91Q27S5" strategy="lazyOnload" />
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-9S0M03X13S" strategy="lazyOnload" />
         <Script id="gtag-init" strategy="lazyOnload">{`
           gtag('js', new Date());
-          gtag('config', 'G-JJL91Q27S5', { anonymize_ip: true });
+          gtag('config', 'G-9S0M03X13S', { anonymize_ip: true });
         `}</Script>
       </body>
     </html>
