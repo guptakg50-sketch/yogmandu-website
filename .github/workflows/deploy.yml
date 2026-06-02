@@ -1,17 +1,20 @@
 name: Deploy to cPanel
 
 # Push to master → build the Next.js standalone bundle and upload it to the
-# cPanel host over FTPS, then trigger a Phusion Passenger restart. No SSH
-# required. Secrets needed (Settings → Secrets and variables → Actions):
-#   FTP_HOST      e.g. yogmandu.com  (or the server hostname from cPanel)
-#   FTP_USERNAME  the cPanel/FTP account username (logs into /home/yogmandu)
-#   FTP_PASSWORD  that account's password
+# cPanel host over WebDAV (Web Disk, HTTPS port 2078). A cPanel cron job on
+# the server then extracts it and restarts the app. HTTPS is used end-to-end
+# because this host firewalls FTP passive ports and kills SSH/SFTP sessions —
+# but it cannot block its own HTTPS control plane.
+#
+# Required repo secrets (Settings → Secrets and variables → Actions):
+#   WEBDISK_URL   e.g. https://yogmandu.com:2078   (Web Disk root = yogmandu-next)
+#   WEBDISK_USER  the Web Disk account username (e.g. deploy@yogmandu.com)
+#   WEBDISK_PASS  that account's password
 on:
   push:
     branches: [master]
   workflow_dispatch: {}
 
-# Never run two deploys at once; cancel an in-progress one if a newer push lands.
 concurrency:
   group: cpanel-deploy
   cancel-in-progress: true
@@ -38,30 +41,23 @@ jobs:
         env:
           GITHUB_SHA: ${{ github.sha }}
 
-      - name: Deploy over FTPS
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          # Plain FTP: FTPS fails here because the encrypted control channel
-          # hides the PASV response from the network's FTP helper, so the
-          # passive data port never opens (data-connection timeout). The
-          # `deploy` account is jailed to yogmandu-next to limit exposure.
-          protocol: ftp
-          # Trailing slashes are required by this action. The `deploy` FTP
-          # account is jailed to /home/yogmandu/yogmandu-next, so its login
-          # root IS the app folder — server-dir is therefore ./.
-          local-dir: ./.next/standalone/
-          server-dir: ./
-          # IMPORTANT: this list REPLACES the action's defaults. The defaults
-          # exclude node_modules — but the standalone server NEEDS its bundled
-          # node_modules, so we must upload it. We still protect the server's
-          # own app.js (Passenger entry point) and .env (secrets), which are
-          # never overwritten or deleted.
-          exclude: |
-            **/.git*
-            **/.git*/**
-            app.js
-            .env
-            .ftp-deploy-sync-state.json
+      - name: Package (exclude server-owned app.js/.env)
+        run: tar -czf /tmp/build.tar.gz --exclude=./app.js --exclude=./.env -C .next/standalone .
+
+      - name: Upload via WebDAV + trigger deploy
+        env:
+          URL:  ${{ secrets.WEBDISK_URL }}
+          USER: ${{ secrets.WEBDISK_USER }}
+          PASS: ${{ secrets.WEBDISK_PASS }}
+        run: |
+          set -euo pipefail
+          dav() { curl -fsS -k -u "$USER:$PASS" "$@"; }
+          # Ensure the .deploy drop folder exists (MKCOL is idempotent-ish; ignore if present)
+          dav -X MKCOL "$URL/.deploy/" || true
+          # Clear any stale trigger so the cron can't act on a half-finished upload
+          dav -X DELETE "$URL/.deploy/ready" || true
+          # 1) upload the build, 2) THEN the ready marker — its presence means the build is complete
+          dav -T /tmp/build.tar.gz "$URL/.deploy/build.tar.gz"
+          printf '%s\n' "$GITHUB_SHA" > /tmp/ready
+          dav -T /tmp/ready "$URL/.deploy/ready"
+          echo "✅ Uploaded. The cPanel cron will extract and restart within ~1 minute."
