@@ -3,6 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getBlogBySlug, getPublishedBlogs } from "@/lib/publicData";
 
+// Re-fetch from Supabase at most once a minute so edits made in the admin
+// Blog Manager appear on the live site without a rebuild/redeploy. New slugs
+// not returned by generateStaticParams are rendered on first request.
+export const revalidate = 60;
+export const dynamicParams = true;
+
 const CATEGORY_COLORS: Record<string, string> = {
   "Teacher Training": "#6B2D8B",
   "Sound Healing":    "#F7941D",

@@ -1,31 +1,25 @@
 /**
  * Packages the Next.js standalone build into a single tarball for cPanel.
  *
- *   npm run build && node scripts/package-cpanel.mjs
+ *   npm run deploy:cpanel
  *
  * Produces /tmp/yogmandu-deploy.tar.gz — upload to the `yogmandu-next`
  * folder in cPanel File Manager, Extract into `yogmandu-next`, then
  * Restart the Node.js app. The .env and app.js already on the server are
  * preserved (this archive does not overwrite them).
+ *
+ * NOTE: This is the MANUAL fallback. The normal path is now automatic —
+ * push to master and the GitHub Actions workflow (.github/workflows/deploy.yml)
+ * builds and FTP-deploys for you. See AGENTS.md / cpanel-deployment memory.
  */
 import { execSync } from "node:child_process";
-import { existsSync, cpSync, rmSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.cwd();
 const standalone = join(root, ".next", "standalone");
 
-if (!existsSync(standalone)) {
-  console.error("❌ No standalone build found. Run `npm run build` first.");
-  process.exit(1);
-}
-
-// Copy static assets + public into the standalone tree (Next doesn't do this automatically)
-console.log("→ Copying .next/static and public into standalone…");
-rmSync(join(standalone, ".next", "static"), { recursive: true, force: true });
-cpSync(join(root, ".next", "static"), join(standalone, ".next", "static"), { recursive: true });
-rmSync(join(standalone, "public"), { recursive: true, force: true });
-cpSync(join(root, "public"), join(standalone, "public"), { recursive: true });
+// Copy static + public into the standalone tree, ensure tmp/restart.txt.
+execSync("node scripts/assemble-standalone.mjs", { stdio: "inherit" });
 
 // Package everything EXCEPT app.js and .env (those live on the server, don't clobber them)
 const out = "/tmp/yogmandu-deploy.tar.gz";

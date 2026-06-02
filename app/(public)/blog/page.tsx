@@ -3,6 +3,10 @@ import Link from "next/link";
 import { getPublishedBlogs } from "@/lib/publicData";
 import type { DBBlog } from "@/lib/publicData";
 
+// Re-fetch from Supabase at most once a minute so posts published in the
+// admin Blog Manager appear on the live site without a rebuild/redeploy.
+export const revalidate = 60;
+
 const blogSchema = {
   "@context": "https://schema.org",
   "@type": "Blog",

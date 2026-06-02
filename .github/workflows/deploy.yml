@@ -1,0 +1,63 @@
+name: Deploy to cPanel
+
+# Push to master → build the Next.js standalone bundle and upload it to the
+# cPanel host over FTPS, then trigger a Phusion Passenger restart. No SSH
+# required. Secrets needed (Settings → Secrets and variables → Actions):
+#   FTP_HOST      e.g. yogmandu.com  (or the server hostname from cPanel)
+#   FTP_USERNAME  the cPanel/FTP account username (logs into /home/yogmandu)
+#   FTP_PASSWORD  that account's password
+on:
+  push:
+    branches: [master]
+  workflow_dispatch: {}
+
+# Never run two deploys at once; cancel an in-progress one if a newer push lands.
+concurrency:
+  group: cpanel-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build standalone bundle
+        run: npm run build
+
+      - name: Assemble standalone (static + public + restart.txt)
+        run: node scripts/assemble-standalone.mjs
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+
+      - name: Deploy over FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          # Trailing slashes are required by this action. The `deploy` FTP
+          # account is jailed to /home/yogmandu/yogmandu-next, so its login
+          # root IS the app folder — server-dir is therefore ./.
+          local-dir: ./.next/standalone/
+          server-dir: ./
+          # IMPORTANT: this list REPLACES the action's defaults. The defaults
+          # exclude node_modules — but the standalone server NEEDS its bundled
+          # node_modules, so we must upload it. We still protect the server's
+          # own app.js (Passenger entry point) and .env (secrets), which are
+          # never overwritten or deleted.
+          exclude: |
+            **/.git*
+            **/.git*/**
+            app.js
+            .env
+            .ftp-deploy-sync-state.json
