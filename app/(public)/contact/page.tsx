@@ -10,7 +10,7 @@ const contactPageSchema = {
   mainEntity: {
     "@type": "LocalBusiness",
     name: "Yogmandu",
-    telephone: "+977-9862909469",
+    telephone: "+977-9810263277",
     email: "info@yogmandu.com",
     address: {
       "@type": "PostalAddress",
@@ -33,7 +33,7 @@ const breadcrumbSchema = {
 export const metadata: Metadata = {
   title: "Contact Yogmandu | Book Yoga & Sound Healing in Kathmandu Nepal",
   description:
-    "Contact Yogmandu to book yoga classes, teacher training or sound healing sessions. WhatsApp +977-9862909469 · info@yogmandu.com · Miteri Marg, Mid-Baneshwor-31, Kathmandu.",
+    "Contact Yogmandu to book yoga classes, teacher training or sound healing sessions. WhatsApp +977-9810263277 · info@yogmandu.com · Miteri Marg, Mid-Baneshwor-31, Kathmandu.",
   keywords: [
     "contact Yogmandu", "book yoga class Kathmandu", "yoga enquiry Nepal",
     "sound healing booking Nepal", "yoga teacher training enquiry",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://yogmandu.com/contact" },
   openGraph: {
     title: "Contact Yogmandu | Book Yoga & Sound Healing in Kathmandu",
-    description: "WhatsApp +977-9862909469 · info@yogmandu.com · Miteri Marg, Mid-Baneshwor-31, Kathmandu, Nepal.",
+    description: "WhatsApp +977-9810263277 · info@yogmandu.com · Miteri Marg, Mid-Baneshwor-31, Kathmandu, Nepal.",
     url: "https://yogmandu.com/contact",
   },
 };

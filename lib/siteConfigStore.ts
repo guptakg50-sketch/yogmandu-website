@@ -45,7 +45,7 @@ export const defaultFooterConfig = {
   ],
   contact: [
     { icon: "📍", text: "Miteri Marg, Mid-Baneshwor-31, Kathmandu, Nepal" },
-    { icon: "📞", text: "+977-9862909469 / +977-9810263277" },
+    { icon: "📞", text: "+977-9810263277" },
     { icon: "✉️", text: "info@yogmandu.com" },
     { icon: "🕐", text: "Mon–Sun · 6:00–20:00" },
   ],

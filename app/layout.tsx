@@ -66,7 +66,7 @@ const localBusinessSchema = {
   url: "https://yogmandu.com",
   logo: "https://yogmandu.com/logo.png",
   image: "https://yogmandu.com/logo.png",
-  telephone: "+977-9862909469",
+  telephone: "+977-9810263277",
   email: "info@yogmandu.com",
   address: {
     "@type": "PostalAddress",

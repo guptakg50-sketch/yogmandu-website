@@ -66,7 +66,7 @@ export default function ContactForm() {
               {
                 label: "WhatsApp / Phone",
                 value: "+977-9810263277",
-                sub: "+977-9862909469 · Fastest response, usually within 2 hours",
+                sub: "+977-9810263277 · Fastest response, usually within 2 hours",
                 color: "#8DC63F",
                 href: "https://wa.me/9779810263277",
                 icon: (

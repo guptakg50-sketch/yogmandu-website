@@ -395,7 +395,7 @@ export default function YogaTeacherTrainingPage() {
               style={{ border: "1.5px solid #F7941D", color: "#F7941D" }}>Also explore Sound Healing →</Link>
           </div>
           <div className="mt-8 flex justify-center gap-8 text-sm" style={{ color: "#7A5840" }}>
-            <span>📞 +977-9862909469</span>
+            <span>📞 +977-9810263277</span>
             <span>✉️ info@yogmandu.com</span>
           </div>
         </div>

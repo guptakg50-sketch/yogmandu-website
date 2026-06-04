@@ -31,7 +31,7 @@ const DEFAULT_CONFIG = {
   ],
   contact: [
     { icon: "📍", text: "Mid-Baneshwor-31, Kathmandu, Nepal" },
-    { icon: "📞", text: "+977-9862909469 / +977-9810263277" },
+    { icon: "📞", text: "+977-9810263277" },
     { icon: "✉️", text: "info@yogmandu.com" },
     { icon: "🕐", text: "Sun–Fri · 5:30–18:30" },
   ],

@@ -143,7 +143,7 @@ export default function TermsPage() {
               <strong>Yogmandu</strong><br />
               Miteri Marg, Mid-Baneshwor-31, Kathmandu, Nepal<br />
               <a href="mailto:info@yogmandu.com" style={linkStyle}>info@yogmandu.com</a><br />
-              +977-9862909469
+              +977-9810263277
             </div>
           </Section>
         </div>
