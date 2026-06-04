@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import SingingBowl from "@/components/SingingBowlClient";
 
 export const metadata: Metadata = {
-  title: "Sound Healing Therapy Nepal — Tibetan Singing Bowls | Yogmandu",
+  title: { absolute: "Sound Healing & Tibetan Singing Bowls | Yogmandu Nepal" },
   description:
-    "Authentic Tibetan singing bowl sound healing in Kathmandu, Nepal. Individual sessions USD 20, group USD 10/person, Level I & II certification. Book with Yogmandu — Nepal's premier sound healing centre.",
+    "Tibetan singing bowl sound healing therapy in Kathmandu with Yogmandu — relaxing sessions plus sound healing teacher training. Book a session today.",
   keywords: [
     "sound healing Kathmandu",
     "Tibetan singing bowl therapy Nepal",
@@ -21,6 +21,7 @@ export const metadata: Metadata = {
     title: "Sound Healing Therapy Nepal — Tibetan Singing Bowls | Yogmandu",
     description: "Authentic Tibetan singing bowl sessions in Kathmandu. Individual USD 20 · Group USD 10/person · Level I & II certification. Book on WhatsApp.",
     url: "https://yogmandu.com/sound-healing-therapy",
+    images: ["/opengraph-image.png"],
   },
   twitter: {
     title: "Sound Healing Therapy Nepal — Tibetan Singing Bowls | Yogmandu",

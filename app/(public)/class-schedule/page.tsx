@@ -7,9 +7,9 @@ import { getActiveSessions, getInstructorMap } from "@/lib/publicData";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "Yoga Class Schedule Kathmandu | Daily Classes at Yogmandu Nepal",
+  title: { absolute: "Yoga Classes in Kathmandu — Daily Schedule | Yogmandu" },
   description:
-    "Weekly yoga timetable at Yogmandu Kathmandu — Morning Hatha, Vinyasa, Ashtanga, Yin Yoga, Pranayama, Meditation, Tibetan Bowl Healing and Restorative Yoga. All levels welcome.",
+    "Join daily yoga classes in Kathmandu at Yogmandu — Hatha, Vinyasa, Ashtanga, Yin, pranayama & meditation. All levels welcome. See the weekly timetable.",
   keywords: [
     "yoga classes Kathmandu",
     "yoga schedule Nepal",
@@ -26,6 +26,7 @@ export const metadata: Metadata = {
     title: "Yoga Class Schedule Kathmandu | Daily Classes at Yogmandu",
     description: "Hatha, Vinyasa, Ashtanga, Yin, Pranayama, Meditation & Sound Healing — 7 days a week in Kathmandu. All levels welcome.",
     url: "https://yogmandu.com/class-schedule",
+    images: ["/opengraph-image.png"],
   },
 };
 

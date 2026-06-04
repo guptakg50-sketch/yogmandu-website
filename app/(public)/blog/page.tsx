@@ -31,9 +31,9 @@ const breadcrumbSchema = {
 };
 
 export const metadata: Metadata = {
-  title: "Yoga Blog Nepal | Yogmandu Insights",
+  title: { absolute: "Yoga Blog — Philosophy, Breathwork & Sound Healing | Yogmandu" },
   description:
-    "Articles on yoga philosophy, pranayama, Tibetan sound healing, teacher training, and life in Kathmandu. Written by Dr. Chintamani Gautam and the Yogmandu teaching team.",
+    "Articles on yoga philosophy, pranayama, Tibetan sound healing and teacher training from Dr. Chintamani Gautam and the Yogmandu team in Kathmandu, Nepal.",
   keywords: [
     "yoga blog Nepal", "yoga philosophy articles", "pranayama guide",
     "sound healing blog", "yoga teacher training tips", "Kathmandu yoga lifestyle",
@@ -43,6 +43,7 @@ export const metadata: Metadata = {
     title: "Yoga Blog — Philosophy, Breathwork & Sound Healing | Yogmandu Nepal",
     description: "Yoga philosophy, pranayama, Tibetan sound healing insights from the Yogmandu teaching team in Kathmandu.",
     url: "https://yogmandu.com/blog",
+    images: ["/opengraph-image.png"],
   },
 };
 

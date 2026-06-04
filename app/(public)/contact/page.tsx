@@ -31,9 +31,9 @@ const breadcrumbSchema = {
 };
 
 export const metadata: Metadata = {
-  title: "Contact Yogmandu | Book Yoga & Sound Healing in Kathmandu Nepal",
+  title: { absolute: "Contact Yogmandu — Yoga in Kathmandu, Nepal" },
   description:
-    "Contact Yogmandu to book yoga classes, teacher training or sound healing sessions. WhatsApp +977-9810263277 · info@yogmandu.com · Miteri Marg, Mid-Baneshwor-31, Kathmandu.",
+    "Contact Yogmandu to book yoga classes, teacher training or sound healing in Kathmandu. WhatsApp +977-9810263277 · info@yogmandu.com · Mid-Baneshwor.",
   keywords: [
     "contact Yogmandu", "book yoga class Kathmandu", "yoga enquiry Nepal",
     "sound healing booking Nepal", "yoga teacher training enquiry",
@@ -44,6 +44,7 @@ export const metadata: Metadata = {
     title: "Contact Yogmandu | Book Yoga & Sound Healing in Kathmandu",
     description: "WhatsApp +977-9810263277 · info@yogmandu.com · Miteri Marg, Mid-Baneshwor-31, Kathmandu, Nepal.",
     url: "https://yogmandu.com/contact",
+    images: ["/opengraph-image.png"],
   },
 };
 

@@ -4,9 +4,9 @@ import PricingSection from "./PricingSection";
 import IntakeMonths from "./IntakeMonths";
 
 export const metadata: Metadata = {
-  title: "200hr Yoga Teacher Training Nepal | Yogmandu — Yoga Alliance RYS 200",
+  title: { absolute: "Yoga Teacher Training in Nepal — RYS 200 | Yogmandu" },
   description:
-    "Yoga Alliance RYS 200 certified teacher training in Kathmandu, Nepal. Residential USD 1,400 · Non-residential USD 600. 2026 batches: June, July, August. Hatha, Ashtanga, anatomy, philosophy & more.",
+    "Yoga Alliance RYS 200 teacher training in Kathmandu, Nepal. Residential & non-residential 2026 batches — Hatha, Ashtanga, anatomy, philosophy & practice.",
   keywords: [
     "200hr yoga teacher training Nepal",
     "yoga teacher training Kathmandu",
@@ -23,6 +23,7 @@ export const metadata: Metadata = {
     title: "200hr Yoga Teacher Training Nepal | Yogmandu",
     description: "Yoga Alliance RYS 200 certified. Residential USD 1,400 · Non-residential USD 600. 2026 batches: June, July, August. Kathmandu, Nepal.",
     url: "https://yogmandu.com/yoga-teacher-training",
+    images: ["/opengraph-image.png"],
   },
   twitter: {
     title: "200hr Yoga Teacher Training Nepal | Yogmandu",

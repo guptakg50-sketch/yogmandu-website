@@ -8,9 +8,9 @@ import WhySection from "@/components/WhySection";
 import { DeferUntilIdle, DeferUntilVisible } from "@/components/DeferredHeavy";
 
 export const metadata: Metadata = {
-  title: "Yoga Teacher Training Nepal | Yogmandu Kathmandu",
+  title: { absolute: "Yoga Teacher Training & Classes in Nepal | Yogmandu" },
   description:
-    "Nepal's premier Yoga Alliance RYS 200, 300 & 500 certified teacher training school. Authentic Tibetan singing bowl sound healing. Founded 2018 by Dr. Chintamani Gautam. 3,000+ teachers from 50+ countries.",
+    "Nepal's Yoga Alliance RYS 200/300/500 school in Kathmandu — yoga teacher training, daily classes & Tibetan sound healing. 3,000+ teachers since 2018.",
   keywords: [
     "yoga teacher training Nepal",
     "200hr yoga teacher training Kathmandu",
@@ -28,6 +28,7 @@ export const metadata: Metadata = {
     description:
       "Nepal's premier Yoga Alliance certified school. 200hr & 300hr YTT + authentic Tibetan sound healing in Kathmandu. 3,000+ teachers trained from 50+ countries.",
     url: "https://yogmandu.com",
+    images: ["/opengraph-image.png"],
   },
 };
 

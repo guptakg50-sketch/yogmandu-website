@@ -14,7 +14,7 @@ const breadcrumbSchema = {
 };
 
 export const metadata: Metadata = {
-  title: "Yogmandu Gallery | Yoga & Sound Healing Nepal",
+  title: { absolute: "Gallery — Yoga & Sound Healing in Nepal | Yogmandu" },
   description:
     "Photos from Yogmandu Kathmandu — yoga classes, Tibetan singing bowl sessions, teacher training graduates, and the beauty of Nepal. See what awaits you.",
   keywords: [
@@ -26,6 +26,7 @@ export const metadata: Metadata = {
     title: "Gallery | Yoga & Sound Healing in Kathmandu — Yogmandu",
     description: "Photos from yoga classes, Tibetan singing bowl sessions, and teacher training at Yogmandu Kathmandu.",
     url: "https://yogmandu.com/gallery",
+    images: ["/opengraph-image.png"],
   },
 };
 

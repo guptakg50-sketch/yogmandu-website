@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import AboutContent from "./AboutContent";
 
 export const metadata: Metadata = {
-  title: "About Yogmandu | Nepal's First Yoga Alliance Registered School",
+  title: { absolute: "About Yogmandu — Yoga School in Kathmandu, Nepal" },
   description:
-    "Founded in 2018 by the teams of experts in the yoga and wellness industry. Led by Dr. Chintamani Gautam (PhD Yogic Science, ERYT 500). Nepal's first Yoga Alliance registered school — 3,000+ teachers trained from 50+ countries. Mid-Baneshwor, Kathmandu.",
+    "Founded 2018 and led by Dr. Chintamani Gautam (PhD Yogic Science, E-RYT 500), Yogmandu is a Yoga Alliance registered yoga school in Kathmandu, Nepal.",
   keywords: [
     "Yogmandu about", "Dr Chintamani Gautam", "yoga school Nepal history",
     "Yoga Alliance Nepal", "ERYT 500 Nepal", "yoga teacher Kathmandu",
@@ -15,6 +15,7 @@ export const metadata: Metadata = {
     title: "About Yogmandu | Nepal's First Yoga Alliance Registered School",
     description: "Founded 2018 by Dr. Chintamani Gautam. ERYT 500, PhD Yogic Science. 3,000+ teachers from 50+ countries. Kathmandu, Nepal.",
     url: "https://yogmandu.com/about",
+    images: ["/opengraph-image.png"],
   },
   twitter: {
     title: "About Yogmandu | Nepal's First Yoga Alliance Registered School",
