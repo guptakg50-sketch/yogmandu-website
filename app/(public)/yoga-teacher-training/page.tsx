@@ -320,6 +320,59 @@ export default function YogaTeacherTrainingPage() {
               </div>
             ))}
           </div>
+
+          {/* Training hours breakdown */}
+          <div className="mt-14 rounded-2xl p-8 md:p-10 relative overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, #6B2D8B0C 0%, #F9F5FF 80%)",
+              border: "1.5px solid #6B2D8B22",
+              boxShadow: "0 6px 22px #6B2D8B10",
+            }}>
+            <div style={{
+              position: "absolute", top: -30, right: -30, width: 110, height: 110, borderRadius: "50%",
+              background: "radial-gradient(circle, #F7941D22 0%, transparent 70%)", pointerEvents: "none",
+            }} />
+            <div className="flex items-baseline gap-3 mb-7 relative flex-wrap">
+              <span className="text-4xl md:text-5xl font-light" style={{ fontFamily: "Cormorant Garamond, serif", color: "#6B2D8B" }}>200</span>
+              <p className="text-xs tracking-[0.25em] uppercase font-semibold" style={{ color: "#A65808" }}>Total Training Hours</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+              <div className="rounded-xl p-6" style={{ background: "#FFFFFF", border: "1px solid #F7941D22" }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-2xl font-light" style={{ fontFamily: "Cormorant Garamond, serif", color: "#F7941D" }}>100–110</span>
+                  <p className="text-xs tracking-[0.2em] uppercase font-semibold" style={{ color: "#F7941D" }}>Contact Hrs</p>
+                </div>
+                <ul className="space-y-2">
+                  {[
+                    "Practicum — 2.5 hours daily (Studio / Online)",
+                    "Theory — 1 hour daily (Zoom Meetings)",
+                  ].map(item => (
+                    <li key={item} className="text-sm flex items-start gap-2" style={{ color: "#3D2515" }}>
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#F7941D", boxShadow: "0 0 6px #F7941D80" }} />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="rounded-xl p-6" style={{ background: "#FFFFFF", border: "1px solid #8DC63F22" }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-2xl font-light" style={{ fontFamily: "Cormorant Garamond, serif", color: "#4A6418" }}>90–100</span>
+                  <p className="text-xs tracking-[0.2em] uppercase font-semibold" style={{ color: "#4A6418" }}>Non-Contact Hrs</p>
+                </div>
+                <ul className="space-y-2">
+                  {[
+                    "Assignments",
+                    "Self & group teaching practice",
+                  ].map(item => (
+                    <li key={item} className="text-sm flex items-start gap-2" style={{ color: "#3D2515" }}>
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#8DC63F", boxShadow: "0 0 6px #8DC63F80" }} />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
