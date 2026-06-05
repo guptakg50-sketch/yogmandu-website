@@ -6,6 +6,9 @@ import Spinner from "@/components/Spinner";
 const programs = [
   "200hr Yoga Teacher Training",
   "300hr Advanced Teacher Training",
+  "Non-Residential (At Studio)",
+  "Online (Via Zoom)",
+  "Residential (At Retreat)",
   "Sound Healing Session",
   "Sound Healing Certification",
   "General Inquiry",

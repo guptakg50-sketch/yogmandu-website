@@ -485,16 +485,6 @@ function Step2({
               />
             </div>
             <div style={{ gridColumn: "1 / -1" }}>
-              <label style={labelStyle}>Preferred Date</label>
-              <input
-                type="date" value={form.preferredDate} onChange={e => setForm(p => ({ ...p, preferredDate: e.target.value }))}
-                min={new Date().toISOString().split("T")[0]}
-                style={inputStyle}
-                onFocus={e => { e.currentTarget.style.borderColor = service.color; e.currentTarget.style.boxShadow = `0 0 0 3px ${service.color}22`; }}
-                onBlur={e => { e.currentTarget.style.borderColor = "rgba(107,45,139,0.18)"; e.currentTarget.style.boxShadow = "none"; }}
-              />
-            </div>
-            <div style={{ gridColumn: "1 / -1" }}>
               <label style={labelStyle}>Message / Notes</label>
               <textarea
                 rows={4} value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))}

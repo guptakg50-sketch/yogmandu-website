@@ -229,8 +229,13 @@ export default function YogaTeacherTrainingPage() {
                 backdropFilter: "blur(6px)",
                 cursor: "default",
               }}>
-              <div className="stat-num text-3xl font-light text-white mb-1"
-                style={{ fontFamily: "Cormorant Garamond, serif", color: "#F7941D" }}>{s.value}</div>
+              <div className={`stat-num font-light text-white mb-1 ${s.value.length > 8 ? "" : "text-3xl"}`}
+                style={{
+                  fontFamily: "Cormorant Garamond, serif", color: "#F7941D",
+                  ...(s.value.length > 8
+                    ? { fontSize: "clamp(1.15rem, 5.5vw, 1.875rem)", lineHeight: 1.12, overflowWrap: "break-word" }
+                    : {}),
+                }}>{s.value}</div>
               <div className="text-xs tracking-widest uppercase" style={{ color: "rgba(255,255,255,0.75)", fontWeight: 500 }}>{s.label}</div>
             </div>
           ))}
