@@ -22,7 +22,7 @@ type Tier = {
 const TIERS: Tier[] = [
   {
     id:        "commuter",
-    badge:     "",
+    badge:     "Most Popular",
     badgeColor: "#F7941D",
     category:  "Non-Residential",
     title:     "Commuter Program",
@@ -40,10 +40,11 @@ const TIERS: Tier[] = [
     ],
     ctaLabel:  "Apply Now",
     ctaHref:   "https://wa.me/9779810263277",
+    featured:  true,
   },
   {
     id:        "residential",
-    badge:     "Most Popular",
+    badge:     "",
     badgeColor: "#6B2D8B",
     category:  "Residential",
     title:     "Full Board Program",
@@ -63,7 +64,6 @@ const TIERS: Tier[] = [
     ],
     ctaLabel:  "Apply Now",
     ctaHref:   "https://wa.me/9779810263277",
-    featured:  true,
   },
   {
     id:        "virtual",
@@ -72,8 +72,8 @@ const TIERS: Tier[] = [
     category:  "Virtual",
     title:     "Online Program",
     icon:      "💻",
-    price:     "Contact Us",
-    priceSub:  "Live virtual sessions",
+    price:     "USD 500",
+    priceSub:  "NPR 40,000 (Nepali citizens)",
     priceNote: "Registration via Google Form",
     color:     "#8DC63F",
     features: [

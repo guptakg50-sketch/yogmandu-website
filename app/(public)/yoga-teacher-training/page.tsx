@@ -53,6 +53,7 @@ const courseSchema = {
   offers: [
     { "@type": "Offer", priceCurrency: "USD", price: "600",  name: "Non-Residential" },
     { "@type": "Offer", priceCurrency: "USD", price: "1400", name: "Residential (Full Board)" },
+    { "@type": "Offer", priceCurrency: "USD", price: "500",  name: "Online (Virtual)" },
   ],
 };
 
@@ -217,7 +218,7 @@ export default function YogaTeacherTrainingPage() {
           {[
             { value: "28 Days",  label: "Program Duration" },
             { value: "RYT 200",  label: "Yoga Alliance Certified" },
-            { value: "English",  label: "Language of Instruction" },
+            { value: "English/Nepali",  label: "Language of Instruction" },
             { value: "2018",     label: "Teaching Since" },
           ].map(s => (
             <div key={s.value} className="stat-3d"
@@ -235,6 +236,23 @@ export default function YogaTeacherTrainingPage() {
           ))}
         </div>
       </div>
+
+      {/* Credibility stats — same design as the homepage hero */}
+      <section className="py-16 px-6" style={{ background: "#FFFFFF" }}>
+        <div className="max-w-3xl mx-auto flex items-center justify-center gap-x-14 gap-y-10 flex-wrap">
+          {[
+            { value: "3,000+", label: "Teachers Trained",      color: "#A65808" },
+            { value: "50+",    label: "Countries Represented",  color: "#6B2D8B" },
+            { value: "2018",   label: "Est. in Nepal",          color: "#4A6418" },
+            { value: "RYS",    label: "Yoga Alliance",          color: "#A65808" },
+          ].map((b) => (
+            <div key={b.label} className="flex flex-col">
+              <span className="text-2xl font-light" style={{ fontFamily: "Cormorant Garamond, serif", color: b.color }}>{b.value}</span>
+              <span className="text-xs font-medium" style={{ color: "#7A5840" }}>{b.label}</span>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* Pricing — 3D interactive section */}
       <PricingSection />
@@ -344,9 +362,9 @@ export default function YogaTeacherTrainingPage() {
             <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Cancellation Policy</h3>
             <div style={{ border: "1px solid rgba(42,18,8,0.08)", borderRadius: "0.75rem", overflow: "hidden" }}>
               {[
-                { when: "Week 1 cancellation", refund: "50% refund" },
-                { when: "Week 2 cancellation", refund: "40% refund" },
-                { when: "Week 3 cancellation", refund: "25% refund" },
+                { when: "Week 1 cancellation", refund: "20% refund" },
+                { when: "Week 2 cancellation", refund: "15% refund" },
+                { when: "Week 3 cancellation", refund: "10% refund" },
                 { when: "Week 4+ cancellation", refund: "No refund" },
               ].map((r, i) => (
                 <div key={r.when} style={{
