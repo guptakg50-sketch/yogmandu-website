@@ -4,6 +4,8 @@ import React, { useEffect, useReducer, useState } from "react";
 import {
   Archive,
   Bell,
+  Megaphone,
+  AlertTriangle,
   BookOpen,
   CalendarDays,
   Camera,
@@ -2158,6 +2160,7 @@ function AdminWorkspace({ onLogout }) {
     ["instructors", "Instructors",  Users],
     ["media",       "Media",        Camera],
     ["gallery",     "Gallery",      Image],
+    ["popup",       "Popup",        Megaphone],
     ["settings",    "Settings",     Settings],
   ];
   const title = nav.find(([id]) => id === active)?.[1] || "Dashboard";
@@ -2193,6 +2196,7 @@ function AdminWorkspace({ onLogout }) {
           {active === "instructors" && <InstructorsManager instructors={state.instructors} setInstructors={setPart("instructors")} sessions={state.sessions} toast={notify} />}
           {active === "media" && <MediaLibrary media={state.media} setMedia={setPart("media")} blogs={state.blogs} sessions={state.sessions} toast={notify} />}
           {active === "gallery" && <GalleryManager items={state.gallery} setItems={setPart("gallery")} toast={notify} />}
+          {active === "popup" && <PopupManager media={state.media} setMedia={setPart("media")} toast={notify} />}
           {active === "settings" && <SettingsPage settings={state.settings} setSettings={setPart("settings")} instructors={state.instructors} setInstructors={setPart("instructors")} sessions={state.sessions} toast={notify} />}
         </main>
       </div>
@@ -2304,6 +2308,213 @@ function ContactListEditor({ value, onChange }) {
           <Button variant="ghost" className="h-8 w-8 p-0 text-red-400" onClick={() => remove(i)}><Trash2 size={14} /></Button>
         </div>
       ))}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   Popup Manager  (site-wide entry popup)
+───────────────────────────────────────────── */
+const POPUP_PRESETS = [
+  { label: "3 days",  days: 3 },
+  { label: "1 week",  days: 7 },
+  { label: "2 weeks", days: 14 },
+  { label: "1 month", days: 30 },
+];
+
+function popupIsoToDateInput(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const tz = d.getTimezoneOffset() * 60000;
+  return new Date(d.getTime() - tz).toISOString().slice(0, 10);
+}
+
+function PopupManager({ media = [], setMedia, toast }) {
+  const [loaded,     setLoaded]     = useState(false);
+  const [saving,     setSaving]     = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [enabled,    setEnabled]    = useState(false);
+  const [imageUrl,   setImageUrl]   = useState("");
+  const [imageAlt,   setImageAlt]   = useState("");
+  const [linkUrl,    setLinkUrl]    = useState("");
+  const [startDate,  setStartDate]  = useState(popupIsoToDateInput(new Date().toISOString()));
+  const [durationDays, setDurationDays] = useState(7);
+  const [customMode, setCustomMode] = useState(false);
+  const [version,    setVersion]    = useState(1);
+
+  useEffect(() => {
+    fetch("/api/admin/popup")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((res) => {
+        const d = res?.data;
+        if (d) {
+          setEnabled(Boolean(d.enabled));
+          setImageUrl(d.imageUrl || "");
+          setImageAlt(d.imageAlt || "");
+          setLinkUrl(d.linkUrl || "");
+          if (d.startAt) setStartDate(popupIsoToDateInput(d.startAt));
+          if (d.startAt && d.endAt) {
+            const days = Math.round((Date.parse(d.endAt) - Date.parse(d.startAt)) / 86400000);
+            if (days > 0) {
+              setDurationDays(days);
+              setCustomMode(!POPUP_PRESETS.some((p) => p.days === days));
+            }
+          }
+          setVersion(d.version || 1);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoaded(true));
+  }, []);
+
+  function computeWindow() {
+    const startAt = startDate ? new Date(`${startDate}T00:00:00`).toISOString() : null;
+    const endAt   = startAt ? new Date(Date.parse(startAt) + durationDays * 86400000).toISOString() : null;
+    return { startAt, endAt };
+  }
+
+  const { startAt, endAt } = computeWindow();
+
+  function statusBadge() {
+    if (!enabled)   return { text: "Disabled", cls: "bg-stone-200 text-stone-600" };
+    if (!imageUrl)  return { text: "No image", cls: "bg-amber-100 text-amber-700" };
+    const now = Date.now();
+    if (startAt && now < Date.parse(startAt)) return { text: "Scheduled", cls: "bg-blue-100 text-blue-700" };
+    if (endAt && now > Date.parse(endAt))     return { text: "Expired",   cls: "bg-red-100 text-red-700" };
+    return { text: "Active · shows once per visitor", cls: "bg-emerald-100 text-emerald-700" };
+  }
+
+  async function persist(overrides = {}) {
+    setSaving(true);
+    const payload = { enabled, imageUrl, imageAlt, linkUrl, ...computeWindow(), ...overrides };
+    try {
+      const res = await fetch("/api/admin/popup", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        if (data?.data?.version) setVersion(data.data.version);
+        toast(overrides.enabled === false
+          ? "Popup removed — hidden on next page load"
+          : `Popup saved — live on next page load (v${data?.data?.version || version})`);
+        return true;
+      }
+      toast(data?.error || "Save failed");
+    } catch {
+      toast("Save failed — server error");
+    } finally {
+      setSaving(false);
+    }
+    return false;
+  }
+
+  async function emergencyRemove() {
+    if (!confirm("Disable the popup now for all visitors?")) return;
+    setEnabled(false);
+    await persist({ enabled: false });
+  }
+
+  const badge = statusBadge();
+  const activeUntil = startAt && endAt
+    ? new Date(endAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+    : null;
+
+  if (!loaded) {
+    return <div className="space-y-4">{Array.from({ length: 3 }, (_, i) => <div key={i} className="h-24 animate-pulse rounded-xl bg-stone-200" />)}</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold text-stone-900">Entry Popup</h2>
+          <p className="text-sm text-stone-500">An image shown once per visitor when they arrive. It won&apos;t show again on refresh.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge className={badge.cls}>{badge.text}</Badge>
+          <Button onClick={() => persist()} disabled={saving}><Save size={16} /> {saving ? "Saving…" : "Save & Publish"}</Button>
+        </div>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
+        <div className="space-y-5">
+          <Toggle label="Show popup on the website" checked={enabled} onChange={setEnabled} />
+
+          <div className="space-y-4 rounded-xl border border-stone-200 bg-stone-50 p-5">
+            <Field label="Popup image">
+              <TextInput value={imageUrl} placeholder="https://…  (or upload / choose below)" onChange={(e) => setImageUrl(e.target.value)} />
+            </Field>
+            <div className="flex flex-wrap gap-2">
+              <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700">
+                <Upload size={16} /> Upload image
+                <input type="file" accept="image/*" className="hidden"
+                  onChange={(e) => uploadFile(e, (url, item) => { setImageUrl(url); if (item) setMedia([item, ...media]); toast("Image uploaded"); }, { caption: "Popup image" })} />
+              </label>
+              <Button variant="secondary" onClick={() => setPickerOpen(true)}><Image size={16} /> Choose from library</Button>
+            </div>
+            <Field label="Image description (alt text)">
+              <TextInput value={imageAlt} placeholder="e.g. Free blood donation event – 14 June" onChange={(e) => setImageAlt(e.target.value)} />
+            </Field>
+            <Field label="Click-through link (optional)" hint="blank = not clickable">
+              <TextInput value={linkUrl} placeholder="https://…" onChange={(e) => setLinkUrl(e.target.value)} />
+            </Field>
+          </div>
+
+          <div className="grid gap-4 rounded-xl border border-stone-200 bg-stone-50 p-5 md:grid-cols-2">
+            <Field label="Start date">
+              <TextInput type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+            </Field>
+            <Field label="Run for">
+              <Select value={customMode ? "custom" : String(durationDays)}
+                onChange={(e) => { const v = e.target.value; if (v === "custom") { setCustomMode(true); } else { setCustomMode(false); setDurationDays(Number(v)); } }}>
+                {POPUP_PRESETS.map((p) => <option key={p.label} value={String(p.days)}>{p.label}</option>)}
+                <option value="custom">Custom…</option>
+              </Select>
+            </Field>
+            {customMode && (
+              <Field label="Custom duration (days)" className="md:col-span-2">
+                <TextInput type="number" min="1" value={durationDays}
+                  onChange={(e) => setDurationDays(Math.max(1, Number(e.target.value) || 1))} />
+              </Field>
+            )}
+            <div className="text-sm text-stone-600 md:col-span-2">
+              {activeUntil ? <>Campaign runs until <strong>{activeUntil}</strong>, then auto-hides.</> : "Set a start date to schedule the campaign window."}
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
+            <div className="flex items-center gap-2 text-sm text-red-700"><AlertTriangle size={18} /> Need it gone right now?</div>
+            <Button variant="danger" onClick={emergencyRemove} disabled={saving}><Trash2 size={16} /> Emergency remove</Button>
+          </div>
+
+          <p className="text-xs text-stone-500">Saving shows the popup again to everyone who already closed it (it counts as a new campaign).</p>
+        </div>
+
+        <div className="rounded-xl border border-stone-200 bg-white p-4">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-stone-500">Preview</p>
+          {imageUrl
+            ? <div className="rounded-lg bg-stone-900/90 p-4"><img src={imageUrl} alt="" className="mx-auto max-h-80 w-auto rounded-lg object-contain" /></div>
+            : <EmptyState icon={Image} title="No image yet" text="Upload or choose an image to preview the popup." />}
+        </div>
+      </div>
+
+      {pickerOpen && (
+        <Modal title="Choose from Media Library" onClose={() => setPickerOpen(false)} wide>
+          {media.length === 0
+            ? <EmptyState icon={Image} title="No media yet" text="Upload images in the Media section first." />
+            : <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                {media.map((m) => (
+                  <button key={m.id} onClick={() => { setImageUrl(m.url); setPickerOpen(false); toast("Image selected"); }}
+                    className="group overflow-hidden rounded-lg border border-stone-200 hover:border-emerald-500">
+                    <img src={m.url} alt={m.caption || ""} className="h-28 w-full object-cover" />
+                  </button>
+                ))}
+              </div>}
+        </Modal>
+      )}
     </div>
   );
 }

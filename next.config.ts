@@ -78,10 +78,14 @@ const nextConfig: NextConfig = {
       { source: "/yoga-retreat-packages/:path*", destination: "/services", permanent: true },
       { source: "/events", destination: "/class-schedule", permanent: true },
       { source: "/events/:path*", destination: "/class-schedule", permanent: true },
-      { source: "/history-of-hatha-yoga", destination: "/blog", permanent: true },
-      { source: "/history-of-hatha-yoga/:path*", destination: "/blog", permanent: true },
-      { source: "/kids-yoga-guide-to-teaching-benefits-mindfulness", destination: "/blog", permanent: true },
-      { source: "/kids-yoga-guide-to-teaching-benefits-mindfulness/:path*", destination: "/blog", permanent: true },
+      { source: "/history-of-hatha-yoga", destination: "/blog/history-of-hatha-yoga", permanent: true },
+      { source: "/history-of-hatha-yoga/:path*", destination: "/blog/history-of-hatha-yoga", permanent: true },
+      { source: "/kids-yoga-guide-to-teaching-benefits-mindfulness", destination: "/blog/kids-yoga-guide-to-teaching-benefits-mindfulness", permanent: true },
+      { source: "/kids-yoga-guide-to-teaching-benefits-mindfulness/:path*", destination: "/blog/kids-yoga-guide-to-teaching-benefits-mindfulness", permanent: true },
+      // Deleted duplicate OM post → the full version kept (blog migration 2026-06-07)
+      { source: "/blog/mystical-power-of-om", destination: "/blog/the-mystical-power-of-om", permanent: true },
+      // Shortened the over-long weight-loss slug (blog migration 2026-06-07)
+      { source: "/blog/weight-loss-myths-vs-facts-a-scientific-take-with-yogic-wisdomby-yogmandu-kathmandus-trusted-yoga-wellness-studio", destination: "/blog/weight-loss-myths-vs-facts", permanent: true },
       { source: "/contact/", destination: "/contact", permanent: true },
       { source: "/yoga-teacher-training/", destination: "/yoga-teacher-training", permanent: true },
       { source: "/sound-healing-therapy/", destination: "/sound-healing-therapy", permanent: true },

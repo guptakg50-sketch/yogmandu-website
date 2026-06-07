@@ -3,6 +3,7 @@ import Footer from "@/components/Footer";
 import LoadingScreen from "@/components/LoadingScreen";
 import WhatsAppFab from "@/components/WhatsAppFab";
 import ScrollToTop from "@/components/ScrollToTop";
+import EntryPopup from "@/components/EntryPopup";
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -13,6 +14,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <Footer />
       <WhatsAppFab />
       <ScrollToTop />
+      <EntryPopup />
     </>
   );
 }
