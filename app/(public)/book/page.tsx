@@ -161,7 +161,7 @@ function StepDots({ step }: { step: number }) {
           <div key={label} style={{ display: "flex", alignItems: "center" }}>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
               <div style={{
-                width: 36, height: 36, borderRadius: "50%",
+                width: "clamp(28px, 8vw, 36px)", height: "clamp(28px, 8vw, 36px)", borderRadius: "50%", flexShrink: 0,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: done ? 14 : "0.85rem", fontWeight: 600,
                 background: done
@@ -177,15 +177,15 @@ function StepDots({ step }: { step: number }) {
                 {done ? "✓" : num}
               </div>
               <span style={{
-                fontSize: "1rem", fontWeight: 600, letterSpacing: "0.08em",
-                textTransform: "uppercase",
+                fontSize: "clamp(0.6rem, 2.6vw, 1rem)", fontWeight: 600, letterSpacing: "0.06em",
+                textTransform: "uppercase", textAlign: "center",
                 color: active ? "#6B2D8B" : done ? "#8DC63F" : "#9A7860",
                 transition: "color 0.35s ease",
               }}>{label}</span>
             </div>
             {i < steps.length - 1 && (
               <div style={{
-                width: 60, height: 2, marginBottom: 20, marginLeft: 6, marginRight: 6,
+                width: "clamp(18px, 7vw, 60px)", height: 2, marginBottom: 20, marginLeft: "clamp(3px, 1.5vw, 6px)", marginRight: "clamp(3px, 1.5vw, 6px)", flexShrink: 0,
                 background: done
                   ? "linear-gradient(90deg, #8DC63F, #6aaa30)"
                   : "rgba(42,18,8,0.10)",
@@ -311,7 +311,7 @@ function Step2({
   const cardRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
 
-  const [form, setForm] = useState({ name: "", email: "", phone: "", preferredDate: "", message: prefillMessage });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", message: prefillMessage });
   const [error,   setError]   = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -351,7 +351,6 @@ function Step2({
           phone:         form.phone,
           serviceId:     services.map(s => s.id).join(", "),
           serviceTitle:  services.map(s => s.title).join(", "),
-          preferredDate: form.preferredDate,
           message:       form.message,
         }),
       });
