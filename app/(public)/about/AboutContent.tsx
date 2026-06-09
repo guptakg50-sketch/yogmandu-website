@@ -257,9 +257,10 @@ export default function AboutContent({ team }: { team?: TeamMember[] }) {
           <p style={{ textAlign: "center", fontSize: "0.88rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "#F7941D", marginBottom: 48 }}>By the Numbers</p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "1.5rem" }}>
             <AnimatedStat value={2018}  label="Year Founded" color="#F7941D" delay={0} />
-            <AnimatedStat value={3000}  suffix="+" label="Teachers Trained" color="#6B2D8B" delay={150} />
-            <AnimatedStat value={50}    suffix="+" label="Countries" color="#8DC63F" delay={300} />
-            <AnimatedStat value={40000} suffix="+" label="Teaching Hours" color="#F7941D" delay={450} />
+            <AnimatedStat value={50000} suffix="+" label="Satisfied Students" color="#6B2D8B" delay={150} />
+            <AnimatedStat value={3000}  suffix="+" label="Teachers Trained" color="#A65808" delay={300} />
+            <AnimatedStat value={50}    suffix="+" label="Countries" color="#8DC63F" delay={450} />
+            <AnimatedStat value={40000} suffix="+" label="Teaching Hours" color="#F7941D" delay={600} />
           </div>
         </div>
       </section>

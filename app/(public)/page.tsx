@@ -145,6 +145,7 @@ export default function HomePage() {
             {/* Stats */}
             <div className="flex items-center gap-5 mt-12 flex-wrap">
               {[
+                { value: "50,000+", label: "Satisfied Students",     color: "#6B2D8B" },
                 { value: "3,000+", label: "Teachers Trained",      color: "#A65808" },
                 { value: "50+",    label: "Countries Represented",  color: "#6B2D8B" },
                 { value: "2018",   label: "Est. in Nepal",          color: "#4A6418" },

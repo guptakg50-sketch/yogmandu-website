@@ -246,6 +246,7 @@ export default function YogaTeacherTrainingPage() {
       <section className="py-16 px-6" style={{ background: "#FFFFFF" }}>
         <div className="max-w-3xl mx-auto flex items-center justify-center gap-x-14 gap-y-10 flex-wrap">
           {[
+            { value: "50,000+", label: "Satisfied Students",     color: "#6B2D8B" },
             { value: "3,000+", label: "Teachers Trained",      color: "#A65808" },
             { value: "50+",    label: "Countries Represented",  color: "#6B2D8B" },
             { value: "2018",   label: "Est. in Nepal",          color: "#4A6418" },
