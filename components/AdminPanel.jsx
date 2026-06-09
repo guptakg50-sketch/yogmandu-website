@@ -30,6 +30,7 @@ import {
   Search,
   Settings,
   ShieldCheck,
+  Tag,
   Sparkles,
   Trash2,
   Upload,
@@ -2161,6 +2162,7 @@ function AdminWorkspace({ onLogout }) {
     ["media",       "Media",        Camera],
     ["gallery",     "Gallery",      Image],
     ["popup",       "Popup",        Megaphone],
+    ["pricing",     "Pricing",      Tag],
     ["settings",    "Settings",     Settings],
   ];
   const title = nav.find(([id]) => id === active)?.[1] || "Dashboard";
@@ -2197,6 +2199,7 @@ function AdminWorkspace({ onLogout }) {
           {active === "media" && <MediaLibrary media={state.media} setMedia={setPart("media")} blogs={state.blogs} sessions={state.sessions} toast={notify} />}
           {active === "gallery" && <GalleryManager items={state.gallery} setItems={setPart("gallery")} toast={notify} />}
           {active === "popup" && <PopupManager media={state.media} setMedia={setPart("media")} toast={notify} />}
+          {active === "pricing" && <PricingManager toast={notify} />}
           {active === "settings" && <SettingsPage settings={state.settings} setSettings={setPart("settings")} instructors={state.instructors} setInstructors={setPart("instructors")} sessions={state.sessions} toast={notify} />}
         </main>
       </div>
@@ -2515,6 +2518,91 @@ function PopupManager({ media = [], setMedia, toast }) {
               </div>}
         </Modal>
       )}
+    </div>
+  );
+}
+
+function PricingManager({ toast }) {
+  const [loaded, setLoaded] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [l1Price, setL1Price] = useState("");
+  const [l1Note,  setL1Note]  = useState("");
+  const [l2Price, setL2Price] = useState("");
+  const [l2Note,  setL2Note]  = useState("");
+
+  useEffect(() => {
+    fetch("/api/admin/pricing")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((res) => {
+        const sc = res?.data?.soundCert || {};
+        setL1Price(sc.level1?.price || "");
+        setL1Note(sc.level1?.note || "");
+        setL2Price(sc.level2?.price || "");
+        setL2Note(sc.level2?.note || "");
+      })
+      .catch(() => {})
+      .finally(() => setLoaded(true));
+  }, []);
+
+  async function persist() {
+    setSaving(true);
+    const payload = {
+      soundCert: {
+        level1: { price: l1Price, note: l1Note },
+        level2: { price: l2Price, note: l2Note },
+      },
+    };
+    try {
+      const res = await fetch("/api/admin/pricing", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) { toast("Pricing saved — live on next page load"); return; }
+      toast(data?.error || "Save failed");
+    } catch {
+      toast("Save failed — server error");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (!loaded) {
+    return <div className="space-y-4">{Array.from({ length: 2 }, (_, i) => <div key={i} className="h-24 animate-pulse rounded-xl bg-stone-200" />)}</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold text-stone-900">Sound Healing Certification Pricing</h2>
+          <p className="text-sm text-stone-500">Rates shown on the two certification cards (/sound-healing-therapy). Leave a price blank to show &ldquo;Price on request&rdquo;.</p>
+        </div>
+        <Button onClick={persist} disabled={saving}><Save size={16} /> {saving ? "Saving…" : "Save & Publish"}</Button>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="space-y-4 rounded-xl border border-stone-200 bg-stone-50 p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Level I · Foundational</p>
+          <Field label="Price" hint="e.g. USD 150 / NPR 18,000">
+            <TextInput value={l1Price} placeholder="USD 150 / NPR 18,000" onChange={(e) => setL1Price(e.target.value)} />
+          </Field>
+          <Field label="Note under price (optional)" hint="e.g. 20 hours · certificate included">
+            <TextInput value={l1Note} placeholder="20 hours · certificate included" onChange={(e) => setL1Note(e.target.value)} />
+          </Field>
+        </div>
+
+        <div className="space-y-4 rounded-xl border border-stone-200 bg-stone-50 p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-purple-700">Level II · Advanced</p>
+          <Field label="Price" hint="e.g. USD 300 / NPR 36,000">
+            <TextInput value={l2Price} placeholder="USD 300 / NPR 36,000" onChange={(e) => setL2Price(e.target.value)} />
+          </Field>
+          <Field label="Note under price (optional)">
+            <TextInput value={l2Note} placeholder="Extended program · certificate included" onChange={(e) => setL2Note(e.target.value)} />
+          </Field>
+        </div>
+      </div>
     </div>
   );
 }

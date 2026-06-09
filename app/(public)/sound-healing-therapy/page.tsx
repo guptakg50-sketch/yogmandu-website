@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import SingingBowl from "@/components/SingingBowlClient";
 import StatsOrbs from "@/components/StatsOrbs";
+import CertPrice from "@/components/CertPrice";
 
 export const metadata: Metadata = {
   title: { absolute: "Sound Healing & Tibetan Singing Bowls | Yogmandu Nepal" },
@@ -114,6 +115,7 @@ const sessions = [
 const certLevels = [
   {
     level:   "Level I",
+    priceKey: "level1",
     badge:   "Foundational",
     color:   "#8DC63F",
     icon:    "🌱",
@@ -129,6 +131,7 @@ const certLevels = [
   },
   {
     level:   "Level II",
+    priceKey: "level2",
     badge:   "Advanced",
     color:   "#6B2D8B",
     icon:    "✨",
@@ -521,6 +524,8 @@ export default function SoundHealingPage() {
                 <p className="text-base font-light leading-relaxed mb-6 relative" style={{ color: "#3D2515" }}>
                   {lvl.summary}
                 </p>
+
+                <CertPrice level={lvl.priceKey as "level1" | "level2"} color={lvl.color} />
 
                 <p className="text-xs tracking-[0.18em] uppercase font-semibold mb-3 relative" style={{ color: lvl.color }}>
                   What you'll learn
