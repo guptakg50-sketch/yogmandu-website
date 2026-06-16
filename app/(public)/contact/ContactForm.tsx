@@ -104,8 +104,14 @@ export default function ContactForm() {
                   </svg>
                 ),
               },
-            ].map(item => (
-              <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer"
+            ].map(item => {
+              // Only open real web pages (http/https) in a new tab. mailto:/tel:
+              // links must stay in the same tab — target="_blank" on them spawns a
+              // stray blank tab instead of handing off to the mail/phone app.
+              const isWeb = /^https?:/i.test(item.href);
+              return (
+              <a key={item.label} href={item.href}
+                {...(isWeb ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                 className="card-light flex gap-4 items-start p-6 block transition-colors group">
                 <div className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center"
                   style={{ background: `${item.color}15`, border: `1px solid ${item.color}25` }}>
@@ -117,7 +123,8 @@ export default function ContactForm() {
                   <p className="text-xs font-light mt-0.5" style={{ color: "#7A5840" }}>{item.sub}</p>
                 </div>
               </a>
-            ))}
+              );
+            })}
           </div>
 
           {/* Form */}
