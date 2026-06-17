@@ -7,76 +7,62 @@ const Background3D = dynamic(() => import("@/components/TestimonialsBackground3D
   loading: () => null,
 });
 
+// Real, verbatim Google reviews (Yogmandu Yoga, 4.9★ · 132 reviews on Google).
+// Quotes are unedited excerpts taken directly from the reviewers' Google posts.
 const testimonials = [
   {
-    quote: "Yoga helped me attain a flexible body, a fresh mind, and positive thinking. The teachers at Yogmandu are incredibly supportive and knowledgeable.",
-    name: "Sabnam Shahi",
-    origin: "Nepal",
-    flag: "🇳🇵",
-    program: "Yoga Classes",
+    quote: "Yogmandu Yoga is a beautiful, calming space with incredible instructors who truly care. Every class feels grounding and uplifting. It's the perfect place to reconnect with yourself and your practice.",
+    name: "Shraddha Timalsena",
+    when: "a year ago",
     stars: 5,
     color: "#F7941D",
   },
   {
-    quote: "Yoga helped me attain a flexible body, a fresh mind, and positive thinking. I feel completely transformed after joining Yogmandu.",
-    name: "Pawan Kumar BK",
-    origin: "Nepal",
-    flag: "🇳🇵",
-    program: "Yoga Classes",
+    quote: "Absolutely fantastic experience! The yoga teachers create a welcoming environment. Their expertise and guidance in each session helped me improve my flexibility and overall well-being. If you're in Kathmandu and seeking a yoga experience, Yogmandu is the place to be.",
+    name: "George H.",
+    when: "2 years ago",
     stars: 5,
     color: "#6B2D8B",
   },
   {
-    quote: "The 200hr training at Yogmandu completely transformed how I understand my own body and breath. The teachers hold space with such presence and warmth.",
-    name: "Sarah M.",
-    origin: "Australia",
-    flag: "🇦🇺",
-    program: "200hr YTT",
+    quote: "I've been practicing yoga for years, but my sessions at Yogmandu Yoga have taken my practice to a whole new level. The instructors are incredibly knowledgeable and attentive, ensuring that each pose is performed correctly and safely.",
+    name: "Love Thakur",
+    when: "a year ago",
     stars: 5,
     color: "#8DC63F",
   },
   {
-    quote: "I came for yoga, but the sound healing sessions cracked something open in me. The Tibetan bowls resonate in ways words can't fully describe.",
-    name: "Kenji T.",
-    origin: "Japan",
-    flag: "🇯🇵",
-    program: "Sound Healing",
+    quote: "The space is beautifully designed with soft lighting, peaceful music, and a warm, inviting vibe that made me feel comfortable immediately. The staff was friendly and knowledgeable, and the instructors were truly outstanding.",
+    name: "Rinku Thakur",
+    when: "a year ago",
     stars: 5,
     color: "#F7941D",
   },
   {
-    quote: "The valley, the mountains, the community — Kathmandu itself becomes part of your practice. Dr. Gautam's teaching is unmatched in authenticity.",
-    name: "Priya N.",
-    origin: "United Kingdom",
-    flag: "🇬🇧",
-    program: "200hr YTT",
+    quote: "Yogmandu is a truly peaceful and energizing space where I always feel a sense of positivity and calm. Practicing yoga here has helped me both physically and mentally. I leave every session feeling refreshed and balanced.",
+    name: "Babita Kc",
+    when: "a year ago",
     stars: 5,
     color: "#6B2D8B",
   },
   {
-    quote: "I've attended many yoga trainings, but none with this level of authentic Himalayan lineage. The philosophy teachings alone are worth the journey to Nepal.",
-    name: "Marco L.",
-    origin: "Italy",
-    flag: "🇮🇹",
-    program: "200hr YTT",
+    quote: "As a beginner, I was nervous to join yoga class due to my health condition at that time, but with the help, efforts and fully positive supportive instructors I was able to complete the course. The place is wonderful and located in a peaceful environment.",
+    name: "Sunita Rai",
+    when: "a year ago",
     stars: 5,
     color: "#8DC63F",
   },
   {
-    quote: "Yogmandu became part of my daily rhythm. The teachers meet you exactly where you are — beginner or returning practitioner.",
-    name: "Achitra Thieng",
-    origin: "Nepal",
-    flag: "🇳🇵",
-    program: "Yoga Classes",
+    quote: "The best part of my yoga journey with Yogmandu is the peaceful and friendly environment. The teachers are very kind, cooperative and humble. I am so blessed to be part of this organization.",
+    name: "Sunaina Deoju",
+    when: "a year ago",
     stars: 5,
     color: "#F7941D",
   },
   {
-    quote: "I left every session lighter than I arrived. The studio has a calm I haven't found anywhere else in Kathmandu.",
-    name: "Dolkar Sherpa",
-    origin: "Nepal",
-    flag: "🇳🇵",
-    program: "Yoga & Sound Healing",
+    quote: "Yogmandu is filled with positivity and offers wonderful guidance. I will always be thankful to each and every teacher, as well as the receptionist for being so kind.",
+    name: "Dipika Shrestha",
+    when: "a year ago",
     stars: 5,
     color: "#6B2D8B",
   },
@@ -189,16 +175,18 @@ function TestimonialCard({
           </div>
           <div>
             <p className="font-medium text-sm" style={{ color: "#2A1208" }}>{t.name}</p>
-            <p className="text-xs font-light mt-0.5 flex items-center gap-1" style={{ color: "rgba(42,18,8,0.45)" }}>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={t.color} strokeWidth="2" style={{ flexShrink: 0 }} aria-hidden="true">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z" />
-                <circle cx="12" cy="10" r="3" />
+            <p className="text-xs font-light mt-0.5 flex items-center gap-1.5" style={{ color: "rgba(42,18,8,0.45)" }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" aria-hidden="true" style={{ flexShrink: 0 }}>
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1Z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z"/>
+                <path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z"/>
+                <path fill="#EA4335" d="M12 4.75c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 1.46 14.97.5 12 .5A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 4.75 12 4.75Z"/>
               </svg>
-              {t.origin}&nbsp;&middot;&nbsp;
-              <span style={{ color: t.color }}>{t.program}</span>
+              Google review&nbsp;&middot;&nbsp;
+              <span>{t.when}</span>
             </p>
           </div>
-          {/* Verified badge */}
+          {/* Verified Google review badge */}
           <div className="ml-auto flex items-center gap-1 px-2.5 py-1 rounded-full"
             style={{ background: `${t.color}10`, border: `1px solid ${t.color}20` }}>
             <svg width="10" height="10" viewBox="0 0 24 24" fill={t.color}>
