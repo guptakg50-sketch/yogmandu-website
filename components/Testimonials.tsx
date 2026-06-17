@@ -9,8 +9,11 @@ const Background3D = dynamic(() => import("@/components/TestimonialsBackground3D
 
 // Real, verbatim Google reviews (Yogmandu Yoga, 4.9★ · 132 reviews on Google).
 // Quotes are unedited excerpts taken directly from the reviewers' Google posts.
-const testimonials = [
+// These are also the fallback shown when the admin-managed Supabase list is
+// empty/unconfigured — keep them in sync with supabase/migrations/011_testimonials.sql.
+const DEFAULT_TESTIMONIALS = [
   {
+    id: "rev-shraddha-timalsena",
     quote: "Yogmandu Yoga is a beautiful, calming space with incredible instructors who truly care. Every class feels grounding and uplifting. It's the perfect place to reconnect with yourself and your practice.",
     name: "Shraddha Timalsena",
     when: "a year ago",
@@ -18,6 +21,7 @@ const testimonials = [
     color: "#F7941D",
   },
   {
+    id: "rev-george-h",
     quote: "Absolutely fantastic experience! The yoga teachers create a welcoming environment. Their expertise and guidance in each session helped me improve my flexibility and overall well-being. If you're in Kathmandu and seeking a yoga experience, Yogmandu is the place to be.",
     name: "George H.",
     when: "2 years ago",
@@ -25,6 +29,7 @@ const testimonials = [
     color: "#6B2D8B",
   },
   {
+    id: "rev-love-thakur",
     quote: "I've been practicing yoga for years, but my sessions at Yogmandu Yoga have taken my practice to a whole new level. The instructors are incredibly knowledgeable and attentive, ensuring that each pose is performed correctly and safely.",
     name: "Love Thakur",
     when: "a year ago",
@@ -32,6 +37,7 @@ const testimonials = [
     color: "#8DC63F",
   },
   {
+    id: "rev-rinku-thakur",
     quote: "The space is beautifully designed with soft lighting, peaceful music, and a warm, inviting vibe that made me feel comfortable immediately. The staff was friendly and knowledgeable, and the instructors were truly outstanding.",
     name: "Rinku Thakur",
     when: "a year ago",
@@ -39,6 +45,7 @@ const testimonials = [
     color: "#F7941D",
   },
   {
+    id: "rev-babita-kc",
     quote: "Yogmandu is a truly peaceful and energizing space where I always feel a sense of positivity and calm. Practicing yoga here has helped me both physically and mentally. I leave every session feeling refreshed and balanced.",
     name: "Babita Kc",
     when: "a year ago",
@@ -46,6 +53,7 @@ const testimonials = [
     color: "#6B2D8B",
   },
   {
+    id: "rev-sunita-rai",
     quote: "As a beginner, I was nervous to join yoga class due to my health condition at that time, but with the help, efforts and fully positive supportive instructors I was able to complete the course. The place is wonderful and located in a peaceful environment.",
     name: "Sunita Rai",
     when: "a year ago",
@@ -53,6 +61,7 @@ const testimonials = [
     color: "#8DC63F",
   },
   {
+    id: "rev-sunaina-deoju",
     quote: "The best part of my yoga journey with Yogmandu is the peaceful and friendly environment. The teachers are very kind, cooperative and humble. I am so blessed to be part of this organization.",
     name: "Sunaina Deoju",
     when: "a year ago",
@@ -60,19 +69,30 @@ const testimonials = [
     color: "#F7941D",
   },
   {
+    id: "rev-dipika-shrestha",
     quote: "Yogmandu is filled with positivity and offers wonderful guidance. I will always be thankful to each and every teacher, as well as the receptionist for being so kind.",
     name: "Dipika Shrestha",
     when: "a year ago",
     stars: 5,
     color: "#6B2D8B",
   },
+  {
+    id: "rev-smriti-kafle",
+    quote: "Best experience at Yogmandu's yoga. Specially the tratak meditation makes you a completely different person, so I suggest you go through it.",
+    name: "Smriti Kafle",
+    when: "9 months ago",
+    stars: 5,
+    color: "#8DC63F",
+  },
 ];
+
+type Testimonial = typeof DEFAULT_TESTIMONIALS[number];
 
 
 function TestimonialCard({
   t, index, active, total, onNext, onPrev, mousePos,
 }: {
-  t: typeof testimonials[0];
+  t: Testimonial;
   index: number;
   active: number;
   total: number;
@@ -201,14 +221,33 @@ function TestimonialCard({
 }
 
 export default function Testimonials() {
+  const [items, setItems] = useState<Testimonial[]>(DEFAULT_TESTIMONIALS);
   const [active, setActive] = useState(0);
   const dragging = useRef(false);
   const dragStart = useRef(0);
   const mousePos = useRef({ x: 0, y: 0 });
   const sectionRef = useRef<HTMLElement>(null);
 
-  const next = useCallback(() => setActive(a => (a + 1) % testimonials.length), []);
-  const prev = useCallback(() => setActive(a => (a - 1 + testimonials.length) % testimonials.length), []);
+  // Pull admin-managed reviews; fall back to the built-in real Google reviews.
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/testimonials")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((res) => {
+        const list = Array.isArray(res?.data) ? (res.data as Testimonial[]) : [];
+        if (alive && list.length > 0) {
+          setItems(list);
+          setActive(0);
+        }
+      })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
+
+  const total = items.length;
+  const next = useCallback(() => setActive(a => (a + 1) % total), [total]);
+  const prev = useCallback(() => setActive(a => (a - 1 + total) % total), [total]);
+  const current = items[active] ?? items[0];
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -286,10 +325,10 @@ export default function Testimonials() {
 
         {/* Card stage */}
         <div className="relative select-none" style={{ height: "clamp(380px, 440px, 100vw)" }}>
-          {testimonials.map((t, i) => (
+          {items.map((t, i) => (
             <TestimonialCard
-              key={i} t={t} index={i} active={active}
-              total={testimonials.length} onNext={next} onPrev={prev}
+              key={t.id ?? i} t={t} index={i} active={active}
+              total={total} onNext={next} onPrev={prev}
               mousePos={mousePos}
             />
           ))}
@@ -306,8 +345,8 @@ export default function Testimonials() {
           </button>
 
           <div className="flex gap-2 items-center">
-            {testimonials.map((t, i) => (
-              <button key={i} onClick={() => setActive(i)}
+            {items.map((t, i) => (
+              <button key={t.id ?? i} onClick={() => setActive(i)}
                 className="rounded-full transition-all duration-500"
                 style={{
                   width: i === active ? "32px" : "8px",
@@ -333,13 +372,13 @@ export default function Testimonials() {
           style={{ width: "100px", height: "2px", background: "rgba(255,255,255,0.1)" }}>
           <div className="h-full rounded-full transition-all duration-700"
             style={{
-              width: `${((active + 1) / testimonials.length) * 100}%`,
-              background: `linear-gradient(90deg, ${testimonials[active].color}, #F7941D)`,
+              width: `${((active + 1) / total) * 100}%`,
+              background: `linear-gradient(90deg, ${current.color}, #F7941D)`,
             }}
           />
         </div>
         <p className="text-center mt-2 text-xs font-light" style={{ color: "rgba(255,255,255,0.25)" }}>
-          {active + 1} / {testimonials.length}
+          {active + 1} / {total}
         </p>
       </div>
     </section>

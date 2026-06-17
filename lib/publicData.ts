@@ -218,6 +218,34 @@ export async function getGalleryItems(): Promise<DBGalleryItem[] | null> {
   }
 }
 
+// ── Testimonials (admin-managed Google reviews) ───────────────────────────────
+export interface DBTestimonial {
+  id:           string;
+  quote:        string;
+  name:         string;
+  when:         string;   // e.g. "a year ago"
+  stars:        number;   // 1–5
+  color:        string;   // accent hex
+  status?:      string;   // "Active" | "Hidden"
+  displayOrder?: number;
+}
+
+export async function getTestimonials(): Promise<DBTestimonial[] | null> {
+  if (!isSupabaseConfigured) return null;
+  try {
+    const supabase = getSupabaseAdmin();
+    const { data, error } = await supabase
+      .from("yogmandu_testimonials")
+      .select("data")
+      .order("display_order", { ascending: true })
+      .order("created_at", { ascending: true });
+    if (error) return null;
+    return (data ?? []).map((row) => row.data as DBTestimonial);
+  } catch {
+    return null;
+  }
+}
+
 export async function getMediaItems(): Promise<DBMedia[] | null> {
   if (!isSupabaseConfigured) return null;
   try {

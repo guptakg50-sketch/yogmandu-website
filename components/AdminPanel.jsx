@@ -32,6 +32,7 @@ import {
   ShieldCheck,
   Tag,
   Sparkles,
+  Star,
   Trash2,
   Upload,
   Users,
@@ -2173,6 +2174,7 @@ function AdminWorkspace({ onLogout }) {
     ["gallery",     "Gallery",      Image],
     ["popup",       "Popup",        Megaphone],
     ["pricing",     "Pricing",      Tag],
+    ["testimonials","Reviews",      Star],
     ["settings",    "Settings",     Settings],
   ];
   const title = nav.find(([id]) => id === active)?.[1] || "Dashboard";
@@ -2210,6 +2212,7 @@ function AdminWorkspace({ onLogout }) {
           {active === "gallery" && <GalleryManager items={state.gallery} setItems={setPart("gallery")} toast={notify} />}
           {active === "popup" && <PopupManager media={state.media} setMedia={setPart("media")} toast={notify} />}
           {active === "pricing" && <PricingManager toast={notify} />}
+          {active === "testimonials" && <TestimonialsManager toast={notify} />}
           {active === "settings" && <SettingsPage settings={state.settings} setSettings={setPart("settings")} instructors={state.instructors} setInstructors={setPart("instructors")} sessions={state.sessions} toast={notify} />}
         </main>
       </div>
@@ -2612,6 +2615,148 @@ function PricingManager({ toast }) {
             <TextInput value={l2Note} placeholder="Extended program · certificate included" onChange={(e) => setL2Note(e.target.value)} />
           </Field>
         </div>
+      </div>
+    </div>
+  );
+}
+
+const REVIEW_COLORS = [
+  { value: "#F7941D", label: "Orange" },
+  { value: "#6B2D8B", label: "Purple" },
+  { value: "#8DC63F", label: "Green" },
+];
+
+// Built-in real Google reviews — used to pre-fill the editor the first time
+// (before anything is saved to Supabase). Mirrors components/Testimonials.tsx.
+const DEFAULT_REVIEWS = [
+  { id: "rev-shraddha-timalsena", name: "Shraddha Timalsena", when: "a year ago", stars: 5, color: "#F7941D", status: "Active", quote: "Yogmandu Yoga is a beautiful, calming space with incredible instructors who truly care. Every class feels grounding and uplifting. It's the perfect place to reconnect with yourself and your practice." },
+  { id: "rev-george-h", name: "George H.", when: "2 years ago", stars: 5, color: "#6B2D8B", status: "Active", quote: "Absolutely fantastic experience! The yoga teachers create a welcoming environment. Their expertise and guidance in each session helped me improve my flexibility and overall well-being. If you're in Kathmandu and seeking a yoga experience, Yogmandu is the place to be." },
+  { id: "rev-love-thakur", name: "Love Thakur", when: "a year ago", stars: 5, color: "#8DC63F", status: "Active", quote: "I've been practicing yoga for years, but my sessions at Yogmandu Yoga have taken my practice to a whole new level. The instructors are incredibly knowledgeable and attentive, ensuring that each pose is performed correctly and safely." },
+  { id: "rev-rinku-thakur", name: "Rinku Thakur", when: "a year ago", stars: 5, color: "#F7941D", status: "Active", quote: "The space is beautifully designed with soft lighting, peaceful music, and a warm, inviting vibe that made me feel comfortable immediately. The staff was friendly and knowledgeable, and the instructors were truly outstanding." },
+  { id: "rev-babita-kc", name: "Babita Kc", when: "a year ago", stars: 5, color: "#6B2D8B", status: "Active", quote: "Yogmandu is a truly peaceful and energizing space where I always feel a sense of positivity and calm. Practicing yoga here has helped me both physically and mentally. I leave every session feeling refreshed and balanced." },
+  { id: "rev-sunita-rai", name: "Sunita Rai", when: "a year ago", stars: 5, color: "#8DC63F", status: "Active", quote: "As a beginner, I was nervous to join yoga class due to my health condition at that time, but with the help, efforts and fully positive supportive instructors I was able to complete the course. The place is wonderful and located in a peaceful environment." },
+  { id: "rev-sunaina-deoju", name: "Sunaina Deoju", when: "a year ago", stars: 5, color: "#F7941D", status: "Active", quote: "The best part of my yoga journey with Yogmandu is the peaceful and friendly environment. The teachers are very kind, cooperative and humble. I am so blessed to be part of this organization." },
+  { id: "rev-dipika-shrestha", name: "Dipika Shrestha", when: "a year ago", stars: 5, color: "#6B2D8B", status: "Active", quote: "Yogmandu is filled with positivity and offers wonderful guidance. I will always be thankful to each and every teacher, as well as the receptionist for being so kind." },
+  { id: "rev-smriti-kafle", name: "Smriti Kafle", when: "9 months ago", stars: 5, color: "#8DC63F", status: "Active", quote: "Best experience at Yogmandu's yoga. Specially the tratak meditation makes you a completely different person, so I suggest you go through it." },
+];
+
+function TestimonialsManager({ toast }) {
+  const [loaded, setLoaded] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [reviews, setReviews] = useState([]);
+
+  useEffect(() => {
+    fetch("/api/admin/testimonials")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((res) => {
+        const list = Array.isArray(res?.data) ? res.data : [];
+        setReviews(list.length ? list : DEFAULT_REVIEWS.map((r) => ({ ...r })));
+      })
+      .catch(() => setReviews(DEFAULT_REVIEWS.map((r) => ({ ...r }))))
+      .finally(() => setLoaded(true));
+  }, []);
+
+  function update(id, patch) {
+    setReviews((items) => items.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+  }
+  function remove(id) {
+    if (confirm("Remove this review?")) setReviews((items) => items.filter((r) => r.id !== id));
+  }
+  function move(index, dir) {
+    setReviews((items) => {
+      const next = [...items];
+      const target = index + dir;
+      if (target < 0 || target >= next.length) return items;
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+  }
+  function add() {
+    setReviews((items) => [
+      ...items,
+      { id: `rev-${Date.now()}`, name: "", when: "", stars: 5, color: REVIEW_COLORS[items.length % 3].value, status: "Active", quote: "" },
+    ]);
+  }
+
+  async function persist() {
+    setSaving(true);
+    const payload = reviews.map((r, i) => ({ ...r, displayOrder: i }));
+    try {
+      const res = await fetch("/api/admin/testimonials", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) { toast("Reviews saved — live on next page load"); return; }
+      toast(data?.error || "Save failed");
+    } catch {
+      toast("Save failed — server error");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (!loaded) {
+    return <div className="space-y-4">{Array.from({ length: 3 }, (_, i) => <div key={i} className="h-28 animate-pulse rounded-xl bg-stone-200" />)}</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold text-stone-900">Homepage Reviews</h2>
+          <p className="text-sm text-stone-500">The &ldquo;Voices from the practice&rdquo; carousel on the homepage. Paste real Google reviews here — order top-to-bottom is the order shown.</p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={add}><Plus size={16} /> Add Review</Button>
+          <Button onClick={persist} disabled={saving}><Save size={16} /> {saving ? "Saving…" : "Save & Publish"}</Button>
+        </div>
+      </div>
+
+      {reviews.length === 0 && (
+        <div className="rounded-xl border border-dashed border-stone-300 p-8 text-center text-sm text-stone-500">No reviews yet. Click &ldquo;Add Review&rdquo; to create one.</div>
+      )}
+
+      <div className="space-y-4">
+        {reviews.map((r, i) => (
+          <div key={r.id} className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm">
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-stone-400">Review {i + 1}</span>
+              <div className="flex items-center gap-1">
+                <Button variant="ghost" onClick={() => move(i, -1)} disabled={i === 0} title="Move up">↑</Button>
+                <Button variant="ghost" onClick={() => move(i, 1)} disabled={i === reviews.length - 1} title="Move down">↓</Button>
+                <Button variant="ghost" onClick={() => remove(r.id)} title="Remove"><Trash2 size={16} /></Button>
+              </div>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <Field label="Reviewer name">
+                <TextInput value={r.name} placeholder="e.g. Shraddha Timalsena" onChange={(e) => update(r.id, { name: e.target.value })} />
+              </Field>
+              <Field label="When" hint="e.g. a year ago">
+                <TextInput value={r.when} placeholder="a year ago" onChange={(e) => update(r.id, { when: e.target.value })} />
+              </Field>
+              <Field label="Review text" className="md:col-span-2">
+                <TextArea rows={3} value={r.quote} placeholder="Paste the Google review text…" onChange={(e) => update(r.id, { quote: e.target.value })} />
+              </Field>
+              <Field label="Rating">
+                <Select value={r.stars} onChange={(e) => update(r.id, { stars: Number(e.target.value) })}>
+                  {[5, 4, 3, 2, 1].map((n) => <option key={n} value={n}>{n} star{n > 1 ? "s" : ""}</option>)}
+                </Select>
+              </Field>
+              <Field label="Accent colour">
+                <Select value={r.color} onChange={(e) => update(r.id, { color: e.target.value })}>
+                  {REVIEW_COLORS.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+                </Select>
+              </Field>
+              <Field label="Visibility">
+                <Select value={r.status || "Active"} onChange={(e) => update(r.id, { status: e.target.value })}>
+                  {["Active", "Hidden"].map((s) => <option key={s} value={s}>{s}</option>)}
+                </Select>
+              </Field>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
