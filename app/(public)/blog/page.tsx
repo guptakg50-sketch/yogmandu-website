@@ -78,12 +78,13 @@ function dbToPost(p: DBBlog) {
     readTime: `${readTime} min`,
     date:     p.publishDate ? new Date(p.publishDate).toLocaleDateString("en", { month: "long", year: "numeric" }) : "",
     color:    CATEGORY_COLORS[p.category] ?? "#6B2D8B",
+    image:    p.featuredImage || "",
   };
 }
 
 export default async function BlogPage() {
   const dbPosts = await getPublishedBlogs();
-  const posts = dbPosts && dbPosts.length > 0 ? dbPosts.map(dbToPost) : FALLBACK_POSTS;
+  const posts = dbPosts && dbPosts.length > 0 ? dbPosts.map(dbToPost) : FALLBACK_POSTS.map((p) => ({ ...p, image: "" }));
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchema) }} />
@@ -108,6 +109,14 @@ export default async function BlogPage() {
           <div className="max-w-5xl mx-auto">
             <div className="card-light p-10 md:p-12 rounded-3xl"
               style={{ borderLeft: "3px solid #F7941D" }}>
+              {posts[0].image && (
+                <Link href={`/blog/${posts[0].slug}`} className="block mb-8 overflow-hidden rounded-2xl">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={posts[0].image} alt={posts[0].title} loading="eager"
+                    className="w-full object-cover"
+                    style={{ height: "clamp(220px, 38vw, 380px)", display: "block" }} />
+                </Link>
+              )}
               <span className="text-xs tracking-[0.25em] uppercase font-light" style={{ color: "#F7941D" }}>
                 {posts[0].category} · {posts[0].date}
               </span>
@@ -136,6 +145,18 @@ export default async function BlogPage() {
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.slice(1).map(post => (
             <Link key={post.slug} href={`/blog/${post.slug}`} className="card-light p-7 flex flex-col group">
+              <div className="overflow-hidden rounded-xl mb-5" style={{ height: 180 }}>
+                {post.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={post.image} alt={post.title} loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center"
+                    style={{ background: `linear-gradient(135deg, ${post.color}22 0%, ${post.color}0a 100%)` }}>
+                    <span style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "2rem", color: `${post.color}99` }}>ॐ</span>
+                  </div>
+                )}
+              </div>
               <span className="text-xs tracking-[0.2em] uppercase font-light mb-4" style={{ color: post.color }}>
                 {post.category}
               </span>

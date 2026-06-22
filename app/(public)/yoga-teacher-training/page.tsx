@@ -263,6 +263,60 @@ export default function YogaTeacherTrainingPage() {
       {/* Pricing — 3D interactive section */}
       <PricingSection />
 
+      {/* Beyond 200hr — 300hr Advanced & 500hr Master live inside this page */}
+      <section className="py-20 px-6 relative overflow-hidden" style={{ background: "linear-gradient(160deg, #1a0a2e 0%, #3D1560 60%, #1a0a2e 100%)" }}>
+        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(247,148,29,0.16) 0%, transparent 70%)" }} />
+        <div className="max-w-5xl mx-auto relative">
+          <div className="text-center mb-12">
+            <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#8DC63F" }}>After Your 200hr</p>
+            <h2 className="text-3xl md:text-4xl font-light mb-3" style={{ fontFamily: "Cormorant Garamond, serif", color: "#FFFFFF" }}>
+              Continue your journey
+            </h2>
+            <p className="text-sm max-w-xl mx-auto" style={{ color: "rgba(255,255,255,0.75)" }}>
+              Once you complete the 200-hour foundation, you can deepen your practice and teaching with our advanced Yoga Alliance pathways.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              {
+                tag: "RYS 300", title: "300hr Advanced Training",
+                color: "#F7941D",
+                body: "The next step for certified 200hr teachers — advanced asana, deeper philosophy, anatomy, and refined teaching methodology. Combine your 200hr + 300hr to qualify for Yoga Alliance RYT 500.",
+              },
+              {
+                tag: "RYS 500", title: "500hr Master Training",
+                color: "#8DC63F",
+                body: "Our complete master pathway (200hr + 300hr) for those committed to teaching at the highest level — a full immersion in classical yoga, therapy, and mentorship.",
+              },
+            ].map((c) => (
+              <div key={c.title} style={{
+                background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.14)",
+                borderRadius: "1.25rem", padding: "2rem", backdropFilter: "blur(4px)",
+              }}>
+                <span className="text-[11px] font-semibold tracking-[0.2em] uppercase"
+                  style={{ color: c.color, background: `${c.color}1F`, padding: "4px 12px", borderRadius: 99, border: `1px solid ${c.color}40` }}>
+                  {c.tag}
+                </span>
+                <h3 className="text-2xl font-light mt-4 mb-2" style={{ fontFamily: "Cormorant Garamond, serif", color: "#FFFFFF" }}>
+                  {c.title}
+                </h3>
+                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.78)" }}>
+                  {c.body}
+                </p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-10">
+            <a href="https://wa.me/9779810263277" target="_blank" rel="noopener noreferrer"
+              className="cta-lift inline-block px-8 py-3.5 rounded-full font-medium text-sm text-white"
+              style={{ background: "#A65808", boxShadow: "0 6px 20px rgba(247,148,29,0.4)" }}>
+              Ask about 300hr &amp; 500hr
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* 2026 Dates */}
       <section className="py-16 px-6" style={{ background: "#F9F5FF" }}>
         <div className="max-w-5xl mx-auto text-center">

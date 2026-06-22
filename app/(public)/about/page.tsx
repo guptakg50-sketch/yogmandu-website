@@ -98,6 +98,7 @@ export default async function AboutPage() {
       photo:          i.photo ?? "",
       color:          TEAM_PALETTE[idx % TEAM_PALETTE.length],
       initials:       initialsOf(i.name),
+      profileUrl:     i.social?.website ?? "",
     }));
 
   return (

@@ -45,6 +45,16 @@ const DEFAULT_CONFIG = {
   ctaTagline:   "Begin your journey",
 };
 
+// "Begin your journey" hero buttons — each goes to its own unique page.
+// (300hr lives inside the 200hr Teacher Training page now, so the 4th
+//  button is Sound Healing rather than a duplicate teacher-training link.)
+const CTA_BUTTONS = [
+  { href: "/class-schedule",        label: "Class Schedule" },
+  { href: "/yoga-for-beginners",    label: "Yoga for Beginners" },
+  { href: "/yoga-teacher-training", label: "200hr Teacher Training" },
+  { href: "/sound-healing-therapy", label: "Sound Healing" },
+];
+
 export default function Footer() {
   const [cfg, setCfg] = useState(DEFAULT_CONFIG);
 
@@ -105,7 +115,7 @@ export default function Footer() {
             </h3>
           </div>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            {cfg.programs.slice(0, 4).map((p, i) => {
+            {CTA_BUTTONS.map((p, i) => {
               const styles: React.CSSProperties[] = [
                 { background: "#6B2D8B", color: "#fff", border: "none", boxShadow: "0 6px 24px rgba(107,45,139,0.3)", fontWeight: 500 },
                 { background: "#A65808", color: "#fff", border: "none", boxShadow: "0 6px 24px rgba(166,88,8,0.35)", fontWeight: 500 },

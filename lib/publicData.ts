@@ -246,6 +246,30 @@ export async function getTestimonials(): Promise<DBTestimonial[] | null> {
   }
 }
 
+export interface DBService {
+  id:           string;
+  label:        string;
+  href:         string;
+  status?:      string;   // "Active" | "Hidden"
+  displayOrder?: number;
+}
+
+export async function getServices(): Promise<DBService[] | null> {
+  if (!isSupabaseConfigured) return null;
+  try {
+    const supabase = getSupabaseAdmin();
+    const { data, error } = await supabase
+      .from("yogmandu_services")
+      .select("data")
+      .order("display_order", { ascending: true })
+      .order("created_at", { ascending: true });
+    if (error) return null;
+    return (data ?? []).map((row) => row.data as DBService);
+  } catch {
+    return null;
+  }
+}
+
 export async function getMediaItems(): Promise<DBMedia[] | null> {
   if (!isSupabaseConfigured) return null;
   try {

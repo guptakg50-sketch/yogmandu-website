@@ -127,6 +127,7 @@ type TeamMember = {
   credentials: string[];
   certifications?: string;
   photo?: string;
+  profileUrl?: string;
 };
 
 // Fallback team — used when the admin Instructors list is empty or Supabase is down.
@@ -138,6 +139,7 @@ const DEFAULT_TEAM: TeamMember[] = [
     color: "#6B2D8B",
     initials: "CG",
     credentials: ["PhD — Gurukul Kangri University", "E-RYT 500", "40,000+ teaching hours", "Nepal Vidyabhushan Award 2012"],
+    profileUrl: "https://chintamanigautam.com/yoga-instructor-in-nepal/",
   },
   {
     name: "Yogi Arjun Rakhal",
@@ -146,6 +148,7 @@ const DEFAULT_TEAM: TeamMember[] = [
     color: "#F7941D",
     initials: "AR",
     credentials: ["Hatha & Ashtanga", "Vinyasa & Power Yoga", "Sanatan Tradition"],
+    profileUrl: "https://app.yogaalliance.org/teacherpublicprofile?id=0033g00000CmAtbAAF",
   },
   {
     name: "Dr. Dipika",
@@ -164,8 +167,51 @@ const values = [
   { n: "04", title: "Holistic Wellness", body: "A one-stop solution for health and fitness in collaboration with dietitians, nutritionists, and mental health professionals.", color: "#F7941D" },
 ];
 
+type ServiceItem = { id?: string; label: string; href: string };
+
+// Fallback list — used when Supabase is empty/unconfigured. Each links to its
+// closest page; the admin "Services" editor can override label + link.
+const DEFAULT_SERVICES: ServiceItem[] = [
+  { label: "Hatha Yoga Classes",                         href: "/class-schedule" },
+  { label: "Vinyasa Yoga",                               href: "/class-schedule" },
+  { label: "Power Yoga",                                 href: "/class-schedule" },
+  { label: "Ashtanga Yoga",                              href: "/class-schedule" },
+  { label: "Sanatan Yoga",                               href: "/class-schedule" },
+  { label: "Meditation Classes",                         href: "/class-schedule" },
+  { label: "200hr Yoga Teacher Training",                href: "/yoga-teacher-training" },
+  { label: "300hr Advanced Training",                    href: "/yoga-teacher-training" },
+  { label: "500hr Master Training",                      href: "/yoga-teacher-training" },
+  { label: "Sound Healing Therapy",                      href: "/sound-healing-therapy" },
+  { label: "Sound Healing Certification (Level I & II)", href: "/sound-healing-therapy" },
+  { label: "Pranayama & Breathwork",                     href: "/class-schedule" },
+  { label: "Yoga Therapy",                               href: "/services" },
+  { label: "Virtual Live Yoga Classes",                  href: "/services" },
+  { label: "Private & Corporate Yoga",                   href: "/services" },
+  { label: "Children's Yoga",                            href: "/services" },
+  { label: "Senior Citizen Yoga",                        href: "/services" },
+  { label: "49-Day Weight Loss Bootcamp",                href: "/services" },
+  { label: "Diet & Nutrition Consultation",              href: "/services" },
+  { label: "Yoga Retreats & Trekking",                   href: "/services" },
+  { label: "Reiki Healing",                              href: "/services" },
+];
+
 export default function AboutContent({ team }: { team?: TeamMember[] }) {
   const teamMembers = team && team.length ? team : DEFAULT_TEAM;
+
+  // Admin-editable "Our services" list (label + link). Falls back to defaults.
+  const [services, setServices] = useState<ServiceItem[]>(DEFAULT_SERVICES);
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/services")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((res) => {
+        const list = Array.isArray(res?.data) ? (res.data as ServiceItem[]) : [];
+        if (alive && list.length > 0) setServices(list);
+      })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
+
   return (
     <>
       {/* ── HERO ── */}
@@ -275,7 +321,7 @@ export default function AboutContent({ team }: { team?: TeamMember[] }) {
             </h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 16, fontSize: "0.92rem", lineHeight: 1.85, color: "#4A2E1A" }}>
               <p>Yogmandu Yoga and Retreat is a complete one-stop solution for all of your health and fitness needs under one roof. Our mission is to make people healthy physically, mentally, socially, and spiritually at an affordable cost.</p>
-              <p>Established in 2018 as Nepal&apos;s first registered Yoga School and as a sister company to Zumbandu Fitness and Diet Therapy Clinic, we are affiliated with Yoga Alliance USA and Yoga Alliance International Australia.</p>
+              <p>Established in 2018 as Nepal&apos;s first registered Yoga School and as a sister company to Zumbandu Fitness and Diet Therapy Clinic, we are affiliated with Yoga Alliance USA.</p>
               <p>We collaborate with dietitians, nutritionists, and mental health professionals to offer holistic care — from therapeutic yoga for chronic conditions to weight management programs and diet consultation.</p>
             </div>
           </div>
@@ -284,7 +330,7 @@ export default function AboutContent({ team }: { team?: TeamMember[] }) {
           <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             {[
               { badge: "RYS 200, 300 & 500", org: "Yoga Alliance USA", color: "#6B2D8B" },
-              { badge: "Certified School", org: "Yoga Alliance International Australia", color: "#F7941D" },
+              { badge: "Certified School", org: "Yoga Alliance Registered", color: "#F7941D" },
               { badge: "Since 2018", org: "Nepal's First Registered Yoga School", color: "#8DC63F" },
             ].map(a => (
               <TiltCard key={a.org} style={{
@@ -348,6 +394,20 @@ export default function AboutContent({ team }: { team?: TeamMember[] }) {
                     }}>{c}</span>
                   ))}
                 </div>
+                {/* Verified / external profile link */}
+                {member.profileUrl ? (
+                  <a href={member.profileUrl} target="_blank" rel="noopener noreferrer"
+                    style={{
+                      display: "inline-flex", alignItems: "center", gap: 6, marginTop: 16,
+                      fontSize: "0.82rem", fontWeight: 600, color: member.color,
+                      textDecoration: "none", letterSpacing: "0.02em",
+                    }}>
+                    View profile
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M7 17 17 7M7 7h10v10" />
+                    </svg>
+                  </a>
+                ) : null}
               </TiltCard>
             ))}
           </div>
@@ -385,18 +445,10 @@ export default function AboutContent({ team }: { team?: TeamMember[] }) {
             <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "2.8rem", fontWeight: 300, color: "#2A1208" }}>Our services</h2>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "0.75rem" }}>
-            {[
-              "Hatha Yoga Classes", "Vinyasa Yoga", "Power Yoga",
-              "Ashtanga Yoga", "Sanatan Yoga", "Meditation Classes",
-              "200hr Yoga Teacher Training", "300hr Advanced Training", "500hr Master Training", "Sound Healing Therapy",
-              "Sound Healing Certification (Level I & II)", "Pranayama & Breathwork", "Yoga Therapy",
-              "Virtual Live Yoga Classes", "Private & Corporate Yoga", "Children's Yoga",
-              "Senior Citizen Yoga", "49-Day Weight Loss Bootcamp", "Diet & Nutrition Consultation",
-              "Yoga Retreats & Trekking", "Reiki Healing",
-            ].map((s, i) => {
+            {services.map((s, i) => {
               const accent = i % 3 === 0 ? "#F7941D" : i % 3 === 1 ? "#6B2D8B" : "#8DC63F";
               return (
-                <div key={s}
+                <Link key={s.id || s.label} href={s.href || "/services"}
                   className="pill-3d"
                   style={{
                     padding: "0.8rem 1.1rem", borderRadius: "0.85rem",
@@ -404,7 +456,7 @@ export default function AboutContent({ team }: { team?: TeamMember[] }) {
                     background: `linear-gradient(135deg, ${accent}12 0%, ${accent}04 100%)`,
                     fontSize: "1rem", color: "#2A1208",
                     display: "flex", alignItems: "center", gap: 10,
-                    cursor: "default",
+                    cursor: "pointer", textDecoration: "none",
                     position: "relative", overflow: "hidden",
                     fontWeight: 500,
                   }}
@@ -423,8 +475,8 @@ export default function AboutContent({ team }: { team?: TeamMember[] }) {
                     width: 8, height: 8, borderRadius: "50%", background: accent,
                     flexShrink: 0, boxShadow: `0 0 8px ${accent}80`,
                   }} />
-                  {s}
-                </div>
+                  {s.label}
+                </Link>
               );
             })}
           </div>

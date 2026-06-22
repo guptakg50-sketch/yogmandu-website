@@ -124,15 +124,13 @@ export default async function ClassSchedulePage() {
             animation:"drift 7s ease-in-out infinite", animationDelay:`${delay}s`, pointerEvents:"none" }}/>
         ))}
 
-        {/* Centered logo */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, marginBottom: 24 }}>
-          <picture>
-            <source srcSet="/logo-206-inv.webp" type="image/webp" />
-            <img src="/logo-206.png" alt="Yogmandu" width={180} height={72} fetchPriority="high" decoding="async" style={{ height: 72, width: "auto", objectFit: "contain", filter: "brightness(0) invert(1)" }} />
-          </picture>
-          <span style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.6rem", fontWeight: 400 }}>
-            <span style={{ color: "#F7941D" }}>Yog</span>
-            <span style={{ color: "#FFFFFF" }}>mandu</span>
+        {/* Centered logo — actual Yogmandu logo on a soft chip so it reads on the purple hero */}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
+          <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center",
+            background: "rgba(255,255,255,0.96)", borderRadius: 18, padding: "14px 24px",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.28)" }}>
+            <img src="/logo-206.png" alt="Yogmandu" width={200} height={80} fetchPriority="high" decoding="async"
+              style={{ height: 64, width: "auto", objectFit: "contain", display: "block" }} />
           </span>
         </div>
 

@@ -135,7 +135,7 @@ const initialInstructors = [
     photo: "",
     bio: "Founder & President of Yogmandu. PhD in Yogic Science, E-RYT 500. Has trained over 3,000 teachers from 50+ countries since 2018. Expert in Tibetan singing bowl sound healing and classical yoga lineage.",
     specialties: ["Hatha", "Meditation", "Sound Healing", "Pranayama"],
-    certifications: "PhD Yogic Science, E-RYT 500, Yoga Alliance USA, Yoga Alliance International (Australia)",
+    certifications: "PhD Yogic Science, E-RYT 500, Yoga Alliance USA",
     years: 20,
     social: { instagram: "@yogmandu", facebook: "yogmandu", website: "https://yogmandu.com" },
     status: "Active",
@@ -1197,9 +1197,9 @@ function BlogManager({ blogs, setBlogs, media, setMedia, toast }) {
                 <td className="p-3 font-medium text-stone-900">{post.title}</td>
                 <td className="p-3 text-stone-600">{post.author}</td>
                 <td className="p-3 text-stone-600">{post.category}</td>
-                <td className="p-3"><div className="flex flex-wrap gap-1">{post.tags.slice(0, 2).map((tag) => <Badge key={tag} className="bg-stone-100 text-stone-600">{tag}</Badge>)}</div></td>
+                <td className="p-3"><div className="flex flex-wrap gap-1">{(post.tags ?? []).slice(0, 2).map((tag) => <Badge key={tag} className="bg-stone-100 text-stone-600">{tag}</Badge>)}</div></td>
                 <td className="p-3"><Badge className={post.status === "Published" ? "bg-emerald-100 text-emerald-700" : "bg-stone-100 text-stone-600"}>{post.status}</Badge></td>
-                <td className="p-3 text-stone-600">{post.views.toLocaleString()}</td>
+                <td className="p-3 text-stone-600">{(post.views ?? 0).toLocaleString()}</td>
                 <td className="p-3 text-stone-600">{post.createdAt}</td>
                 <td className="p-3"><Button variant="ghost" onClick={() => setEditing(post)}><Edit3 size={16} /></Button></td>
               </tr>
@@ -1455,15 +1455,59 @@ function SessionsGrid({ sessions, instructors, onEdit }) {
   return <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{sessions.map((session) => <article key={session.id} className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm"><img src={session.image || "https://images.unsplash.com/photo-1545389336-cf090694435e?w=900&auto=format&fit=crop"} alt="" className="h-44 w-full object-cover" /><div className="p-4"><div className="mb-2 flex items-center justify-between"><Badge className={typeColor(session.type)}>{session.type}</Badge><Badge className="bg-stone-100 text-stone-700">{session.status}</Badge></div><h3 className="text-lg font-semibold text-stone-900">{session.name}</h3><p className="mt-1 text-sm text-stone-500">{session.shortDescription}</p><p className="mt-3 text-sm text-stone-600">{instructors.find((item) => item.id === session.instructorId)?.name} - {session.days.join(", ")} {session.startTime}</p><Button className="mt-4 w-full" onClick={() => onEdit(session)}><Edit3 size={16} /> Edit Session</Button></div></article>)}</div>;
 }
 
+// Minutes since midnight from an "HH:MM" (24h) time, or null if unparseable.
+function timeToMinutes(t) {
+  if (!t || typeof t !== "string") return null;
+  const m = t.match(/^(\d{1,2}):(\d{2})/);
+  return m ? Number(m[1]) * 60 + Number(m[2]) : null;
+}
+
+// Find existing sessions whose day + time range overlaps the draft, so the
+// admin is warned before double-booking a slot. Archived/Cancelled are ignored.
+function sessionTimeConflicts(draft, sessions) {
+  const ds = timeToMinutes(draft.startTime);
+  const de = timeToMinutes(draft.endTime);
+  if (ds == null || de == null) return [];
+  const draftDays = draft.recurring ? (draft.days || []) : (draft.date ? [draft.date] : []);
+  if (draftDays.length === 0) return [];
+
+  const out = [];
+  for (const item of sessions) {
+    if (item.id === draft.id) continue;
+    if (item.status === "Archived" || item.status === "Cancelled") continue;
+    const is = timeToMinutes(item.startTime);
+    const ie = timeToMinutes(item.endTime);
+    if (is == null || ie == null) continue;
+    const itemDays = item.recurring ? (item.days || []) : (item.date ? [item.date] : []);
+    const sharedDays = draftDays.filter((d) => itemDays.includes(d));
+    if (sharedDays.length === 0) continue;
+    if (ds < ie && is < de) {
+      out.push(`${sharedDays.join(", ")} · ${item.startTime}–${item.endTime} · ${item.name}`);
+    }
+  }
+  return out;
+}
+
 function SessionEditor({ session, sessions, setSessions, instructors, media, setMedia, onClose, toast }) {
   const [draft, setDraft] = useState(session);
   const [tab, setTab] = useState("Basic");
   const exists = sessions.some((item) => item.id === session.id);
   const update = (key, value) => setDraft((current) => ({ ...current, [key]: value }));
   const save = () => {
+    // Warn if this day + time slot already has a class (the public schedule
+    // sorts chronologically, so the new one will slot into the right place).
+    const conflicts = sessionTimeConflicts(draft, sessions);
+    if (conflicts.length > 0) {
+      const ok = confirm(
+        `Heads up — this time overlaps ${conflicts.length} existing ${conflicts.length === 1 ? "class" : "classes"}:\n\n` +
+        conflicts.map((c) => `• ${c}`).join("\n") +
+        `\n\nSave anyway?`,
+      );
+      if (!ok) return;
+    }
     const next = { ...draft, duration: calculateDuration(draft.startTime, draft.endTime, draft.duration) };
     setSessions(exists ? sessions.map((item) => item.id === next.id ? next : item) : [next, ...sessions]);
-    toast("Session saved");
+    toast(conflicts.length ? "Session saved — note the time overlap" : "Session saved");
     onClose();
   };
 
@@ -2175,6 +2219,7 @@ function AdminWorkspace({ onLogout }) {
     ["popup",       "Popup",        Megaphone],
     ["pricing",     "Pricing",      Tag],
     ["testimonials","Reviews",      Star],
+    ["services",    "Services",     Sparkles],
     ["settings",    "Settings",     Settings],
   ];
   const title = nav.find(([id]) => id === active)?.[1] || "Dashboard";
@@ -2213,6 +2258,7 @@ function AdminWorkspace({ onLogout }) {
           {active === "popup" && <PopupManager media={state.media} setMedia={setPart("media")} toast={notify} />}
           {active === "pricing" && <PricingManager toast={notify} />}
           {active === "testimonials" && <TestimonialsManager toast={notify} />}
+          {active === "services" && <ServicesManager toast={notify} />}
           {active === "settings" && <SettingsPage settings={state.settings} setSettings={setPart("settings")} instructors={state.instructors} setInstructors={setPart("instructors")} sessions={state.sessions} toast={notify} />}
         </main>
       </div>
@@ -2752,6 +2798,157 @@ function TestimonialsManager({ toast }) {
               <Field label="Visibility">
                 <Select value={r.status || "Active"} onChange={(e) => update(r.id, { status: e.target.value })}>
                   {["Active", "Hidden"].map((s) => <option key={s} value={s}>{s}</option>)}
+                </Select>
+              </Field>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Built-in default "Our services" list — used to pre-fill the editor the first
+// time (before anything is saved to Supabase). Mirrors AboutContent.tsx.
+const DEFAULT_SERVICES_ADMIN = [
+  { id: "svc-hatha-yoga",             label: "Hatha Yoga Classes",                         href: "/class-schedule" },
+  { id: "svc-vinyasa-yoga",           label: "Vinyasa Yoga",                               href: "/class-schedule" },
+  { id: "svc-power-yoga",             label: "Power Yoga",                                 href: "/class-schedule" },
+  { id: "svc-ashtanga-yoga",          label: "Ashtanga Yoga",                              href: "/class-schedule" },
+  { id: "svc-sanatan-yoga",           label: "Sanatan Yoga",                               href: "/class-schedule" },
+  { id: "svc-meditation",             label: "Meditation Classes",                         href: "/class-schedule" },
+  { id: "svc-200hr-ytt",              label: "200hr Yoga Teacher Training",                href: "/yoga-teacher-training" },
+  { id: "svc-300hr-advanced",         label: "300hr Advanced Training",                    href: "/yoga-teacher-training" },
+  { id: "svc-500hr-master",           label: "500hr Master Training",                      href: "/yoga-teacher-training" },
+  { id: "svc-sound-healing-therapy",  label: "Sound Healing Therapy",                      href: "/sound-healing-therapy" },
+  { id: "svc-sound-healing-cert",     label: "Sound Healing Certification (Level I & II)", href: "/sound-healing-therapy" },
+  { id: "svc-pranayama",              label: "Pranayama & Breathwork",                     href: "/class-schedule" },
+  { id: "svc-yoga-therapy",           label: "Yoga Therapy",                               href: "/services" },
+  { id: "svc-virtual-live",           label: "Virtual Live Yoga Classes",                  href: "/services" },
+  { id: "svc-private-corporate",      label: "Private & Corporate Yoga",                   href: "/services" },
+  { id: "svc-childrens-yoga",         label: "Children's Yoga",                            href: "/services" },
+  { id: "svc-senior-yoga",            label: "Senior Citizen Yoga",                        href: "/services" },
+  { id: "svc-bootcamp",               label: "49-Day Weight Loss Bootcamp",                href: "/services" },
+  { id: "svc-diet",                   label: "Diet & Nutrition Consultation",              href: "/services" },
+  { id: "svc-retreats-trekking",      label: "Yoga Retreats & Trekking",                   href: "/services" },
+  { id: "svc-reiki",                  label: "Reiki Healing",                              href: "/services" },
+];
+
+// Suggested internal links the client can pick from (free text also allowed).
+const SERVICE_LINK_OPTIONS = [
+  "/class-schedule",
+  "/yoga-teacher-training",
+  "/sound-healing-therapy",
+  "/services",
+  "/yoga-for-beginners",
+  "/gallery",
+  "/contact",
+  "/book",
+];
+
+function ServicesManager({ toast }) {
+  const [loaded, setLoaded] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [services, setServices] = useState([]);
+
+  useEffect(() => {
+    fetch("/api/admin/services")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((res) => {
+        const list = Array.isArray(res?.data) ? res.data : [];
+        setServices(list.length ? list : DEFAULT_SERVICES_ADMIN.map((s) => ({ ...s })));
+      })
+      .catch(() => setServices(DEFAULT_SERVICES_ADMIN.map((s) => ({ ...s }))))
+      .finally(() => setLoaded(true));
+  }, []);
+
+  function update(id, patch) {
+    setServices((items) => items.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+  }
+  function remove(id) {
+    if (confirm("Remove this service?")) setServices((items) => items.filter((s) => s.id !== id));
+  }
+  function move(index, dir) {
+    setServices((items) => {
+      const next = [...items];
+      const target = index + dir;
+      if (target < 0 || target >= next.length) return items;
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+  }
+  function add() {
+    setServices((items) => [
+      ...items,
+      { id: `svc-${Date.now()}`, label: "", href: "/services", status: "Active" },
+    ]);
+  }
+
+  async function persist() {
+    setSaving(true);
+    const payload = services.map((s, i) => ({ ...s, displayOrder: i }));
+    try {
+      const res = await fetch("/api/admin/services", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) { toast("Services saved — live on next page load"); return; }
+      toast(data?.error || "Save failed");
+    } catch {
+      toast("Save failed — server error");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (!loaded) {
+    return <div className="space-y-4">{Array.from({ length: 4 }, (_, i) => <div key={i} className="h-16 animate-pulse rounded-xl bg-stone-200" />)}</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold text-stone-900">Our Services</h2>
+          <p className="text-sm text-stone-500">The &ldquo;What we offer&rdquo; grid on the About page. Edit each item&rsquo;s text and where it links. Order top-to-bottom is the order shown.</p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={add}><Plus size={16} /> Add Service</Button>
+          <Button onClick={persist} disabled={saving}><Save size={16} /> {saving ? "Saving…" : "Save & Publish"}</Button>
+        </div>
+      </div>
+
+      {services.length === 0 && (
+        <div className="rounded-xl border border-dashed border-stone-300 p-8 text-center text-sm text-stone-500">No services yet. Click &ldquo;Add Service&rdquo; to create one.</div>
+      )}
+
+      <datalist id="service-link-options">
+        {SERVICE_LINK_OPTIONS.map((o) => <option key={o} value={o} />)}
+      </datalist>
+
+      <div className="space-y-3">
+        {services.map((s, i) => (
+          <div key={s.id} className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-stone-400">Service {i + 1}</span>
+              <div className="flex items-center gap-1">
+                <Button variant="ghost" onClick={() => move(i, -1)} disabled={i === 0} title="Move up">↑</Button>
+                <Button variant="ghost" onClick={() => move(i, 1)} disabled={i === services.length - 1} title="Move down">↓</Button>
+                <Button variant="ghost" onClick={() => remove(s.id)} title="Remove"><Trash2 size={16} /></Button>
+              </div>
+            </div>
+            <div className="grid gap-4 md:grid-cols-[1.4fr_1.4fr_0.7fr]">
+              <Field label="Service name">
+                <TextInput value={s.label} placeholder="e.g. Hatha Yoga Classes" onChange={(e) => update(s.id, { label: e.target.value })} />
+              </Field>
+              <Field label="Links to" hint="a page on the site, e.g. /class-schedule">
+                <TextInput list="service-link-options" value={s.href} placeholder="/services" onChange={(e) => update(s.id, { href: e.target.value })} />
+              </Field>
+              <Field label="Visibility">
+                <Select value={s.status || "Active"} onChange={(e) => update(s.id, { status: e.target.value })}>
+                  {["Active", "Hidden"].map((v) => <option key={v} value={v}>{v}</option>)}
                 </Select>
               </Field>
             </div>

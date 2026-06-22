@@ -104,24 +104,48 @@ function formatTimeRange(start: string, end: string, location?: string): string 
   return out;
 }
 
+/**
+ * Chronological sort key (minutes since midnight) for a session.
+ * Prefers the 24-hour startTime ("HH:MM"); falls back to parsing a legacy
+ * display string like "5:30 – 6:30 AM" or "3:00 – 5:30 PM" so AM always
+ * sorts before PM regardless of the leading digit.
+ */
+function startMinutes(start: string, display: string): number {
+  if (start && /^\d{1,2}:\d{2}$/.test(start)) {
+    const [h, m] = start.split(":").map(Number);
+    return h * 60 + m;
+  }
+  const match = display.match(/(\d{1,2}):(\d{2})\s*(?:–.*?)?\s*(AM|PM)/i);
+  if (match) {
+    let h = Number(match[1]) % 12;
+    const m = Number(match[2]);
+    if (/PM/i.test(match[3])) h += 12;
+    return h * 60 + m;
+  }
+  return 0;
+}
+
 function buildSchedule(sessions: DBSession[], instructorMap: Record<string,string>) {
-  const map: typeof FALLBACK = {};
+  const map: Record<string, ((typeof FALLBACK)[string][number] & { sort: number })[]> = {};
   for (const s of sessions) {
     const abbrs = Array.isArray(s.days) ? s.days : [];
     for (const abbr of abbrs) {
       const day = DAY_MAP[abbr] ?? abbr;
       if (!map[day]) map[day] = [];
+      const time = formatTimeRange(s.startTime, s.endTime, s.location);
       map[day].push({
-        time:       formatTimeRange(s.startTime, s.endTime, s.location),
+        time,
         name:       s.name,
         level:      s.level,
         duration:   `${s.duration} min`,
         instructor: resolveInstructor(s.instructorId, instructorMap),
         accent:     styleToAccent(s.styles),
+        sort:       startMinutes(s.startTime, time),
       });
     }
   }
-  for (const day of Object.keys(map)) map[day].sort((a,b)=>a.time.localeCompare(b.time));
+  // Sort chronologically (early morning → night), not alphabetically.
+  for (const day of Object.keys(map)) map[day].sort((a,b)=>a.sort-b.sort);
   return map;
 }
 

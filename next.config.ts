@@ -4,11 +4,11 @@ const CSP = [
   "default-src 'self'",
   // unsafe-inline required: GA4 init inline script + React inline styles
   // unsafe-eval required: Three.js / shader compilation
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://challenges.cloudflare.com",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://challenges.cloudflare.com https://static.cloudflareinsights.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
   "img-src 'self' data: blob: https:",
-  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://challenges.cloudflare.com",
+  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://challenges.cloudflare.com https://cloudflareinsights.com https://static.cloudflareinsights.com",
   "media-src 'self' blob:",
   "worker-src 'self' blob:",  // Three.js workers
   "frame-src https://challenges.cloudflare.com",  // Turnstile widget

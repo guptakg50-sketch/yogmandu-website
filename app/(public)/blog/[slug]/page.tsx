@@ -103,6 +103,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
     ? { ...db, color: CATEGORY_COLORS[db.category] ?? "#6B2D8B", readTime: `${Math.max(1, Math.ceil((db.body ?? "").split(/\s+/).length / 200))} min`, date: db.publishDate ? new Date(db.publishDate).toLocaleDateString("en", { month: "long", year: "numeric" }) : "" }
     : FALLBACK_POSTS.find((p) => p.slug === slug);
   if (!post) notFound();
+  const heroImage = (post as { featuredImage?: string }).featuredImage || "";
 
   const blogPostingSchema = {
     "@context": "https://schema.org",
@@ -189,6 +190,17 @@ export default async function BlogPostPage({ params }: { params: Params }) {
         </div>
       </section>
 
+      {/* Featured image */}
+      {heroImage && (
+        <section className="px-6 pb-4" style={{ background: "#FAF6F0" }}>
+          <div className="max-w-3xl mx-auto overflow-hidden rounded-2xl" style={{ boxShadow: "0 12px 36px rgba(42,18,8,0.14)" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={heroImage} alt={post.title} loading="eager"
+              className="w-full object-cover" style={{ maxHeight: 460, display: "block" }} />
+          </div>
+        </section>
+      )}
+
       {/* Article */}
       <section className="px-6 pb-20" style={{ background: "#FAF6F0" }}>
         <div className="max-w-3xl mx-auto">
@@ -204,6 +216,8 @@ export default async function BlogPostPage({ params }: { params: Params }) {
               {post.body.split(/\n\n+/).map((block, i) => {
                 const imageMatch = block.trim().match(/^!\[([^\]]*)\]\(([^)\s]+)\)$/);
                 if (imageMatch) {
+                  // Skip if this is the same image already shown as the hero above.
+                  if (heroImage && heroImage === imageMatch[2]) return null;
                   return (
                     <figure key={i} style={{ margin: "2.5rem 0" }}>
                       <img src={imageMatch[2]} alt={imageMatch[1]} loading="lazy"
