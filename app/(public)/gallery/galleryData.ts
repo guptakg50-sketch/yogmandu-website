@@ -93,3 +93,34 @@ export function shuffleInterleaved(items: PhotoItem[]): PhotoItem[] {
   }
   return out;
 }
+
+// ── Server-side helpers for SEO (JSON-LD + sitemap) ──────────────────────────
+
+export const SITE_URL = "https://yogmandu.com";
+
+/** Absolute URL for an image src. Remote URLs pass through; local /images/* are
+ *  prefixed with the production origin so crawlers get a fully-qualified URL. */
+export function toAbsoluteSrc(src: string): string {
+  if (/^https?:\/\//i.test(src)) return src;
+  return `${SITE_URL}${src.startsWith("/") ? "" : "/"}${src}`;
+}
+
+/** Minimal shape of an admin-managed (Supabase) gallery row. */
+type DBGalleryLike = { id: string; url: string; title?: string; category?: string };
+
+/**
+ * Resolves the gallery photo list exactly like the public grid (DB rows override
+ * the static set), but in stable, un-shuffled order — suitable for structured
+ * data and the sitemap, which want deterministic output per build.
+ */
+export function resolveGalleryPhotos(items?: DBGalleryLike[] | null): PhotoItem[] {
+  if (items && items.length > 0) {
+    return items.map(it => ({
+      id:    it.id,
+      src:   it.url,
+      title: it.title || "Photo",
+      cat:   it.category || "Yoga",
+    }));
+  }
+  return STATIC_PHOTOS;
+}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import GalleryGrid from "./GalleryGrid";
 import { getGalleryItems } from "@/lib/publicData";
+import { resolveGalleryPhotos, toAbsoluteSrc } from "./galleryData";
 
 export const revalidate = 60;
 
@@ -31,10 +32,28 @@ export const metadata: Metadata = {
 };
 
 export default async function GalleryPage() {
-  const items = await getGalleryItems();
+  const items  = await getGalleryItems();
+  const photos = resolveGalleryPhotos(items);
+
+  const gallerySchema = {
+    "@context": "https://schema.org",
+    "@type": "ImageGallery",
+    name: "Yogmandu Gallery",
+    description:
+      "Photos from Yogmandu Kathmandu — yoga classes, Tibetan singing bowl sessions, teacher training graduates, and the beauty of Nepal.",
+    url: "https://yogmandu.com/gallery",
+    image: photos.map((p) => ({
+      "@type": "ImageObject",
+      contentUrl: toAbsoluteSrc(p.src),
+      name: p.title,
+      caption: p.title,
+    })),
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(gallerySchema) }} />
       <GalleryGrid items={items} />
     </>
   );

@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 import { statSync } from "fs";
 import { join } from "path";
-import { getPublishedBlogs, getCustomSitemapUrls } from "@/lib/publicData";
+import { getPublishedBlogs, getCustomSitemapUrls, getGalleryItems } from "@/lib/publicData";
+import { resolveGalleryPhotos, toAbsoluteSrc } from "./(public)/gallery/galleryData";
 
 // Cache mtime lookups at module load so we don't stat repeatedly per request.
 function mtime(relPath: string): Date {
@@ -18,6 +19,10 @@ const BUILD_DATE = new Date();
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = "https://yogmandu.com";
 
+  // Gallery photos as <image:image> entries so Google can discover them directly.
+  const galleryItems  = await getGalleryItems().catch(() => null);
+  const galleryImages = resolveGalleryPhotos(galleryItems).map((p) => toAbsoluteSrc(p.src));
+
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: base,                                    lastModified: mtime("app/(public)/page.tsx"),                       changeFrequency: "weekly",  priority: 1.0 },
     { url: `${base}/yoga-teacher-training`,         lastModified: mtime("app/(public)/yoga-teacher-training/page.tsx"), changeFrequency: "monthly", priority: 0.95 },
@@ -28,7 +33,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/services`,                      lastModified: mtime("app/(public)/services/page.tsx"),              changeFrequency: "monthly", priority: 0.85 },
     { url: `${base}/about`,                         lastModified: mtime("app/(public)/about/page.tsx"),                 changeFrequency: "monthly", priority: 0.8 },
     { url: `${base}/contact`,                       lastModified: mtime("app/(public)/contact/page.tsx"),               changeFrequency: "yearly",  priority: 0.75 },
-    { url: `${base}/gallery`,                       lastModified: mtime("app/(public)/gallery/page.tsx"),               changeFrequency: "monthly", priority: 0.65 },
+    { url: `${base}/gallery`,                       lastModified: mtime("app/(public)/gallery/page.tsx"),               changeFrequency: "monthly", priority: 0.65, images: galleryImages },
+    { url: `${base}/gallery/all`,                   lastModified: mtime("app/(public)/gallery/all/page.tsx"),           changeFrequency: "monthly", priority: 0.6,  images: galleryImages },
     { url: `${base}/blog`,                          lastModified: mtime("app/(public)/blog/page.tsx"),                  changeFrequency: "weekly",  priority: 0.7 },
     { url: `${base}/privacy`,                       lastModified: mtime("app/(public)/privacy/page.tsx"),               changeFrequency: "yearly",  priority: 0.3 },
     { url: `${base}/terms`,                         lastModified: mtime("app/(public)/terms/page.tsx"),                 changeFrequency: "yearly",  priority: 0.3 },
