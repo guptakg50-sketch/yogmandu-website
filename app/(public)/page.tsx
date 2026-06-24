@@ -5,6 +5,7 @@ import SingingBowl from "@/components/SingingBowlClient";
 import MountainScene from "@/components/MountainSceneClient";
 import ProgramsSection from "@/components/ProgramsSectionClient";
 import WhySection from "@/components/WhySection";
+import PhotoCarousel from "@/components/PhotoCarousel";
 import { DeferUntilIdle, DeferUntilVisible } from "@/components/DeferredHeavy";
 
 export const metadata: Metadata = {
@@ -362,6 +363,11 @@ export default function HomePage() {
 
       {/* ── WHY YOGMANDU ── */}
       <WhySection />
+
+      {/* ── PHOTO CAROUSEL — "Life at Yogmandu" trust band, defer until visible ── */}
+      <DeferUntilVisible fallback={<div style={{ minHeight: 600 }} />}>
+        <PhotoCarousel />
+      </DeferUntilVisible>
 
       {/* ── TESTIMONIALS — heavy 3D bg, defer until visible ── */}
       <DeferUntilVisible fallback={<div style={{ minHeight: 600 }} />}>
