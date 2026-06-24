@@ -17,7 +17,7 @@ const breadcrumbSchema = {
 export const metadata: Metadata = {
   title: "All Photos | Yogmandu Gallery — Yoga & Sound Healing Nepal",
   description:
-    "Every moment from Yogmandu Kathmandu — yoga classes, Tibetan singing bowl sessions, teacher training graduates, and the spirit of Nepal. Browse all 40 photos.",
+    "Every moment from Yogmandu Kathmandu — yoga classes, Tibetan singing bowl sessions, teacher training graduates, and the spirit of Nepal. Browse all 50 photos.",
   alternates: { canonical: "https://yogmandu.com/gallery/all" },
   openGraph: {
     title: "All Photos | Yogmandu Gallery",

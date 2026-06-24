@@ -1,5 +1,5 @@
 // Static gallery data + helpers for /gallery and /gallery/all.
-// Image files live in /public/images/gallery/{yoga,bell,certificates}/
+// Image files live in /public/images/gallery/{yoga,bell,certificates,graduation}/
 
 export type PhotoItem = {
   id:    string;
@@ -9,13 +9,14 @@ export type PhotoItem = {
   desc?: string;
 };
 
-export const CATEGORIES = ["All", "Yoga", "Sound Healing", "Certificates"] as const;
+export const CATEGORIES = ["All", "Yoga", "Sound Healing", "Certificates", "Graduation"] as const;
 
 export const CAT_ACCENT: Record<string, string> = {
   All:              "#F7941D",
   Yoga:             "#F7941D",
   "Sound Healing":  "#6B2D8B",
   Certificates:     "#8DC63F",
+  Graduation:       "#C2477F",
 };
 
 const yogaPhotos: PhotoItem[] = Array.from({ length: 12 }, (_, i) => ({
@@ -46,11 +47,19 @@ const certificatePhotos: PhotoItem[] = Array.from({ length: 8 }, (_, i) => ({
   cat:   "Certificates",
 }));
 
+const graduationPhotos: PhotoItem[] = Array.from({ length: 10 }, (_, i) => ({
+  id:    `graduation-${i + 1}`,
+  src:   `/images/gallery/graduation/graduation-${i + 1}.jpg`,
+  title: `Graduation Ceremony ${i + 1}`,
+  cat:   "Graduation",
+}));
+
 export const STATIC_PHOTOS: PhotoItem[] = [
   ...yogaPhotos,
   ...bowlPhotos,
   ...bellExtras,
   ...certificatePhotos,
+  ...graduationPhotos,
 ];
 
 /**

@@ -5,7 +5,7 @@ import { validateImageUpload } from "@/lib/uploadValidation";
 
 export const dynamic = "force-dynamic";
 
-const ALLOWED_CATEGORIES = ["Yoga", "Sound Healing", "Certificates"] as const;
+const ALLOWED_CATEGORIES = ["Yoga", "Sound Healing", "Certificates", "Graduation"] as const;
 type Category = (typeof ALLOWED_CATEGORIES)[number];
 
 function sanitizeCategory(value: string): Category {

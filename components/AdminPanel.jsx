@@ -1597,7 +1597,7 @@ function MediaLibrary({ media, setMedia, blogs, sessions, toast }) {
   );
 }
 
-const GALLERY_CATEGORIES = ["Yoga", "Sound Healing", "Certificates"];
+const GALLERY_CATEGORIES = ["Yoga", "Sound Healing", "Certificates", "Graduation"];
 
 function GalleryManager({ items, setItems, toast }) {
   const [filter, setFilter]   = useState("All");
@@ -1657,7 +1657,7 @@ function GalleryManager({ items, setItems, toast }) {
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h3 className="font-semibold text-stone-900">Gallery Photos</h3>
-            <p className="text-sm text-stone-500">Photos shown on the public /gallery page. Categories: Yoga, Sound Healing, Certificates.</p>
+            <p className="text-sm text-stone-500">Photos shown on the public /gallery page. Categories: Yoga, Sound Healing, Certificates, Graduation.</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Select value={uploadCat} onChange={(e) => setUploadCat(e.target.value)} className="w-44">
