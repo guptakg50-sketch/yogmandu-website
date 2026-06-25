@@ -8,9 +8,7 @@ type NavUser = { full_name: string; avatar_url: string } | null;
 const DEFAULT_CONFIG = {
   services: [
     { href: "/class-schedule",        label: "Class Schedule",          icon: "🗓", desc: "Weekly yoga class timetable" },
-    { href: "/yoga-teacher-training", label: "200hr Teacher Training",  icon: "🧘", desc: "Yoga Alliance RYS 200 certified" },
-    { href: "/yoga-teacher-training", label: "300hr Advanced Training", icon: "⭐", desc: "Yoga Alliance RYS 300 certified" },
-    { href: "/yoga-teacher-training", label: "500hr Master Training",   icon: "🏆", desc: "Yoga Alliance RYS 500 certified" },
+    { href: "/yoga-teacher-training", label: "200 & 300hr Teacher Training", icon: "🧘", desc: "Yoga Alliance RYS 200 & 300 certified" },
     { href: "/sound-healing-therapy#sessions",      label: "Sound Healing Sessions", icon: "🎵", desc: "Individual & group sessions" },
     { href: "/sound-healing-therapy#certification", label: "Sound Healing Cert.",    icon: "📜", desc: "Level I & II certification" },
     { href: "/services",              label: "All Services",            icon: "✨", desc: "Yoga, retreats, therapy, corporate & more" },

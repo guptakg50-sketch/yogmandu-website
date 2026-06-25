@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import { useWebGLAvailable } from "@/lib/useWebGL";
 
 const SingingBowl = dynamic(() => import("@/components/SingingBowl"), {
   ssr: false,
@@ -152,18 +153,20 @@ function CSSBowl() {
  */
 export default function SingingBowlClient() {
   const [mobile, setMobile] = useState<boolean | null>(null);
+  const webgl = useWebGLAvailable();
 
   useEffect(() => {
     setMobile(window.innerWidth < 768);
   }, []);
 
-  if (mobile === null) {
+  if (mobile === null || webgl === null) {
     return (
       <div className="w-full h-full flex items-center justify-center" style={{ minHeight: 200 }}>
         <div className="w-16 h-16 rounded-full animate-pulse" style={{ border: "1.5px solid rgba(107,45,139,0.3)" }} />
       </div>
     );
   }
-  if (mobile) return <CSSBowl />;
+  // Mobile OR no WebGL support → lightweight CSS bowl (Three.js never mounts).
+  if (mobile || !webgl) return <CSSBowl />;
   return <SingingBowl />;
 }

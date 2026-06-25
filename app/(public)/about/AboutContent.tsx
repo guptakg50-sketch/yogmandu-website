@@ -1,7 +1,15 @@
 "use client";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, type TouchEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+
+// Mirror of lib/publicData.ts `instructorSlug` (kept local so this client
+// component doesn't import the server-only Supabase module). Used for the
+// DEFAULT_TEAM fallback; admin teachers already arrive with `slug` set.
+function slugifyName(name: string): string {
+  return (name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
 
 const FloatingLotus = dynamic(() => import("@/components/FloatingLotus"), {
   ssr: false,
@@ -120,6 +128,7 @@ function AnimatedStat({ value, suffix, label, color, delay = 0 }: { value: numbe
 
 type TeamMember = {
   name: string;
+  slug?: string;
   role: string;
   bio: string;
   color: string;
@@ -127,6 +136,7 @@ type TeamMember = {
   credentials: string[];
   certifications?: string;
   photo?: string;
+  photos?: string[];
   profileUrl?: string;
 };
 
@@ -178,8 +188,7 @@ const DEFAULT_SERVICES: ServiceItem[] = [
   { label: "Ashtanga Yoga",                              href: "/class-schedule" },
   { label: "Sanatan Yoga",                               href: "/class-schedule" },
   { label: "Meditation Classes",                         href: "/class-schedule" },
-  { label: "200hr Yoga Teacher Training",                href: "/yoga-teacher-training" },
-  { label: "300hr Advanced Training",                    href: "/yoga-teacher-training" },
+  { label: "200 & 300hr Teacher Training",               href: "/yoga-teacher-training" },
   { label: "500hr Master Training",                      href: "/yoga-teacher-training" },
   { label: "Sound Healing Therapy",                      href: "/sound-healing-therapy" },
   { label: "Sound Healing Certification (Level I & II)", href: "/sound-healing-therapy" },
@@ -194,6 +203,200 @@ const DEFAULT_SERVICES: ServiceItem[] = [
   { label: "Yoga Retreats & Trekking",                   href: "/services" },
   { label: "Reiki Healing",                              href: "/services" },
 ];
+
+// Lighten a brand hex toward white so accent text stays legible on the dark
+// photo overlay (the plum especially needs this).
+function lighten(hex: string, amt = 0.45): string {
+  const m = hex.replace("#", "");
+  if (m.length < 6) return hex;
+  const r = parseInt(m.slice(0, 2), 16);
+  const g = parseInt(m.slice(2, 4), 16);
+  const b = parseInt(m.slice(4, 6), 16);
+  const up = (c: number) => Math.round(c + (255 - c) * amt);
+  return `rgb(${up(r)}, ${up(g)}, ${up(b)})`;
+}
+
+// A teacher as a full-bleed photo "box": the photo IS the card. When a teacher
+// has several photos they crossfade with a slow ken-burns drift (swipeable on
+// touch). "See details" links to the teacher's own page (/teachers/[slug]) —
+// nothing pops up over the photo.
+function TeacherCard({ member }: { member: TeamMember }) {
+  const router = useRouter();
+  const photos = member.photos && member.photos.length
+    ? member.photos
+    : member.photo
+      ? [member.photo]
+      : [];
+
+  const [idx, setIdx]       = useState(0);
+  const [inView, setInView] = useState(false);
+  const [manual, setManual] = useState(false);   // user took control of the photo slider
+  const [hovered, setHovered] = useState(false);
+  const ref    = useRef<HTMLDivElement | null>(null);
+  const touchX = useRef<number | null>(null);
+  const swiped = useRef(false);
+
+  const slug = member.slug || slugifyName(member.name);
+  const href = `/teachers/${slug}`;
+
+  // Only run the crossfade timer while the card is on screen.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.15 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    // Auto-advance pauses once the user swipes / taps a dot to take control.
+    if (photos.length < 2 || !inView || manual) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const t = setInterval(() => setIdx((i) => (i + 1) % photos.length), 4600);
+    return () => clearInterval(t);
+  }, [photos.length, inView, manual]);
+
+  const accent      = member.color;
+  const accentLight = lighten(accent, 0.45);
+
+  // ── Touch: swipe the photo to change it; tap (anywhere but the dots) opens
+  // the teacher page. Distinguish a swipe from a tap so a swipe never navigates.
+  const goToPhoto = (i: number) => { setManual(true); setIdx(i); };
+  const onCardClick = () => {
+    if (swiped.current) { swiped.current = false; return; }
+    router.push(href);
+  };
+  const onTouchStart = (e: TouchEvent<HTMLDivElement>) => { touchX.current = e.touches[0].clientX; };
+  const onTouchEnd = (e: TouchEvent<HTMLDivElement>) => {
+    const start = touchX.current;
+    touchX.current = null;
+    if (start == null || photos.length < 2) return;
+    const dx = e.changedTouches[0].clientX - start;
+    if (Math.abs(dx) > 40) {
+      swiped.current = true;
+      setManual(true);
+      setIdx((i) => (i + (dx < 0 ? 1 : -1) + photos.length) % photos.length);
+    }
+  };
+
+  return (
+    <div
+      ref={ref}
+      onClick={onCardClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      style={{
+        position: "relative", borderRadius: "1.5rem", overflow: "hidden",
+        aspectRatio: "4 / 5", background: "#160a12",
+        boxShadow: hovered ? "0 34px 76px rgba(42,18,8,0.34)" : "0 24px 60px rgba(42,18,8,0.18)",
+        border: `1px solid ${hovered ? `${accent}66` : `${accent}22`}`,
+        cursor: "pointer",
+        transform: hovered ? "translateY(-6px)" : "translateY(0)",
+        transition: "transform 0.5s cubic-bezier(0.22,1,0.36,1), box-shadow 0.5s ease, border-color 0.5s ease",
+        willChange: "transform",
+        WebkitTapHighlightColor: "transparent",
+        touchAction: "pan-y",
+      }}
+    >
+      {/* Crossfading photos (with a gentle zoom-in on hover), or initials panel */}
+      {photos.length > 0 ? (
+        <div style={{
+          position: "absolute", inset: 0,
+          transform: hovered ? "scale(1.06)" : "scale(1)",
+          transition: "transform 0.7s cubic-bezier(0.22,1,0.36,1)",
+        }}>
+          {photos.map((src, i) => (
+            <img
+              key={`${src}-${i}`}
+              src={src}
+              alt={`${member.name}${photos.length > 1 ? ` — photo ${i + 1}` : ""}`}
+              loading="lazy"
+              style={{
+                position: "absolute", inset: 0, width: "100%", height: "100%",
+                objectFit: "cover",
+                opacity: i === idx ? 1 : 0,
+                transform: i === idx ? "scale(1.06)" : "scale(1)",
+                transition: "opacity 1.4s ease, transform 5.5s ease",
+              }}
+            />
+          ))}
+        </div>
+      ) : (
+        <div style={{
+          position: "absolute", inset: 0, display: "flex",
+          alignItems: "center", justifyContent: "center",
+          background: `linear-gradient(150deg, ${accent} 0%, #160a12 125%)`,
+          fontFamily: "Cormorant Garamond, serif", fontSize: "4.5rem",
+          fontWeight: 300, letterSpacing: "0.05em", color: "rgba(255,255,255,0.92)",
+          transform: hovered ? "scale(1.04)" : "scale(1)",
+          transition: "transform 0.7s cubic-bezier(0.22,1,0.36,1)",
+        }}>{member.initials}</div>
+      )}
+
+      {/* Top accent hairline */}
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, zIndex: 4, background: `linear-gradient(90deg, ${accent}, ${accent}33)` }} />
+
+      {/* Crossfade indicator dots */}
+      {photos.length > 1 ? (
+        <div style={{ position: "absolute", top: 8, left: 8, display: "flex", gap: 2, zIndex: 6 }}>
+          {photos.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              aria-label={`Show photo ${i + 1}`}
+              onClick={(e) => { e.stopPropagation(); goToPhoto(i); }}
+              style={{
+                background: "transparent", border: "none", cursor: "pointer",
+                padding: "8px 4px", display: "flex", alignItems: "center",
+              }}
+            >
+              <span style={{
+                display: "block",
+                width: i === idx ? 18 : 6, height: 6, borderRadius: 3,
+                background: i === idx ? "#fff" : "rgba(255,255,255,0.55)",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.45)",
+                transition: "width 0.5s ease, background 0.5s ease",
+              }} />
+            </button>
+          ))}
+        </div>
+      ) : null}
+
+      {/* Name + role + "See details" link over a soft scrim (always visible) */}
+      <div style={{
+        position: "absolute", left: 0, right: 0, bottom: 0, zIndex: 3,
+        padding: "3.75rem 1.5rem 1.5rem",
+        background: "linear-gradient(to top, rgba(11,5,9,0.94) 0%, rgba(11,5,9,0.5) 55%, transparent 100%)",
+      }}>
+        <h3 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.7rem", fontWeight: 400, color: "#fff", lineHeight: 1.12, marginBottom: 5 }}>{member.name}</h3>
+        {member.role ? (
+          <p style={{ fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: accentLight, marginBottom: 14 }}>{member.role}</p>
+        ) : null}
+        <Link
+          href={href}
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 8,
+            padding: "0.5rem 1rem", borderRadius: "3rem",
+            background: hovered ? `${accent}cc` : "rgba(255,255,255,0.1)",
+            border: `1px solid ${hovered ? accent : "rgba(255,255,255,0.28)"}`,
+            color: "#fff", fontSize: "0.78rem", fontWeight: 600, letterSpacing: "0.04em",
+            textDecoration: "none", backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)",
+            transition: "background 0.4s ease, border-color 0.4s ease",
+          }}
+        >
+          See details
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"
+            style={{ transform: hovered ? "translateX(3px)" : "translateX(0)", transition: "transform 0.4s ease" }}>
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 export default function AboutContent({ team }: { team?: TeamMember[] }) {
   const teamMembers = team && team.length ? team : DEFAULT_TEAM;
@@ -352,65 +555,21 @@ export default function AboutContent({ team }: { team?: TeamMember[] }) {
       </section>
 
       {/* ── TEAM ── */}
-      <section style={{ background: "#FFFFFF", padding: "6rem 1.5rem" }}>
+      <section id="teachers" style={{ background: "#FFFFFF", padding: "6rem 1.5rem", scrollMarginTop: 90 }}>
         <div style={{ maxWidth: 1280, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 56 }}>
             <p style={{ fontSize: "0.88rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "#8DC63F", marginBottom: 12 }}>The Teachers</p>
             <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "3rem", fontWeight: 300, color: "#2A1208" }}>Meet your guides</h2>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(320px,100%), 1fr))", gap: "2rem" }}>
-            {teamMembers.map(member => (
-              <TiltCard key={member.name} style={{
-                padding: "2rem", borderRadius: "1.5rem",
-                background: "#FFFFFF", border: `1.5px solid ${member.color}15`,
-                cursor: "default", overflow: "hidden", position: "relative",
-              }}>
-                {/* Top accent bar */}
-                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, ${member.color}, ${member.color}44)` }} />
-                {/* Avatar */}
-                <div style={{
-                  width: 64, height: 64, borderRadius: "50%",
-                  background: `${member.color}15`, border: `2px solid ${member.color}30`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontWeight: 700, fontSize: "1.1rem", color: member.color,
-                  marginBottom: 16, overflow: "hidden",
-                }}>
-                  {member.photo
-                    ? <img src={member.photo} alt={member.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    : member.initials}
-                </div>
-                <h3 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.5rem", fontWeight: 400, color: "#2A1208", marginBottom: 4 }}>{member.name}</h3>
-                {member.role ? <p style={{ fontSize: "0.88rem", fontWeight: 600, color: member.color, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: member.certifications ? 4 : 12 }}>{member.role}</p> : null}
-                {member.certifications ? <p style={{ fontSize: "0.8rem", lineHeight: 1.5, color: "#7A5840", marginBottom: 12 }}>{member.certifications}</p> : null}
-                <p style={{ fontSize: "0.88rem", lineHeight: 1.75, color: "#4A2E1A", marginBottom: 16 }}>{member.bio}</p>
-                {/* Credentials */}
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                  {member.credentials.map(c => (
-                    <span key={c} style={{
-                      fontSize: "1rem", padding: "3px 10px", borderRadius: "3rem",
-                      background: `${member.color}10`, border: `1px solid ${member.color}25`,
-                      color: member.color, fontWeight: 500,
-                    }}>{c}</span>
-                  ))}
-                </div>
-                {/* Verified / external profile link */}
-                {member.profileUrl ? (
-                  <a href={member.profileUrl} target="_blank" rel="noopener noreferrer"
-                    style={{
-                      display: "inline-flex", alignItems: "center", gap: 6, marginTop: 16,
-                      fontSize: "0.82rem", fontWeight: 600, color: member.color,
-                      textDecoration: "none", letterSpacing: "0.02em",
-                    }}>
-                    View profile
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M7 17 17 7M7 7h10v10" />
-                    </svg>
-                  </a>
-                ) : null}
-              </TiltCard>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(300px,100%), 1fr))", gap: "2rem", maxWidth: 1100, margin: "0 auto" }}>
+            {teamMembers.map((member) => (
+              <TeacherCard key={member.name} member={member} />
             ))}
           </div>
+          <p style={{ textAlign: "center", marginTop: 28, fontSize: "0.85rem", color: "#8A6A52" }}>
+            Tap a teacher to open their profile and full background.
+          </p>
         </div>
       </section>
 

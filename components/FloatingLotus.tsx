@@ -2,6 +2,40 @@
 import { useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import { useWebGLAvailable } from "@/lib/useWebGL";
+
+/** Static lotus shown when WebGL is unavailable (no 3-D context). */
+function StaticLotus({ className }: { className: string }) {
+  return (
+    <div className={`${className} flex items-center justify-center`} aria-hidden>
+      <svg viewBox="0 0 120 120" width="60%" height="60%" style={{ maxWidth: 200 }}>
+        <g transform="translate(60 66)">
+          {Array.from({ length: 8 }).map((_, i) => {
+            const a = (i / 8) * 360;
+            return (
+              <ellipse
+                key={`o${i}`} cx="0" cy="-22" rx="11" ry="26"
+                fill="#8DC63F" fillOpacity="0.85"
+                transform={`rotate(${a})`}
+              />
+            );
+          })}
+          {Array.from({ length: 6 }).map((_, i) => {
+            const a = (i / 6) * 360 + 30;
+            return (
+              <ellipse
+                key={`i${i}`} cx="0" cy="-12" rx="7" ry="15"
+                fill="#F7941D" fillOpacity="0.9"
+                transform={`rotate(${a})`}
+              />
+            );
+          })}
+          <circle cx="0" cy="0" r="7" fill="#F7941D" />
+        </g>
+      </svg>
+    </div>
+  );
+}
 
 function Petal({ index, total }: { index: number; total: number }) {
   const ref = useRef<THREE.Mesh>(null);
@@ -109,6 +143,11 @@ function LotusGroup() {
 
 export default function FloatingLotus({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
   const sizeMap = { sm: "h-40", md: "h-56", lg: "h-72" };
+  const webgl = useWebGLAvailable();
+
+  // No WebGL (or still probing) → static SVG lotus, never mounts the Canvas.
+  if (!webgl) return <StaticLotus className={`w-full ${sizeMap[size]}`} />;
+
   return (
     <div className={`w-full ${sizeMap[size]}`}>
       <Canvas camera={{ position: [0, 1.8, 2.4], fov: 38 }} gl={{ antialias: true, alpha: true }}

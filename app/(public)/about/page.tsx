@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import AboutContent from "./AboutContent";
-import { getInstructors } from "@/lib/publicData";
+import { getInstructors, instructorSlug } from "@/lib/publicData";
 
 // Brand palette + initials are derived here since the admin record doesn't store them.
 const TEAM_PALETTE = ["#6B2D8B", "#F7941D", "#8DC63F"];
@@ -91,11 +91,15 @@ export default async function AboutPage() {
     .filter((i) => (i.status ?? "Active") === "Active")
     .map((i, idx) => ({
       name:           i.name,
+      slug:           instructorSlug(i.name),
       role:           i.role ?? "",
       bio:            i.bio ?? "",
       certifications: i.certifications ?? "",
       credentials:    Array.isArray(i.specialties) ? i.specialties : [],
       photo:          i.photo ?? "",
+      photos:         Array.isArray(i.photos) && i.photos.length
+                        ? i.photos
+                        : (i.photo ? [i.photo] : []),
       color:          TEAM_PALETTE[idx % TEAM_PALETTE.length],
       initials:       initialsOf(i.name),
       profileUrl:     i.social?.website ?? "",

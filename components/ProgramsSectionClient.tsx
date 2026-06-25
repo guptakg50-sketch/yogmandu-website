@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useWebGLAvailable } from "@/lib/useWebGL";
 
 const ProgramsSection = dynamic(() => import("./ProgramsSection"), {
   ssr: false,
@@ -105,12 +106,14 @@ function MobilePrograms() {
  */
 export default function ProgramsSectionClient() {
   const [mobile, setMobile] = useState<boolean | null>(null);
+  const webgl = useWebGLAvailable();
 
   useEffect(() => {
     setMobile(window.innerWidth < 768);
   }, []);
 
-  if (mobile === null) return <div style={{ minHeight: 480, background: "#F9F5FF" }} />;
-  if (mobile) return <MobilePrograms />;
+  if (mobile === null || webgl === null) return <div style={{ minHeight: 480, background: "#F9F5FF" }} />;
+  // Mobile OR no WebGL support → static card strip (Three.js never mounts).
+  if (mobile || !webgl) return <MobilePrograms />;
   return <ProgramsSection />;
 }

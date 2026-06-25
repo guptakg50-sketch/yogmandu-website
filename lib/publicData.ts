@@ -15,6 +15,7 @@ export interface DBInstructor {
   name:           string;
   role?:          string;
   photo?:         string;
+  photos?:        string[];
   bio?:           string;
   specialties?:   string[];
   certifications?: string;
@@ -38,6 +39,22 @@ export async function getInstructors(): Promise<DBInstructor[] | null> {
   } catch {
     return null;
   }
+}
+
+// Stable URL slug for a teacher, derived from their display name.
+// Used by both the /teachers/[slug] route and the About-page card links so
+// the two always agree. e.g. "Dr. Chintamani Gautam" → "dr-chintamani-gautam".
+export function instructorSlug(name: string): string {
+  return (name || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export async function getInstructorBySlug(slug: string): Promise<DBInstructor | null> {
+  const list = await getInstructors();
+  if (!list) return null;
+  return list.find((i) => instructorSlug(i.name) === slug) ?? null;
 }
 
 export async function getInstructorMap(): Promise<Record<string, string>> {

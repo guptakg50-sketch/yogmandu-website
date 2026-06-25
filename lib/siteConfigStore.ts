@@ -7,8 +7,7 @@ const CONFIG_PATH = join(DATA_DIR, "site-config.json");
 export const defaultNavConfig = {
   services: [
     { href: "/class-schedule",        label: "Class Schedule",          icon: "🗓", desc: "Weekly yoga class timetable" },
-    { href: "/yoga-teacher-training", label: "200hr Teacher Training",  icon: "🧘", desc: "Yoga Alliance RYS 200 certified" },
-    { href: "/yoga-teacher-training", label: "300hr Advanced Training", icon: "⭐", desc: "Yoga Alliance RYS 300 certified" },
+    { href: "/yoga-teacher-training", label: "200 & 300hr Teacher Training", icon: "🧘", desc: "Yoga Alliance RYS 200 & 300 certified" },
     { href: "/sound-healing-therapy", label: "Sound Healing Sessions",  icon: "🎵", desc: "Individual & group sessions" },
     { href: "/sound-healing-therapy", label: "Sound Healing Cert.",     icon: "📜", desc: "Become a certified practitioner" },
   ],
@@ -32,8 +31,7 @@ export const defaultFooterConfig = {
   description: "Yoga Alliance certified teacher training & authentic Tibetan Sound Healing in Kathmandu, Nepal. Transforming practitioners since 2018.",
   programs: [
     { href: "/class-schedule",        label: "Class Schedule" },
-    { href: "/yoga-teacher-training", label: "200hr Teacher Training" },
-    { href: "/yoga-teacher-training", label: "300hr Advanced Training" },
+    { href: "/yoga-teacher-training", label: "200 & 300hr Teacher Training" },
     { href: "/sound-healing-therapy", label: "Sound Healing Sessions" },
     { href: "/sound-healing-therapy", label: "Sound Healing Cert." },
   ],

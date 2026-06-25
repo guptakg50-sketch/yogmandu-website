@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import { useWebGLAvailable } from "@/lib/useWebGL";
 
 const MountainScene = dynamic(() => import("@/components/MountainScene"), {
   ssr: false,
@@ -58,16 +59,18 @@ function SVGMountains() {
  */
 export default function MountainSceneClient() {
   const [mobile, setMobile] = useState<boolean | null>(null);
+  const webgl = useWebGLAvailable();
 
   useEffect(() => {
     setMobile(window.innerWidth < 768);
   }, []);
 
-  if (mobile === null) return (
+  if (mobile === null || webgl === null) return (
     <div className="w-full h-64 flex items-center justify-center">
       <div className="w-20 h-20 rounded-full border animate-pulse" style={{ borderColor: "rgba(247,148,29,0.2)" }} />
     </div>
   );
-  if (mobile) return <SVGMountains />;
+  // Mobile OR no WebGL support → SVG mountain silhouette (Three.js never mounts).
+  if (mobile || !webgl) return <SVGMountains />;
   return <MountainScene />;
 }

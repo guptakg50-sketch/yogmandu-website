@@ -2,6 +2,7 @@
 import { useRef, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import { useWebGLAvailable } from "@/lib/useWebGL";
 
 function Particles() {
   const ref = useRef<THREE.Points>(null);
@@ -47,6 +48,10 @@ function Orb({ position, color, speed }: { position: [number, number, number]; c
 }
 
 export default function TestimonialsBackground3D() {
+  const webgl = useWebGLAvailable();
+  // Pure decorative backdrop — render nothing when WebGL is unavailable.
+  if (!webgl) return null;
+
   return (
     <Canvas camera={{ position: [0, 0, 5], fov: 50 }}
       gl={{ antialias: true, alpha: true }}
