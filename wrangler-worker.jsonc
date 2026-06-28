@@ -1,0 +1,25 @@
+{
+  // Modern Workers deploy (mirrors the proven pilgrims-next setup). Used to
+  // migrate yogmandu off the legacy Pages asset-upload path, which chokes on
+  // the large _worker.js. Deploy with:
+  //   wrangler deploy --config wrangler-worker.jsonc
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "yogmandu-site",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-03-25",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "routes": [
+    { "pattern": "yogmandu.com", "custom_domain": true },
+    { "pattern": "www.yogmandu.com", "custom_domain": true }
+  ],
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "yogmandu-site"
+    }
+  ]
+}
