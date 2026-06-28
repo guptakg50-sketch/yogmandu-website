@@ -9,25 +9,27 @@ import PhotoCarousel from "@/components/PhotoCarousel";
 import { DeferUntilIdle, DeferUntilVisible } from "@/components/DeferredHeavy";
 
 export const metadata: Metadata = {
-  title: { absolute: "Yoga Teacher Training & Classes in Nepal | Yogmandu" },
+  title: { absolute: "Yoga Classes & Teacher Training in Kathmandu | Yogmandu" },
   description:
-    "Nepal's Yoga Alliance RYS 200/300/500 school in Kathmandu — yoga teacher training, daily classes & Tibetan sound healing. 3,000+ teachers since 2018.",
+    "Daily yoga classes in Baneshwor, Kathmandu — near New Baneshwor. Beginner-friendly classes, sound healing & Yoga Alliance teacher training. Book today.",
   keywords: [
+    "yoga classes Kathmandu",
+    "yoga classes Baneshwor",
+    "yoga in New Baneshwor",
+    "yoga near me Kathmandu",
+    "beginner yoga Kathmandu",
+    "sound healing Kathmandu",
+    "Tibetan singing bowl Nepal",
     "yoga teacher training Nepal",
     "200hr yoga teacher training Kathmandu",
     "yoga alliance Nepal",
-    "sound healing Kathmandu",
-    "Tibetan singing bowl Nepal",
-    "yoga school Nepal",
     "Yogmandu",
-    "yoga retreat Kathmandu",
-    "RYS 200 Nepal",
   ],
   alternates: { canonical: "https://yogmandu.com" },
   openGraph: {
-    title: "Yogmandu | Yoga Teacher Training & Sound Healing Kathmandu Nepal",
+    title: "Yogmandu | Yoga Classes, Sound Healing & Teacher Training in Kathmandu",
     description:
-      "Nepal's premier Yoga Alliance certified school. 200hr & 300hr YTT + authentic Tibetan sound healing in Kathmandu. 3,000+ teachers trained from 50+ countries.",
+      "Daily yoga classes in Baneshwor, Kathmandu — near New Baneshwor & the airport. Beginner-friendly classes, authentic Tibetan sound healing & Yoga Alliance certified teacher training.",
     url: "https://yogmandu.com",
     images: ["/opengraph-image.png"],
   },
@@ -101,8 +103,8 @@ export default function HomePage() {
             </h1>
 
             <p className="text-base leading-relaxed mb-8 max-w-md" style={{ color: "#4A2E1A", fontWeight: 400 }}>
-              Yoga Alliance certified teacher training &amp; authentic Sound Healing in Kathmandu, Nepal.
-              Transform your practice amid the Himalayas.
+              Daily yoga classes in Mid-Baneshwor, Kathmandu — minutes from New Baneshwor &amp; the airport.
+              Beginner-friendly classes for all ages, plus Yoga Alliance teacher training &amp; authentic Tibetan sound healing.
             </p>
 
             {/* ── 3 main focuses ── */}
@@ -131,9 +133,14 @@ export default function HomePage() {
             </div>
 
             <div className="flex flex-wrap gap-4">
-              <Link href="/yoga-teacher-training"
+              <Link href="/class-schedule"
                 className="cta-lift px-8 py-3.5 rounded-full font-medium text-sm text-white"
                 style={{ background: "#A65808", boxShadow: "0 6px 20px rgba(247,148,29,0.4)" }}>
+                Book a Class
+              </Link>
+              <Link href="/yoga-teacher-training"
+                className="cta-lift px-8 py-3.5 rounded-full font-medium text-sm"
+                style={{ border: "1.5px solid #A65808", color: "#A65808" }}>
                 Explore Teacher Training
               </Link>
               <Link href="/sound-healing-therapy"

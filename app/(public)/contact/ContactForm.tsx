@@ -56,7 +56,8 @@ export default function ContactForm() {
             <em style={{ color: "#F7941D" }}>conversation</em>
           </h1>
           <p className="text-base font-light max-w-lg" style={{ color: "#5C3D2E" }}>
-            Every journey starts with a question. Whether you're ready to book or still exploring, we reply within 24 hours.
+            Visit our studio in Mid-Baneshwor, Kathmandu — minutes from New Baneshwor and a short drive
+            from Tribhuvan Airport. Whether you're ready to book a class or still exploring, we reply within 24 hours.
           </p>
         </div>
       </section>
@@ -94,7 +95,7 @@ export default function ContactForm() {
               {
                 label: "Location",
                 value: "Miteri Marg, Mid-Baneshwor-31",
-                sub: "Kathmandu, Nepal — near Baneshwor Chowk",
+                sub: "Kathmandu — minutes from New Baneshwor · short drive from Tribhuvan Airport",
                 color: "#6B2D8B",
                 href: "https://www.google.com/maps?q=31+Miteri+Marg,+Mid-Baneshwor-31,+Kathmandu+44600,+Nepal&geocode=KXmrYpZQGes5MVNIqRARKuxM",
                 icon: (
@@ -201,6 +202,37 @@ export default function ContactForm() {
                 </p>
               </form>
             )}
+          </div>
+        </div>
+      </section>
+
+      {/* Map & directions */}
+      <section className="pb-28 px-6" style={{ background: "#FFFFFF" }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-8">
+            <p className="text-xs tracking-[0.3em] uppercase mb-3" style={{ color: "#8DC63F" }}>Find Us</p>
+            <h2 className="text-3xl md:text-4xl font-light" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>
+              Our studio in Mid-Baneshwor, Kathmandu
+            </h2>
+            <p className="text-sm font-light mt-3 max-w-xl mx-auto" style={{ color: "#5C3D2E" }}>
+              Miteri Marg, Mid-Baneshwor-31 · Open Sun–Fri, 5:30 AM – 6:30 PM (closed Saturday).
+              Just minutes from New Baneshwor and a short drive from Tribhuvan International Airport.
+            </p>
+          </div>
+          <div className="rounded-2xl overflow-hidden" style={{ border: "1.5px solid rgba(107,45,139,0.15)" }}>
+            <iframe
+              title="Yogmandu yoga studio location — Mid-Baneshwor, Kathmandu"
+              src="https://www.google.com/maps?q=31+Miteri+Marg,+Mid-Baneshwor-31,+Kathmandu+44600,+Nepal&output=embed"
+              width="100%" height="380" style={{ border: 0, display: "block" }}
+              loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
+          </div>
+          <div className="text-center mt-6">
+            <a href="https://www.google.com/maps?q=31+Miteri+Marg,+Mid-Baneshwor-31,+Kathmandu+44600,+Nepal&geocode=KXmrYpZQGes5MVNIqRARKuxM"
+              target="_blank" rel="noopener noreferrer"
+              className="cta-lift inline-block px-8 py-3.5 rounded-full font-medium text-sm text-white"
+              style={{ background: "#6B2D8B" }}>
+              Get Directions
+            </a>
           </div>
         </div>
       </section>

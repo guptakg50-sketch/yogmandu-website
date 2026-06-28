@@ -4,19 +4,19 @@ import StatsOrbs from "@/components/StatsOrbs";
 import CertPrice from "@/components/CertPrice";
 
 export const metadata: Metadata = {
-  title: { absolute: "Sound Healing & Tibetan Singing Bowls | Yogmandu Nepal" },
+  title: { absolute: "Sound Healing Kathmandu — Tibetan Singing Bowls | Yogmandu" },
   description:
-    "Tibetan singing bowl sound healing therapy in Kathmandu with Yogmandu — relaxing sessions plus sound healing teacher training. Book a session today.",
+    "Tibetan singing bowl sound healing in Baneshwor, Kathmandu — near New Baneshwor. Individual & group sessions plus Level I & II certification. Book today.",
   keywords: [
     "sound healing Kathmandu",
+    "sound healing Baneshwor",
+    "sound bath Kathmandu",
     "Tibetan singing bowl therapy Nepal",
     "sound healing session Nepal",
     "singing bowl Kathmandu",
     "sound healing certification Nepal",
     "chakra healing Kathmandu",
-    "sound bath Nepal",
     "Himalayan bowl therapy",
-    "yoga sound healing Nepal",
   ],
   alternates: { canonical: "https://yogmandu.com/sound-healing-therapy" },
   openGraph: {
@@ -37,7 +37,13 @@ const serviceSchema = {
   name: "Sound Healing Therapy",
   description: "Authentic Tibetan singing bowl sound healing sessions in Kathmandu, Nepal. Individual, group, and certification courses available.",
   provider: { "@type": "Organization", name: "Yogmandu", url: "https://yogmandu.com" },
-  areaServed: { "@type": "City", name: "Kathmandu" },
+  areaServed: [
+    { "@type": "Place", name: "New Baneshwor, Kathmandu" },
+    { "@type": "Place", name: "Mid-Baneshwor, Kathmandu" },
+    { "@type": "Place", name: "Sinamangal, Kathmandu" },
+    { "@type": "City", name: "Kathmandu" },
+    { "@type": "City", name: "Lalitpur" },
+  ],
   serviceType: "Sound Healing Therapy",
   offers: [
     { "@type": "Offer", name: "Individual Session", priceCurrency: "USD", price: "20", description: "90-minute personal Tibetan singing bowl session." },
@@ -179,9 +185,9 @@ export default function SoundHealingPage() {
               <em style={{ color: "#F7941D" }}>what words cannot reach</em>
             </h1>
             <p className="text-lg font-light leading-relaxed mb-10" style={{ color: "#555", maxWidth: "440px" }}>
-              Tibetan singing bowl therapy, practiced in the Himalayas for centuries. Each session
-              works through vibration to release tension, calm the nervous system, and restore
-              inner equilibrium.
+              Tibetan singing bowl therapy, practiced in the Himalayas for centuries — now at our studio
+              in Mid-Baneshwor, Kathmandu, minutes from New Baneshwor. Each session works through vibration
+              to release tension, calm the nervous system, and restore inner equilibrium.
             </p>
             <div className="flex flex-wrap gap-4">
               <a

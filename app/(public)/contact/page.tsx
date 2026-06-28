@@ -10,14 +10,25 @@ const contactPageSchema = {
   mainEntity: {
     "@type": "LocalBusiness",
     name: "Yogmandu",
+    url: "https://yogmandu.com",
     telephone: "+977-9810263277",
     email: "info@yogmandu.com",
     address: {
       "@type": "PostalAddress",
       streetAddress: "Miteri Marg, Mid-Baneshwor-31",
       addressLocality: "Kathmandu",
+      addressRegion: "Bagmati Province",
       addressCountry: "NP",
     },
+    geo: { "@type": "GeoCoordinates", latitude: 27.6981324, longitude: 85.3384591 },
+    openingHours: "Su-Fr 05:30-18:30",
+    areaServed: [
+      { "@type": "Place", name: "New Baneshwor, Kathmandu" },
+      { "@type": "Place", name: "Mid-Baneshwor, Kathmandu" },
+      { "@type": "Place", name: "Sinamangal, Kathmandu" },
+      { "@type": "Place", name: "Koteshwor, Kathmandu" },
+      { "@type": "Place", name: "Lalitpur" },
+    ],
   },
 };
 
@@ -33,7 +44,7 @@ const breadcrumbSchema = {
 export const metadata: Metadata = {
   title: { absolute: "Contact Yogmandu — Yoga in Kathmandu, Nepal" },
   description:
-    "Contact Yogmandu to book yoga classes, teacher training or sound healing in Kathmandu. WhatsApp +977-9810263277 · info@yogmandu.com · Mid-Baneshwor.",
+    "Book yoga classes, teacher training or sound healing at Yogmandu in Mid-Baneshwor, Kathmandu — near New Baneshwor. WhatsApp +977-9810263277 · info@yogmandu.com.",
   keywords: [
     "contact Yogmandu", "book yoga class Kathmandu", "yoga enquiry Nepal",
     "sound healing booking Nepal", "yoga teacher training enquiry",

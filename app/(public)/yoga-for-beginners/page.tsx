@@ -2,19 +2,20 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: { absolute: "Yoga for Beginners in Kathmandu, Nepal | Yogmandu" },
+  title: { absolute: "Yoga for Beginners in Baneshwor, Kathmandu | Yogmandu" },
   description:
-    "New to yoga? Start with beginner-friendly classes at Yogmandu in Kathmandu — gentle Hatha, breathwork and meditation. No experience or flexibility needed.",
+    "New to yoga? Start with beginner-friendly classes at Yogmandu in Baneshwor, Kathmandu — near New Baneshwor. Gentle Hatha & breathwork. No experience needed.",
   keywords: [
     "yoga for beginners",
     "yoga for beginners Kathmandu",
+    "beginner yoga Baneshwor",
+    "yoga for beginners New Baneshwor",
     "beginner yoga Nepal",
     "yoga classes for beginners",
     "gentle yoga Kathmandu",
     "first yoga class",
     "how to start yoga",
     "Hatha yoga beginners Nepal",
-    "yoga for stiff bodies",
   ],
   alternates: { canonical: "https://yogmandu.com/yoga-for-beginners" },
   openGraph: {
@@ -127,12 +128,12 @@ export default function YogaForBeginnersPage() {
           </p>
           <h1 className="text-5xl md:text-7xl font-light leading-[1.05] mb-8"
             style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>
-            Yoga for <em style={{ color: "#6B2D8B" }}>beginners</em> in Kathmandu
+            Yoga for <em style={{ color: "#6B2D8B" }}>beginners</em> in Baneshwor, Kathmandu
           </h1>
           <p className="text-lg leading-relaxed mb-10 max-w-xl mx-auto" style={{ color: "#4A2E1A", fontWeight: 400 }}>
-            You don't need to be flexible, fit, or experienced. You just need to begin. At Yogmandu,
-            our beginner-friendly classes welcome you exactly as you are — gentle, patient, and
-            taught by Yoga Alliance certified teachers in the heart of Nepal.
+            You don't need to be flexible, fit, or experienced. You just need to begin. At Yogmandu in
+            Mid-Baneshwor — minutes from New Baneshwor — our beginner-friendly classes welcome you exactly
+            as you are: gentle, patient, and taught by Yoga Alliance certified teachers.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/class-schedule"

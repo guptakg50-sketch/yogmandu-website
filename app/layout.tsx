@@ -82,6 +82,17 @@ const localBusinessSchema = {
   },
   openingHours: "Su-Fr 05:30-18:30",
   priceRange: "$$",
+  hasMap: "https://www.google.com/maps?q=31+Miteri+Marg,+Mid-Baneshwor-31,+Kathmandu+44600,+Nepal",
+  areaServed: [
+    { "@type": "Place", name: "New Baneshwor, Kathmandu" },
+    { "@type": "Place", name: "Mid-Baneshwor, Kathmandu" },
+    { "@type": "Place", name: "Old Baneshwor, Kathmandu" },
+    { "@type": "Place", name: "Sinamangal, Kathmandu" },
+    { "@type": "Place", name: "Tinkune, Kathmandu" },
+    { "@type": "Place", name: "Koteshwor, Kathmandu" },
+    { "@type": "Place", name: "Lalitpur" },
+    { "@type": "Place", name: "Kathmandu" },
+  ],
   sameAs: [
     "https://www.facebook.com/yogmandu",
     "https://www.instagram.com/yogmandu",

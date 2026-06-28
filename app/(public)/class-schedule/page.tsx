@@ -7,19 +7,19 @@ import { getActiveSessions, getInstructorMap } from "@/lib/publicData";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: { absolute: "Yoga Classes in Kathmandu — Daily Schedule | Yogmandu" },
+  title: { absolute: "Yoga Classes in Baneshwor, Kathmandu | Yogmandu" },
   description:
-    "Join daily yoga classes in Kathmandu at Yogmandu — Hatha, Vinyasa, Ashtanga, Yin, pranayama & meditation. All levels welcome. See the weekly timetable.",
+    "Daily yoga classes in Baneshwor, Kathmandu — near New Baneshwor. Hatha, Vinyasa, Ashtanga, Yin, pranayama & meditation. All levels welcome. See the timetable.",
   keywords: [
     "yoga classes Kathmandu",
-    "yoga schedule Nepal",
+    "yoga classes Baneshwor",
+    "yoga classes New Baneshwor",
     "yoga timetable Kathmandu",
     "Hatha yoga Kathmandu",
     "Vinyasa class Nepal",
-    "Ashtanga Kathmandu",
-    "sound healing class schedule",
     "morning yoga Kathmandu",
-    "yoga drop-in Nepal",
+    "yoga drop-in Kathmandu",
+    "sound healing class schedule",
   ],
   alternates: { canonical: "https://yogmandu.com/class-schedule" },
   openGraph: {
@@ -140,10 +140,11 @@ export default async function ClassSchedulePage() {
         </p>
         <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(2.5rem,6vw,4rem)",
           fontWeight: 300, color: "#FFFFFF", lineHeight: 1.1, margin: "0 auto 16px", maxWidth: 600 }}>
-          Class <em style={{ color: "#F7941D" }}>Schedule</em>
+          Yoga Classes in <em style={{ color: "#F7941D" }}>Baneshwor</em>
         </h1>
-        <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.8)", maxWidth: 500, margin: "0 auto 28px", lineHeight: 1.7 }}>
-          All classes are held at our Mid-Baneshwor studio in Kathmandu. Drop-ins welcome — no reservation required for most classes.
+        <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.8)", maxWidth: 540, margin: "0 auto 28px", lineHeight: 1.7 }}>
+          All classes are held at our Mid-Baneshwor studio in Kathmandu — minutes from New Baneshwor and a
+          short drive from the airport. Open Sun–Fri, 5:30 AM – 6:30 PM. Drop-ins welcome — no reservation required for most classes.
         </p>
         <Link href="/book?service=private" className="cta-lift" style={{
           display: "inline-block", padding: "0.8rem 2rem", borderRadius: 999,
