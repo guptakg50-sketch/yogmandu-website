@@ -11,6 +11,28 @@ export default function ErrorBoundary({
   unstable_retry: () => void;
 }) {
   useEffect(() => {
+    // Deployment-skew recovery: after a redeploy, an already-open tab holds the
+    // previous build's HTML and tries to lazy-load chunk hashes that no longer
+    // exist → ChunkLoadError. Hard-reload once to pick up the fresh build. A
+    // sessionStorage timestamp guards against a reload loop if the chunk is
+    // genuinely missing (then we fall through to the error UI below).
+    if (typeof window !== "undefined") {
+      const isChunkError =
+        error?.name === "ChunkLoadError" ||
+        /Loading chunk [\w-]+ failed|Loading CSS chunk|dynamically imported module|Importing a module script failed/i.test(
+          error?.message || ""
+        );
+      if (isChunkError) {
+        const KEY = "chunk-reload-ts";
+        const last = Number(sessionStorage.getItem(KEY) || 0);
+        if (Date.now() - last > 10000) {
+          sessionStorage.setItem(KEY, String(Date.now()));
+          window.location.reload();
+          return;
+        }
+      }
+    }
+
     if (typeof window !== "undefined" && "gtag" in window) {
       // Best-effort error reporting to GA4
       try {

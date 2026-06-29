@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PricingSection from "./PricingSection";
 import IntakeMonths from "./IntakeMonths";
+import LotusBackdrop from "@/components/LotusBackdropClient";
 
 export const metadata: Metadata = {
   title: { absolute: "Yoga Teacher Training in Nepal — RYS 200 | Yogmandu" },
@@ -265,9 +266,10 @@ export default function YogaTeacherTrainingPage() {
 
       {/* Beyond 200hr — 300hr Advanced & 500hr Master live inside this page */}
       <section className="py-20 px-6 relative overflow-hidden" style={{ background: "linear-gradient(160deg, #1a0a2e 0%, #3D1560 60%, #1a0a2e 100%)" }}>
+        <LotusBackdrop />
         <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full pointer-events-none"
           style={{ background: "radial-gradient(circle, rgba(247,148,29,0.16) 0%, transparent 70%)" }} />
-        <div className="max-w-5xl mx-auto relative">
+        <div className="max-w-5xl mx-auto relative z-10">
           <div className="text-center mb-12">
             <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#8DC63F" }}>After Your 200hr</p>
             <h2 className="text-3xl md:text-4xl font-light mb-3" style={{ fontFamily: "Cormorant Garamond, serif", color: "#FFFFFF" }}>
