@@ -255,7 +255,7 @@ export default function HomePage() {
           ].map(item => (
             <div
               key={item.href}
-              className="service-card"
+              className="service-card card-link"
               style={{
                 padding: "2rem",
                 borderRadius: "1.25rem",

@@ -142,7 +142,7 @@ function PricingCard({ tier }: { tier: Tier }) {
       ref={cardRef}
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
-      className="ytt-card relative rounded-3xl overflow-hidden"
+      className="ytt-card card-link relative rounded-3xl overflow-hidden"
       style={{
         background:    "rgba(255,255,255,0.78)",
         backdropFilter: "blur(12px)",

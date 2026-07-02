@@ -422,7 +422,7 @@ export default function SoundHealingPage() {
             {sessions.map((s) => (
               <div
                 key={s.title}
-                className="lift-3d rounded-3xl p-8 flex flex-col relative"
+                className="lift-3d card-link rounded-3xl p-8 flex flex-col relative"
                 style={{ background: "#FFFFFF", borderTop: `3px solid ${s.color}`, border: `1.5px solid ${s.color}20`, borderTopWidth: 3 }}
               >
                 {/* Whole-card link — the button below stays clickable above it */}
@@ -488,7 +488,7 @@ export default function SoundHealingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {certLevels.map((lvl) => (
               <div key={lvl.level}
-                className="lift-3d rounded-3xl p-8 relative overflow-hidden"
+                className="lift-3d card-link rounded-3xl p-8 relative overflow-hidden"
                 style={{
                   background: "#FFFFFF",
                   border: `1.5px solid ${lvl.color}33`,

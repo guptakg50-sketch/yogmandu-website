@@ -197,7 +197,7 @@ export default function ProgramsSection() {
               style={cardStyle(i)}
               onClick={() => { if (i !== active) setActive(i); }}
             >
-              <div style={{
+              <div className={i === active ? "card-link" : undefined} style={{
                 borderRadius:"1.75rem",
                 overflow:"hidden",
                 background:"#FFFFFF",

@@ -214,7 +214,7 @@ function ServiceCard({ s, idx }: { s: Service; idx: number }) {
       onMouseMove={handleMove}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
-      className="svc-card relative rounded-2xl p-6 flex flex-col h-full overflow-hidden"
+      className="svc-card card-link relative rounded-2xl p-6 flex flex-col h-full overflow-hidden"
       style={{
         background:   "#FFFFFF",
         border:       `1.5px solid ${s.color}1F`,
