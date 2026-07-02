@@ -29,6 +29,7 @@ export const defaultNavConfig = {
     {
       label: "Sound Healing", icon: "🎵",
       items: [
+        { href: "/sound-healing-therapy",               label: "Singing Bowls (Nepal)" },
         { href: "/sound-healing-therapy#sessions",      label: "Sound Healing Sessions" },
         { href: "/sound-healing-therapy#certification", label: "Sound Healing Certification" },
       ],
