@@ -248,6 +248,10 @@ function ServiceCard({ s, idx }: { s: Service; idx: number }) {
           mixBlendMode: "multiply",
         }}
       />
+      {/* Whole-card link — covers the card; the buttons below sit above it */}
+      <Link href={`/book?service=${s.id}`} aria-label={s.title}
+        style={{ position: "absolute", inset: 0, zIndex: 3, borderRadius: "1rem" }} />
+
       {/* corner glow */}
       <div style={{
         position: "absolute", top: 0, right: 0, width: 130, height: 130,
@@ -287,7 +291,7 @@ function ServiceCard({ s, idx }: { s: Service; idx: number }) {
       <p className="text-sm font-light leading-relaxed flex-1 mb-5 relative" style={{ color: "#4A2E1A" }}>
         {s.body}
       </p>
-      <div className="flex flex-wrap gap-2 relative">
+      <div className="flex flex-wrap gap-2 relative" style={{ zIndex: 4 }}>
         <Link href={`/book?service=${s.id}`}
           className="cta-lift svc-cta text-center px-4 py-2 rounded-full text-xs font-medium text-white"
           style={{ background: s.color, boxShadow: `0 6px 18px ${s.color}55` }}>

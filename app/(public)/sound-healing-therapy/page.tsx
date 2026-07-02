@@ -422,9 +422,12 @@ export default function SoundHealingPage() {
             {sessions.map((s) => (
               <div
                 key={s.title}
-                className="lift-3d rounded-3xl p-8 flex flex-col"
+                className="lift-3d rounded-3xl p-8 flex flex-col relative"
                 style={{ background: "#FFFFFF", borderTop: `3px solid ${s.color}`, border: `1.5px solid ${s.color}20`, borderTopWidth: 3 }}
               >
+                {/* Whole-card link — the button below stays clickable above it */}
+                <a href="/book?service=sound" aria-label={s.title}
+                  style={{ position: "absolute", inset: 0, zIndex: 1, borderRadius: "1.5rem" }} />
                 <div className="mb-5">
                   <h3 className="text-2xl font-light mb-1"
                     style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>
@@ -447,7 +450,7 @@ export default function SoundHealingPage() {
                 </p>
                 <a href="/book?service=sound"
                   className="cta-lift text-center px-6 py-3 rounded-full text-sm font-medium text-white"
-                  style={{ background: s.color }}>
+                  style={{ background: s.color, position: "relative", zIndex: 2 }}>
                   Book This Session
                 </a>
               </div>
@@ -500,6 +503,9 @@ export default function SoundHealingPage() {
                   position: "absolute", bottom: -50, left: -50, width: 160, height: 160, borderRadius: "50%",
                   background: `radial-gradient(circle, ${lvl.color}14 0%, transparent 70%)`, pointerEvents: "none",
                 }} />
+                {/* Whole-card link — the Apply button stays clickable above it */}
+                <a href="/book?service=sound" aria-label={`Apply for ${lvl.level}`}
+                  style={{ position: "absolute", inset: 0, zIndex: 3, borderRadius: "1.5rem" }} />
 
                 <div className="flex items-start justify-between mb-5 relative">
                   <div style={{
@@ -558,6 +564,7 @@ export default function SoundHealingPage() {
                   style={{
                     background: `linear-gradient(135deg, ${lvl.color}, ${lvl.color}d0)`,
                     boxShadow: `0 10px 26px ${lvl.color}55`,
+                    zIndex: 4,
                   }}>
                   Apply for {lvl.level} →
                 </a>

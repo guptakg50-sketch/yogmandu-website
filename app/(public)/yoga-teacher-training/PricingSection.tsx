@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef } from "react";
+import Link from "next/link";
 
 type Tier = {
   id:        string;
@@ -168,6 +169,14 @@ function PricingCard({ tier }: { tier: Tier }) {
         borderRadius: 22, padding: "0.6rem 0", zIndex: 1,
       }}>
 
+        {/* Whole-card link — covers the full card; the CTA button sits above it */}
+        <Link
+          href="/book?service=ytt-200"
+          aria-label={`${tier.title} — apply`}
+          style={{ position: "absolute", inset: "-2.2rem -1.9rem", zIndex: 4, borderRadius: 26 }}
+        />
+
+
         {/* Cursor-follow soft glow */}
         <div
           ref={glowRef}
@@ -315,6 +324,7 @@ function PricingCard({ tier }: { tier: Tier }) {
             boxShadow: tier.id === "virtual" ? "none" : `0 10px 28px ${tier.color}55`,
             transition: "transform 0.22s ease, box-shadow 0.22s ease",
             letterSpacing: "0.04em",
+            zIndex: 5,
           }}
         >
           <span style={{ position: "relative", zIndex: 2 }}>

@@ -272,6 +272,9 @@ export default function HomePage() {
                 position: "absolute", top: 0, left: 0, right: 0, height: 3,
                 background: `linear-gradient(90deg, ${item.accent}, ${item.accent}55)`,
               }} />
+              {/* Whole-card link — the CTA below stays clickable above it */}
+              <Link href={item.href} aria-label={item.title}
+                style={{ position: "absolute", inset: 0, zIndex: 1, borderRadius: "1.25rem" }} />
               <span style={{ fontSize: "2rem", display: "block", marginBottom: 12 }}>{item.icon}</span>
               <h2 style={{
                 fontFamily: "Cormorant Garamond, serif",
@@ -293,6 +296,7 @@ export default function HomePage() {
                   borderBottom: `1px solid ${item.accent}40`,
                   paddingBottom: "2px",
                   transition: "gap 0.3s ease",
+                  position: "relative", zIndex: 2,
                 }}
               >
                 {item.cta}

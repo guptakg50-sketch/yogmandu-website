@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import CookieConsent from "@/components/CookieConsent";
+import { MAP_LINK } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -82,7 +83,7 @@ const localBusinessSchema = {
   },
   openingHours: "Su-Fr 05:30-18:30",
   priceRange: "$$",
-  hasMap: "https://www.google.com/maps?q=31+Miteri+Marg,+Mid-Baneshwor-31,+Kathmandu+44600,+Nepal",
+  hasMap: MAP_LINK,
   areaServed: [
     { "@type": "Place", name: "New Baneshwor, Kathmandu" },
     { "@type": "Place", name: "Mid-Baneshwor, Kathmandu" },

@@ -4,15 +4,64 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 type NavUser = { full_name: string; avatar_url: string } | null;
+type ServiceLeaf = { href: string; label: string };
+type ServiceGroup = { label: string; icon: string; items: ServiceLeaf[] };
 
 const DEFAULT_CONFIG = {
-  services: [
-    { href: "/class-schedule",        label: "Class Schedule",          icon: "🗓", desc: "Weekly yoga class timetable" },
-    { href: "/yoga-teacher-training", label: "200 & 300hr Teacher Training", icon: "🧘", desc: "Yoga Alliance RYS 200 & 300 certified" },
-    { href: "/sound-healing-therapy#sessions",      label: "Sound Healing Sessions", icon: "🎵", desc: "Individual & group sessions" },
-    { href: "/sound-healing-therapy#certification", label: "Sound Healing Cert.",    icon: "📜", desc: "Level I & II certification" },
-    { href: "/services",              label: "All Services",            icon: "✨", desc: "Yoga, retreats, therapy, corporate & more" },
-  ],
+  // Two-level Services menu: each category opens a flyout of its services.
+  serviceGroups: [
+    {
+      label: "Yoga Classes", icon: "🧘",
+      items: [
+        { href: "/class-schedule",       label: "Class Schedule" },
+        { href: "/yoga-for-beginners",   label: "Yoga for Beginners" },
+        { href: "/book?service=drop-in", label: "Drop-In Sessions" },
+        { href: "/book?service=virtual", label: "Virtual Live Yoga" },
+        { href: "/book?service=private", label: "Private Classes" },
+        { href: "/book?service=home",    label: "Yoga at Home" },
+      ],
+    },
+    {
+      label: "Teacher Training", icon: "📜",
+      items: [
+        { href: "/yoga-teacher-training", label: "200hr Teacher Training" },
+        { href: "/yoga-teacher-training", label: "300hr Advanced Training" },
+      ],
+    },
+    {
+      label: "Sound Healing", icon: "🎵",
+      items: [
+        { href: "/sound-healing-therapy#sessions",      label: "Sound Healing Sessions" },
+        { href: "/sound-healing-therapy#certification", label: "Sound Healing Certification" },
+      ],
+    },
+    {
+      label: "Retreats & Special", icon: "⛰",
+      items: [
+        { href: "/yoga-retreat-nepal",     label: "Yoga Retreat" },
+        { href: "/book?service=bootcamp",  label: "Weight Loss Bootcamp" },
+        { href: "/book?service=corporate", label: "Corporate Yoga" },
+        { href: "/book?service=trekking",  label: "Yoga Trekking" },
+      ],
+    },
+    {
+      label: "Therapy & Wellness", icon: "🌿",
+      items: [
+        { href: "/book?service=therapy", label: "Yoga Therapy" },
+        { href: "/book?service=reiki",   label: "Reiki Healing" },
+        { href: "/book?service=diet",    label: "Diet Consultation" },
+      ],
+    },
+    {
+      label: "For Specific Groups", icon: "🌱",
+      items: [
+        { href: "/book?service=prenatal", label: "Prenatal & Postnatal" },
+        { href: "/book?service=children", label: "Children's Yoga" },
+        { href: "/book?service=seniors",  label: "Senior Citizens" },
+        { href: "/book?service=school",   label: "School Programs" },
+      ],
+    },
+  ] as ServiceGroup[],
   leftLinks:    [{ href: "/about", label: "About" }, { href: "/gallery", label: "Gallery" }],
   rightLinks:   [{ href: "/blog", label: "Blog" }, { href: "/contact", label: "Contact" }],
   youtubeUrl:   "https://www.youtube.com/@yogmandu",
@@ -26,6 +75,8 @@ export default function Nav() {
   const [scrolled, setScrolled]     = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [openGroup, setOpenGroup]   = useState<string | null>(null);   // desktop flyout
+  const [mobileGroup, setMobileGroup] = useState<string | null>(null); // mobile accordion
   const [navUser, setNavUser]       = useState<NavUser>(undefined as unknown as NavUser);
   const pathname  = usePathname();
   const dropdownRef = useRef<HTMLLIElement>(null);
@@ -33,7 +84,16 @@ export default function Nav() {
   useEffect(() => {
     fetch("/api/admin/site-config")
       .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data?.nav) setCfg(prev => ({ ...prev, ...data.nav })); })
+      .then(data => {
+        if (!data?.nav) return;
+        setCfg(prev => {
+          const next = { ...prev, ...data.nav };
+          // Tolerate a stale remote config that lacks the new grouped shape.
+          if (!Array.isArray(next.serviceGroups) || next.serviceGroups.length === 0)
+            next.serviceGroups = prev.serviceGroups;
+          return next;
+        });
+      })
       .catch(() => {});
   }, []);
 
@@ -53,12 +113,16 @@ export default function Nav() {
 
   useEffect(() => {
     const h = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node))
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setServicesOpen(false);
+        setOpenGroup(null);
+      }
     };
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
   }, []);
+
+  const closeAll = () => { setServicesOpen(false); setOpenGroup(null); };
 
   const navBg = {
     background: "#FFFFFF",
@@ -79,7 +143,7 @@ export default function Nav() {
           <ul className="flex items-center gap-6 text-sm font-light">
             <li ref={dropdownRef} style={{ position: "relative" }}>
               <button
-                onClick={() => setServicesOpen(!servicesOpen)}
+                onClick={() => setServicesOpen(o => !o)}
                 style={{
                   display: "flex", alignItems: "center", gap: 4,
                   color: servicesOpen ? "#F7941D" : "#2A1208",
@@ -98,30 +162,82 @@ export default function Nav() {
               {servicesOpen && (
                 <div style={{
                   position: "absolute", top: "calc(100% + 14px)", left: "-8px",
-                  width: 295, background: "#FFFFFF",
+                  width: 260, background: "#FFFFFF",
                   border: "1px solid rgba(107,45,139,0.14)", borderRadius: "1rem",
                   boxShadow: "0 20px 60px rgba(42,18,8,0.14), 0 4px 16px rgba(107,45,139,0.08)",
-                  padding: "0.6rem", zIndex: 200,
+                  padding: "0.5rem", zIndex: 200,
                 }}>
                   <div style={{
                     position: "absolute", top: -6, left: 24, width: 12, height: 12,
                     background: "#FFFFFF", border: "1px solid rgba(107,45,139,0.14)",
                     transform: "rotate(45deg)", borderBottom: "none", borderRight: "none",
                   }} />
-                  {cfg.services.map((s) => (
-                    <Link key={s.label} href={s.href} onClick={() => setServicesOpen(false)}
-                      style={{ display: "flex", alignItems: "center", gap: 12, padding: "0.6rem 0.8rem",
-                        borderRadius: "0.6rem", textDecoration: "none", transition: "background 0.18s" }}
-                      onMouseEnter={e => (e.currentTarget.style.background = "rgba(247,148,29,0.07)")}
-                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-                    >
-                      <span style={{ fontSize: "1.05rem", lineHeight: 1, flexShrink: 0 }}>{s.icon}</span>
-                      <div>
-                        <div style={{ fontSize: "1rem", fontWeight: 500, color: "#2A1208", lineHeight: 1.2 }}>{s.label}</div>
-                        <div style={{ fontSize: "0.85rem", color: "#7A5840", marginTop: 2 }}>{s.desc}</div>
+
+                  {cfg.serviceGroups.map((g) => {
+                    const isOpen = openGroup === g.label;
+                    return (
+                      <div key={g.label} style={{ position: "relative" }}
+                        onMouseEnter={() => setOpenGroup(g.label)}>
+                        <button
+                          onClick={() => setOpenGroup(o => (o === g.label ? null : g.label))}
+                          style={{
+                            width: "100%", display: "flex", alignItems: "center", gap: 12,
+                            padding: "0.55rem 0.7rem", borderRadius: "0.6rem",
+                            background: isOpen ? "rgba(247,148,29,0.08)" : "transparent",
+                            border: "none", cursor: "pointer", textAlign: "left",
+                            transition: "background 0.18s",
+                          }}
+                        >
+                          <span style={{ fontSize: "1.05rem", lineHeight: 1, flexShrink: 0 }}>{g.icon}</span>
+                          <span style={{ fontSize: "0.95rem", fontWeight: 500, color: "#2A1208", flex: 1 }}>{g.label}</span>
+                          <svg width="10" height="10" viewBox="0 0 12 12" fill="none"
+                            style={{ color: "#9A7860", flexShrink: 0 }}>
+                            <path d="M4 2l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </button>
+
+                        {/* second-level flyout */}
+                        {isOpen && (
+                          <div style={{
+                            position: "absolute", top: -8, left: "100%", marginLeft: 8,
+                            width: 250, background: "#FFFFFF",
+                            border: "1px solid rgba(107,45,139,0.14)", borderRadius: "0.9rem",
+                            boxShadow: "0 20px 60px rgba(42,18,8,0.16), 0 4px 16px rgba(107,45,139,0.08)",
+                            padding: "0.5rem", zIndex: 210,
+                          }}>
+                            {g.items.map((s) => (
+                              <Link key={s.label} href={s.href} onClick={closeAll}
+                                style={{
+                                  display: "block", padding: "0.5rem 0.75rem", borderRadius: "0.55rem",
+                                  fontSize: "0.9rem", fontWeight: 400, color: "#3D2515",
+                                  textDecoration: "none", transition: "background 0.18s",
+                                }}
+                                onMouseEnter={e => (e.currentTarget.style.background = "rgba(247,148,29,0.09)")}
+                                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                              >
+                                {s.label}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    </Link>
-                  ))}
+                    );
+                  })}
+
+                  {/* All services */}
+                  <Link href="/services" onClick={closeAll}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 12, marginTop: 4,
+                      padding: "0.6rem 0.7rem", borderRadius: "0.6rem",
+                      borderTop: "1px solid rgba(42,18,8,0.07)",
+                      textDecoration: "none", transition: "background 0.18s",
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(247,148,29,0.07)"; setOpenGroup(null); }}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                  >
+                    <span style={{ fontSize: "1.05rem", lineHeight: 1, flexShrink: 0 }}>✨</span>
+                    <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "#6B2D8B" }}>All Services →</span>
+                  </Link>
                 </div>
               )}
             </li>
@@ -241,18 +357,52 @@ export default function Nav() {
 
       {/* ── Mobile menu ── */}
       {mobileOpen && (
-        <div className="md:hidden px-6 pb-6" style={{ background: "#FFFFFF", borderTop: "1px solid rgba(247,148,29,0.12)" }}>
+        <div className="md:hidden px-6 pb-6" style={{ background: "#FFFFFF", borderTop: "1px solid rgba(247,148,29,0.12)", maxHeight: "calc(100vh - 68px)", overflowY: "auto" }}>
           <div style={{ paddingTop: "0.75rem", paddingBottom: "0.5rem", borderBottom: "1px solid rgba(42,18,8,0.07)" }}>
             <p style={{ fontSize: "0.95rem", letterSpacing: "0.24em", textTransform: "uppercase",
               color: "#F7941D", marginBottom: 8, fontWeight: 500 }}>Services</p>
-            {cfg.services.map((s) => (
-              <Link key={s.label} href={s.href} className="block py-2.5"
-                style={{ color: pathname === s.href ? "#F7941D" : "#2A1208", fontSize: "0.9rem",
-                  textDecoration: "none", fontWeight: 400 }}
-                onClick={() => setMobileOpen(false)}>
-                {s.icon} {s.label}
-              </Link>
-            ))}
+
+            {cfg.serviceGroups.map((g) => {
+              const isOpen = mobileGroup === g.label;
+              return (
+                <div key={g.label} style={{ borderBottom: "1px solid rgba(42,18,8,0.05)" }}>
+                  <button
+                    onClick={() => setMobileGroup(o => (o === g.label ? null : g.label))}
+                    style={{
+                      width: "100%", display: "flex", alignItems: "center", gap: 10,
+                      padding: "0.7rem 0", background: "none", border: "none",
+                      cursor: "pointer", textAlign: "left",
+                    }}
+                  >
+                    <span style={{ fontSize: "1rem" }}>{g.icon}</span>
+                    <span style={{ flex: 1, fontSize: "0.92rem", fontWeight: 500, color: "#2A1208" }}>{g.label}</span>
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
+                      style={{ color: "#9A7860", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.25s" }}>
+                      <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                  {isOpen && (
+                    <div style={{ paddingBottom: "0.4rem" }}>
+                      {g.items.map((s) => (
+                        <Link key={s.label} href={s.href}
+                          className="block py-2"
+                          style={{ paddingLeft: 26, color: pathname === s.href ? "#F7941D" : "#4A2E1A",
+                            fontSize: "0.88rem", textDecoration: "none", fontWeight: 400 }}
+                          onClick={() => setMobileOpen(false)}>
+                          {s.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            <Link href="/services" className="block py-2.5"
+              style={{ color: "#6B2D8B", fontSize: "0.9rem", fontWeight: 600, textDecoration: "none" }}
+              onClick={() => setMobileOpen(false)}>
+              ✨ All Services →
+            </Link>
           </div>
 
           {[...cfg.leftLinks, ...cfg.rightLinks].map((l) => (
