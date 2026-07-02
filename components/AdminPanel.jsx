@@ -2277,12 +2277,40 @@ function AdminWorkspace({ onLogout }) {
    Site Layout Manager  (Nav + Footer editor)
 ───────────────────────────────────────────── */
 const DEFAULT_NAV = {
-  services: [
-    { href: "/class-schedule",        label: "Class Schedule",          icon: "🗓", desc: "Weekly yoga class timetable" },
-    { href: "/yoga-teacher-training", label: "200hr Teacher Training",  icon: "🧘", desc: "Yoga Alliance RYS 200 certified" },
-    { href: "/yoga-teacher-training", label: "300hr Advanced Training", icon: "⭐", desc: "Yoga Alliance RYS 300 certified" },
-    { href: "/sound-healing-therapy", label: "Sound Healing Sessions",  icon: "🎵", desc: "Individual & group sessions" },
-    { href: "/sound-healing-therapy", label: "Sound Healing Cert.",     icon: "📜", desc: "Become a certified practitioner" },
+  serviceGroups: [
+    { label: "Yoga Classes", icon: "🧘", items: [
+      { href: "/class-schedule",       label: "Class Schedule" },
+      { href: "/yoga-for-beginners",   label: "Yoga for Beginners" },
+      { href: "/book?service=drop-in", label: "Drop-In Sessions" },
+      { href: "/book?service=virtual", label: "Virtual Live Yoga" },
+      { href: "/book?service=private", label: "Private Classes" },
+      { href: "/book?service=home",    label: "Yoga at Home" },
+    ]},
+    { label: "Teacher Training", icon: "📜", items: [
+      { href: "/yoga-teacher-training", label: "200hr Teacher Training" },
+      { href: "/yoga-teacher-training", label: "300hr Advanced Training" },
+    ]},
+    { label: "Sound Healing", icon: "🎵", items: [
+      { href: "/sound-healing-therapy#sessions",      label: "Sound Healing Sessions" },
+      { href: "/sound-healing-therapy#certification", label: "Sound Healing Certification" },
+    ]},
+    { label: "Retreats & Special", icon: "⛰", items: [
+      { href: "/yoga-retreat-nepal",     label: "Yoga Retreat" },
+      { href: "/book?service=bootcamp",  label: "Weight Loss Bootcamp" },
+      { href: "/book?service=corporate", label: "Corporate Yoga" },
+      { href: "/book?service=trekking",  label: "Yoga Trekking" },
+    ]},
+    { label: "Therapy & Wellness", icon: "🌿", items: [
+      { href: "/book?service=therapy", label: "Yoga Therapy" },
+      { href: "/book?service=reiki",   label: "Reiki Healing" },
+      { href: "/book?service=diet",    label: "Diet Consultation" },
+    ]},
+    { label: "For Specific Groups", icon: "🌱", items: [
+      { href: "/book?service=prenatal", label: "Prenatal & Postnatal" },
+      { href: "/book?service=children", label: "Children's Yoga" },
+      { href: "/book?service=seniors",  label: "Senior Citizens" },
+      { href: "/book?service=school",   label: "School Programs" },
+    ]},
   ],
   leftLinks:    [{ href: "/about", label: "About" }, { href: "/gallery", label: "Gallery" }],
   rightLinks:   [{ href: "/blog",  label: "Blog"  }, { href: "/contact", label: "Contact" }],
@@ -2352,6 +2380,55 @@ function LinkListEditor({ label, value, onChange, withIcon = false, withDesc = f
             )}
           </div>
           <Button variant="ghost" className="h-8 w-8 p-0 text-red-400 hover:text-red-600" onClick={() => remove(i)}><Trash2 size={14} /></Button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Two-level editor for the nested Services dropdown: categories (label + icon),
+// each holding a list of service links. Keeps the whole menu admin-editable.
+function ServiceGroupsEditor({ value, onChange }) {
+  const groups = Array.isArray(value) ? value : [];
+  const updateGroup = (gi, key, val) =>
+    onChange(groups.map((g, idx) => (idx === gi ? { ...g, [key]: val } : g)));
+  const updateItems = (gi, items) =>
+    onChange(groups.map((g, idx) => (idx === gi ? { ...g, items } : g)));
+  const removeGroup = (gi) => {
+    if (confirm("Remove this whole category and its links?"))
+      onChange(groups.filter((_, idx) => idx !== gi));
+  };
+  const moveGroup = (gi, dir) => {
+    const j = gi + dir;
+    if (j < 0 || j >= groups.length) return;
+    const next = [...groups];
+    [next[gi], next[j]] = [next[j], next[gi]];
+    onChange(next);
+  };
+  const addGroup = () =>
+    onChange([...groups, { label: "New Category", icon: "✨", items: [{ href: "/services", label: "New Service" }] }]);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-xs font-semibold uppercase tracking-wide text-stone-500">Services Dropdown (categories → links)</span>
+        <Button variant="secondary" className="h-7 px-2 text-xs" onClick={addGroup}><Plus size={12} /> Add Category</Button>
+      </div>
+      {groups.length === 0 && (
+        <div className="rounded-lg border border-dashed border-stone-300 p-4 text-center text-xs text-stone-500">No categories yet. Click &ldquo;Add Category&rdquo;.</div>
+      )}
+      {groups.map((g, gi) => (
+        <div key={gi} className="rounded-lg border border-stone-300 bg-white p-3 space-y-3">
+          <div className="flex gap-2 items-center">
+            <TextInput className="w-12 text-center text-lg p-1" value={g.icon || ""} onChange={e => updateGroup(gi, "icon", e.target.value)} placeholder="✨" />
+            <TextInput className="flex-1 font-medium" value={g.label || ""} onChange={e => updateGroup(gi, "label", e.target.value)} placeholder="Category name" />
+            <Button variant="ghost" className="h-8 w-8 p-0" onClick={() => moveGroup(gi, -1)} disabled={gi === 0} title="Move up">↑</Button>
+            <Button variant="ghost" className="h-8 w-8 p-0" onClick={() => moveGroup(gi, 1)} disabled={gi === groups.length - 1} title="Move down">↓</Button>
+            <Button variant="ghost" className="h-8 w-8 p-0 text-red-400 hover:text-red-600" onClick={() => removeGroup(gi)}><Trash2 size={14} /></Button>
+          </div>
+          <div className="pl-2 border-l-2 border-stone-100">
+            <LinkListEditor label="Links in this category" value={Array.isArray(g.items) ? g.items : []} onChange={items => updateItems(gi, items)} />
+          </div>
         </div>
       ))}
     </div>
@@ -3040,7 +3117,7 @@ function SiteLayoutManager({ toast }) {
           </div>
 
           <div className="rounded-xl border border-stone-200 bg-stone-50 p-5 space-y-6">
-            <LinkListEditor label="Services Dropdown" value={nav.services} onChange={v => updateNav("services", v)} withIcon withDesc />
+            <ServiceGroupsEditor value={nav.serviceGroups} onChange={v => updateNav("serviceGroups", v)} />
             <LinkListEditor label="Left Nav Links" value={nav.leftLinks}   onChange={v => updateNav("leftLinks",  v)} />
             <LinkListEditor label="Right Nav Links" value={nav.rightLinks}  onChange={v => updateNav("rightLinks", v)} />
           </div>

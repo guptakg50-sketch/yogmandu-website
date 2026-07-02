@@ -5,11 +5,60 @@ const DATA_DIR = join(process.cwd(), "data");
 const CONFIG_PATH = join(DATA_DIR, "site-config.json");
 
 export const defaultNavConfig = {
-  services: [
-    { href: "/class-schedule",        label: "Class Schedule",          icon: "🗓", desc: "Weekly yoga class timetable" },
-    { href: "/yoga-teacher-training", label: "200 & 300hr Teacher Training", icon: "🧘", desc: "Yoga Alliance RYS 200 & 300 certified" },
-    { href: "/sound-healing-therapy", label: "Sound Healing Sessions",  icon: "🎵", desc: "Individual & group sessions" },
-    { href: "/sound-healing-therapy", label: "Sound Healing Cert.",     icon: "📜", desc: "Become a certified practitioner" },
+  // Two-level Services menu: each category (with its own icon) opens a flyout
+  // of service links. Fully editable from the admin → Site Layout → Navigation.
+  serviceGroups: [
+    {
+      label: "Yoga Classes", icon: "🧘",
+      items: [
+        { href: "/class-schedule",       label: "Class Schedule" },
+        { href: "/yoga-for-beginners",   label: "Yoga for Beginners" },
+        { href: "/book?service=drop-in", label: "Drop-In Sessions" },
+        { href: "/book?service=virtual", label: "Virtual Live Yoga" },
+        { href: "/book?service=private", label: "Private Classes" },
+        { href: "/book?service=home",    label: "Yoga at Home" },
+      ],
+    },
+    {
+      label: "Teacher Training", icon: "📜",
+      items: [
+        { href: "/yoga-teacher-training", label: "200hr Teacher Training" },
+        { href: "/yoga-teacher-training", label: "300hr Advanced Training" },
+      ],
+    },
+    {
+      label: "Sound Healing", icon: "🎵",
+      items: [
+        { href: "/sound-healing-therapy#sessions",      label: "Sound Healing Sessions" },
+        { href: "/sound-healing-therapy#certification", label: "Sound Healing Certification" },
+      ],
+    },
+    {
+      label: "Retreats & Special", icon: "⛰",
+      items: [
+        { href: "/yoga-retreat-nepal",     label: "Yoga Retreat" },
+        { href: "/book?service=bootcamp",  label: "Weight Loss Bootcamp" },
+        { href: "/book?service=corporate", label: "Corporate Yoga" },
+        { href: "/book?service=trekking",  label: "Yoga Trekking" },
+      ],
+    },
+    {
+      label: "Therapy & Wellness", icon: "🌿",
+      items: [
+        { href: "/book?service=therapy", label: "Yoga Therapy" },
+        { href: "/book?service=reiki",   label: "Reiki Healing" },
+        { href: "/book?service=diet",    label: "Diet Consultation" },
+      ],
+    },
+    {
+      label: "For Specific Groups", icon: "🌱",
+      items: [
+        { href: "/book?service=prenatal", label: "Prenatal & Postnatal" },
+        { href: "/book?service=children", label: "Children's Yoga" },
+        { href: "/book?service=seniors",  label: "Senior Citizens" },
+        { href: "/book?service=school",   label: "School Programs" },
+      ],
+    },
   ],
   leftLinks: [
     { href: "/about",   label: "About" },
