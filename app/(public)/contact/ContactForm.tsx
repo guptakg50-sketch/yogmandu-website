@@ -1,8 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import Spinner from "@/components/Spinner";
-import { MAP_LINK, MAP_EMBED } from "@/lib/site";
+import { mapLinkFor, mapEmbedFor, DEFAULT_MAP_QUERY } from "@/lib/site";
 
 const programs = [
   "200hr Yoga Teacher Training",
@@ -20,6 +20,18 @@ export default function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState("");
+  const [mapQuery, setMapQuery]   = useState(DEFAULT_MAP_QUERY);
+
+  // Google Maps location is admin-editable (Site Layout → Footer → mapQuery).
+  useEffect(() => {
+    fetch("/api/admin/site-config")
+      .then(r => (r.ok ? r.json() : null))
+      .then(data => { if (data?.footer?.mapQuery) setMapQuery(data.footer.mapQuery); })
+      .catch(() => {});
+  }, []);
+
+  const mapLink  = mapLinkFor(mapQuery);
+  const mapEmbed = mapEmbedFor(mapQuery);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -98,7 +110,7 @@ export default function ContactForm() {
                 value: "Miteri Marg, Mid-Baneshwor-31",
                 sub: "Kathmandu — minutes from New Baneshwor · short drive from Tribhuvan Airport",
                 color: "#6B2D8B",
-                href: MAP_LINK,
+                href: mapLink,
                 icon: (
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B2D8B" strokeWidth="1.5">
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
@@ -223,12 +235,12 @@ export default function ContactForm() {
           <div className="rounded-2xl overflow-hidden" style={{ border: "1.5px solid rgba(107,45,139,0.15)" }}>
             <iframe
               title="Yogmandu yoga studio location — Mid-Baneshwor, Kathmandu"
-              src={MAP_EMBED}
+              src={mapEmbed}
               width="100%" height="380" style={{ border: 0, display: "block" }}
               loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
           </div>
           <div className="text-center mt-6">
-            <a href={MAP_LINK}
+            <a href={mapLink}
               target="_blank" rel="noopener noreferrer"
               className="cta-lift inline-block px-8 py-3.5 rounded-full font-medium text-sm text-white"
               style={{ background: "#6B2D8B" }}>

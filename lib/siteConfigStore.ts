@@ -99,6 +99,9 @@ export const defaultFooterConfig = {
     { icon: "✉️", text: "info@yogmandu.com" },
     { icon: "🕐", text: "Sun–Fri · 5:30–18:30" },
   ],
+  // Google Maps location — a name+address query, or a full Maps URL. Drives the
+  // "Get Directions" link, the footer location link, and the contact-page embed.
+  mapQuery:     "Yogmandu, Miteri Marg, Mid-Baneshwor, Kathmandu",
   youtubeUrl:   "https://www.youtube.com/@yogmandu",
   instagramUrl: "https://instagram.com/yogmandu",
   facebookUrl:  "https://facebook.com/yogmandu",

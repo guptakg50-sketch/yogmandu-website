@@ -2345,6 +2345,7 @@ const DEFAULT_FOOTER = {
     { icon: "✉️", text: "info@yogmandu.com" },
     { icon: "🕐", text: "Sun–Fri · 5:30–18:30" },
   ],
+  mapQuery:     "Yogmandu, Miteri Marg, Mid-Baneshwor, Kathmandu",
   youtubeUrl:   "https://www.youtube.com/@yogmandu",
   instagramUrl: "https://instagram.com/yogmandu",
   facebookUrl:  "https://facebook.com/yogmandu",
@@ -3149,6 +3150,9 @@ function SiteLayoutManager({ toast }) {
             <LinkListEditor label="Programs Links" value={footer.programs} onChange={v => updateFooter("programs", v)} />
             <LinkListEditor label="Company Links"  value={footer.company}  onChange={v => updateFooter("company",  v)} />
             <ContactListEditor value={footer.contact} onChange={v => updateFooter("contact", v)} />
+            <Field label="Google Maps location" hint="Business name + address (e.g. “Yogmandu, Miteri Marg, Mid-Baneshwor, Kathmandu”) — used for the Get Directions link, footer location link, and the contact-page map. You can also paste a full Google Maps link.">
+              <TextInput value={footer.mapQuery || ""} onChange={e => updateFooter("mapQuery", e.target.value)} placeholder="Yogmandu, Miteri Marg, Mid-Baneshwor, Kathmandu" />
+            </Field>
           </div>
 
           <div className="grid gap-4 rounded-xl border border-stone-200 bg-stone-50 p-5 md:grid-cols-2">
