@@ -1,8 +1,10 @@
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
-import { join } from "path";
+import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabaseAdmin";
 
-const DATA_DIR = join(process.cwd(), "data");
-const CONFIG_PATH = join(DATA_DIR, "site-config.json");
+// Nav + footer config lives in a single Supabase row so the admin panel can edit
+// it in production. (Cloudflare Workers have a read-only filesystem, so the old
+// local-file storage always failed to save there.) Falls back to the code
+// defaults below whenever Supabase is unavailable or the row is empty.
+const CONFIG_ID = "singleton";
 
 export const defaultNavConfig = {
   // Two-level Services menu: each category (with its own icon) opens a flyout
@@ -105,20 +107,38 @@ export const defaultFooterConfig = {
   ctaTagline:   "Begin your journey",
 };
 
-export function readSiteConfig() {
+export async function readSiteConfig() {
+  const fallback = { nav: defaultNavConfig, footer: defaultFooterConfig };
+  if (!isSupabaseConfigured) return fallback;
   try {
-    if (existsSync(CONFIG_PATH)) {
-      return JSON.parse(readFileSync(CONFIG_PATH, "utf-8"));
-    }
-  } catch {}
-  return { nav: defaultNavConfig, footer: defaultFooterConfig };
+    const supabase = getSupabaseAdmin();
+    const { data, error } = await supabase
+      .from("yogmandu_site_config")
+      .select("data")
+      .eq("id", CONFIG_ID)
+      .maybeSingle();
+    if (error || !data?.data) return fallback;
+    const cfg = data.data as { nav?: unknown; footer?: unknown };
+    return {
+      nav:    cfg.nav    ?? defaultNavConfig,
+      footer: cfg.footer ?? defaultFooterConfig,
+    };
+  } catch {
+    return fallback;
+  }
 }
 
-export function writeSiteConfig(config: object) {
+export async function writeSiteConfig(config: object): Promise<boolean> {
+  if (!isSupabaseConfigured) return false;
   try {
-    if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-    writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2), "utf-8");
-    return true;
+    const supabase = getSupabaseAdmin();
+    const { error } = await supabase
+      .from("yogmandu_site_config")
+      .upsert(
+        { id: CONFIG_ID, data: config, updated_at: new Date().toISOString() },
+        { onConflict: "id" },
+      );
+    return !error;
   } catch {
     return false;
   }
