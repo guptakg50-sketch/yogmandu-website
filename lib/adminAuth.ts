@@ -73,13 +73,32 @@ export async function clearAdminSessionCookie() {
  * httpOnly + sameSite=lax session cookie already blocks most cross-site abuse;
  * this closes the remaining gap. Returns true when the request is acceptable.
  */
+// Treat a bare apex and its www. subdomain as the same site, and drop any port.
+// This keeps the Origin check meaningful while not falsely blocking the very
+// common www↔apex case behind Cloudflare (which was rejecting all admin saves).
+function normalizeHost(value: string | null | undefined): string {
+  if (!value) return "";
+  return value.trim().toLowerCase().replace(/:\d+$/, "").replace(/^www\./, "");
+}
+
+// Optional explicit allow-list for hosts that legitimately differ from the
+// request Host (e.g. a *.pages.dev preview vs the custom domain). Comma-separated.
+function allowedOriginHosts(): string[] {
+  return (process.env.ADMIN_ALLOWED_ORIGINS || "")
+    .split(",")
+    .map((h) => normalizeHost(h))
+    .filter(Boolean);
+}
+
 export async function isSameOriginRequest() {
   const headerStore = await headers();
   const origin = headerStore.get("origin");
   if (!origin) return true; // no Origin (same-origin navigation / server-to-server)
   const host = headerStore.get("host");
   try {
-    return new URL(origin).host === host;
+    const originHost = normalizeHost(new URL(origin).host);
+    if (originHost === normalizeHost(host)) return true;
+    return allowedOriginHosts().includes(originHost);
   } catch {
     return false;
   }

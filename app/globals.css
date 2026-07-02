@@ -187,6 +187,15 @@ span.text-xs.font-medium {
   border-bottom-color: currentColor !important;
 }
 
+/* Whole-card clickable affordance — underline the title on hover so it's
+   obvious the box is a link. Applied to any card carrying `.card-link`. */
+.card-link { cursor: pointer; }
+.card-link:hover :is(h2, h3) {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+}
+
 /* Cards — white with brown/purple border */
 .card-light {
   background: #FFFFFF;

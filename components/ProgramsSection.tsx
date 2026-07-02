@@ -197,7 +197,7 @@ export default function ProgramsSection() {
               style={cardStyle(i)}
               onClick={() => { if (i !== active) setActive(i); }}
             >
-              <div style={{
+              <div className={i === active ? "card-link" : undefined} style={{
                 borderRadius:"1.75rem",
                 overflow:"hidden",
                 background:"#FFFFFF",
@@ -207,6 +207,11 @@ export default function ProgramsSection() {
                 position:"relative",
                 height:"100%",
               }}>
+                {/* Whole-card link on the active/front card; side cards keep click-to-advance */}
+                {i === active && (
+                  <Link href={card.href} aria-label={card.title}
+                    style={{ position:"absolute", inset:0, zIndex:5, borderRadius:"1.75rem" }} />
+                )}
                 {/* Top stripe */}
                 <div style={{ position:"absolute", top:0, left:0, right:0, height:4,
                   background:`linear-gradient(90deg,${card.accent},${card.accent}55)` }} />
@@ -257,6 +262,7 @@ export default function ProgramsSection() {
                   display:"inline-block", padding:"0.65rem 1.5rem", borderRadius:999,
                   background:card.accent, color:"#fff", fontSize:"1rem", fontWeight:500,
                   boxShadow:`0 8px 24px ${card.shadow}`,
+                  position:"relative", zIndex:6,
                 }}>
                   {card.cta}
                 </Link>
