@@ -7,7 +7,7 @@ import { COMMUTER_TIER, RESIDENTIAL_TIER, ONLINE_TIER } from "./pricingTiers";
 import type { Tier } from "./pricingTiers";
 
 // ── A single 3D tilt pricing card ─────────────────────────────────────
-function PricingCard({ tier }: { tier: Tier }) {
+export function PricingCard({ tier }: { tier: Tier }) {
   const cardRef    = useRef<HTMLDivElement>(null);
   const glowRef    = useRef<HTMLDivElement>(null);
   const priceRef   = useRef<HTMLDivElement>(null);
@@ -88,7 +88,7 @@ function PricingCard({ tier }: { tier: Tier }) {
 
         {/* Whole-card link — covers the full card; the CTA button sits above it */}
         <Link
-          href="/book?service=ytt-200"
+          href={tier.cardHref || "/book?service=ytt-200"}
           aria-label={`${tier.title} — apply`}
           style={{ position: "absolute", inset: "-2.2rem -1.9rem", zIndex: 4, borderRadius: 26 }}
         />

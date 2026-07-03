@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import PricingSection from "./PricingSection";
-import { COMMUTER_TIER } from "./pricingTiers";
+import PricingSection, { PricingCard } from "./PricingSection";
+import { COMMUTER_TIER, PROGRAM_TIERS } from "./pricingTiers";
 import IntakeMonths from "./IntakeMonths";
-import LotusBackdrop from "@/components/LotusBackdropClient";
 
 export const metadata: Metadata = {
   title: { absolute: "Yoga Teacher Training in Nepal — RYS 200 | Yogmandu" },
@@ -273,32 +272,8 @@ export default function YogaTeacherTrainingPage() {
             </p>
             <div className="section-divider mt-6" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { tag: "RYS 200 · Non-Residential", title: "Commuter (200hr)", href: "#pricing", color: "#F7941D",
-                body: "Train by day, stay in your own accommodation in Kathmandu. From USD 600." },
-              { tag: "RYS 200 · Residential",     title: "Residential Full Board (200hr)", href: "/yoga-teacher-training/residential", color: "#6B2D8B",
-                body: "Live-in immersion with accommodation and all organic meals included. USD 1,400." },
-              { tag: "RYS 200 · Online",          title: "Online (200hr)", href: "/yoga-teacher-training/online", color: "#8DC63F",
-                body: "Earn the same RYT 200 from home with live real-time classes. USD 500." },
-              { tag: "RYS 300 · Advanced",        title: "300hr Advanced Training", href: "/yoga-teacher-training/300-hour", color: "#6B2D8B",
-                body: "The next step for certified 200hr teachers — combine for RYT 500." },
-              { tag: "RYS 500 · Master",          title: "500hr Master Training", href: "/yoga-teacher-training/500-hour", color: "#F7941D",
-                body: "Our complete master pathway (200hr + 300hr) for the highest level of teaching." },
-            ].map((p) => (
-              <Link key={p.title} href={p.href} className="card-link group rounded-3xl p-7 relative overflow-hidden flex flex-col"
-                style={{ background: "#FFFFFF", border: `1.5px solid ${p.color}2A`, boxShadow: `0 8px 26px ${p.color}12` }}>
-                <div style={{ position: "absolute", top: -30, right: -30, width: 120, height: 120, borderRadius: "50%",
-                  background: `radial-gradient(circle, ${p.color}18 0%, transparent 70%)`, pointerEvents: "none" }} />
-                <span className="text-[11px] font-semibold tracking-[0.18em] uppercase self-start"
-                  style={{ color: p.color, background: `${p.color}15`, padding: "4px 12px", borderRadius: 99, border: `1px solid ${p.color}40` }}>
-                  {p.tag}
-                </span>
-                <h3 className="text-2xl font-light mt-4 mb-2" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>{p.title}</h3>
-                <p className="text-sm leading-relaxed flex-1" style={{ color: "#4A2E1A" }}>{p.body}</p>
-                <span className="text-sm font-medium mt-4" style={{ color: p.color }}>View program →</span>
-              </Link>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 md:gap-6 pt-8" style={{ perspective: "1500px" }}>
+            {PROGRAM_TIERS.map((tier) => <PricingCard key={tier.id} tier={tier} />)}
           </div>
         </div>
       </section>
@@ -311,96 +286,6 @@ export default function YogaTeacherTrainingPage() {
         title={<>Commuter <em style={{ color: "#6B2D8B" }}>program</em></>}
         subtitle="Train with us by day and stay in your own accommodation in Kathmandu. Prefer to live on-site or study from home? Explore our Residential & Online formats below."
       />
-
-      {/* Other formats — links to the Residential & Online sub-page */}
-      <section className="pb-24 px-6" style={{ background: "#FFF7E8" }}>
-        <div className="max-w-4xl mx-auto -mt-6">
-          <div className="rounded-3xl p-8 md:p-10 relative overflow-hidden"
-            style={{
-              background: "linear-gradient(135deg, #6B2D8B 0%, #4A1E63 100%)",
-              boxShadow: "0 18px 50px rgba(107,45,139,0.3)",
-            }}>
-            <div style={{
-              position: "absolute", top: -40, right: -40, width: 180, height: 180, borderRadius: "50%",
-              background: "radial-gradient(circle, rgba(247,148,29,0.25) 0%, transparent 70%)", pointerEvents: "none",
-            }} />
-            <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-              <div>
-                <p className="text-[11px] tracking-[0.28em] uppercase font-semibold mb-3" style={{ color: "#F7941D" }}>
-                  Two more ways to train
-                </p>
-                <h3 className="text-2xl md:text-3xl font-light mb-2" style={{ fontFamily: "Cormorant Garamond, serif", color: "#FFFFFF" }}>
-                  Residential Full Board &amp; Online
-                </h3>
-                <p className="text-sm max-w-md" style={{ color: "rgba(255,255,255,0.8)" }}>
-                  Live and train on-site with all meals and accommodation included (USD 1,400), or earn the same RYT 200 certificate remotely with live online classes (USD 500).
-                </p>
-              </div>
-              <div className="shrink-0 flex flex-col sm:flex-row gap-3">
-                <Link href="/yoga-teacher-training/residential"
-                  className="cta-lift inline-block text-center px-7 py-3.5 rounded-full font-medium text-sm"
-                  style={{ background: "#F7941D", color: "#2A1208", boxShadow: "0 8px 24px rgba(247,148,29,0.4)" }}>
-                  Residential →
-                </Link>
-                <Link href="/yoga-teacher-training/online"
-                  className="cta-lift inline-block text-center px-7 py-3.5 rounded-full font-medium text-sm"
-                  style={{ background: "rgba(255,255,255,0.14)", color: "#FFFFFF", border: "1.5px solid rgba(255,255,255,0.35)" }}>
-                  Online →
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Beyond 200hr — 300hr Advanced & 500hr Master live inside this page */}
-      <section className="py-20 px-6 relative overflow-hidden" style={{ background: "linear-gradient(160deg, #1a0a2e 0%, #3D1560 60%, #1a0a2e 100%)" }}>
-        <LotusBackdrop />
-        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full pointer-events-none"
-          style={{ background: "radial-gradient(circle, rgba(247,148,29,0.16) 0%, transparent 70%)" }} />
-        <div className="max-w-5xl mx-auto relative z-10">
-          <div className="text-center mb-12">
-            <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#8DC63F" }}>After Your 200hr</p>
-            <h2 className="text-3xl md:text-4xl font-light mb-3" style={{ fontFamily: "Cormorant Garamond, serif", color: "#FFFFFF" }}>
-              Continue your journey
-            </h2>
-            <p className="text-sm max-w-xl mx-auto" style={{ color: "rgba(255,255,255,0.75)" }}>
-              Once you complete the 200-hour foundation, you can deepen your practice and teaching with our advanced Yoga Alliance pathways.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[
-              {
-                tag: "RYS 300", title: "300hr Advanced Training",
-                color: "#F7941D", href: "/yoga-teacher-training/300-hour",
-                body: "The next step for certified 200hr teachers — advanced asana, deeper philosophy, anatomy, and refined teaching methodology. Combine your 200hr + 300hr to qualify for Yoga Alliance RYT 500.",
-              },
-              {
-                tag: "RYS 500", title: "500hr Master Training",
-                color: "#8DC63F", href: "/yoga-teacher-training/500-hour",
-                body: "Our complete master pathway (200hr + 300hr) for those committed to teaching at the highest level — a full immersion in classical yoga, therapy, and mentorship.",
-              },
-            ].map((c) => (
-              <Link key={c.title} href={c.href} className="card-link block" style={{
-                background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.14)",
-                borderRadius: "1.25rem", padding: "2rem", backdropFilter: "blur(4px)",
-              }}>
-                <span className="text-[11px] font-semibold tracking-[0.2em] uppercase"
-                  style={{ color: c.color, background: `${c.color}1F`, padding: "4px 12px", borderRadius: 99, border: `1px solid ${c.color}40` }}>
-                  {c.tag}
-                </span>
-                <h3 className="text-2xl font-light mt-4 mb-2" style={{ fontFamily: "Cormorant Garamond, serif", color: "#FFFFFF" }}>
-                  {c.title}
-                </h3>
-                <p className="text-sm leading-relaxed mb-3" style={{ color: "rgba(255,255,255,0.78)" }}>
-                  {c.body}
-                </p>
-                <span className="text-sm font-medium" style={{ color: c.color }}>Explore {c.tag} →</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* 2026 Dates */}
       <section className="py-16 px-6" style={{ background: "#F9F5FF" }}>

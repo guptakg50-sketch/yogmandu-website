@@ -18,7 +18,49 @@ export type Tier = {
   ctaLabel:  string;
   ctaHref:   string;
   featured?: boolean;
+  /** Where the whole card links to (defaults to the 200hr booking flow). */
+  cardHref?: string;
 };
+
+// Program cards for the "all teacher training pathways" hub — same 3D card as
+// the pricing tiers, but each links to its own program page.
+export const PROGRAM_TIERS: Tier[] = [
+  {
+    id: "p-commuter", badge: "Most Popular", badgeColor: "#F7941D", category: "RYS 200 · Non-Residential",
+    title: "Commuter (200hr)", icon: "🚪", price: "USD 600", priceSub: "NPR rates for Nepali citizens",
+    priceNote: "28-day program", color: "#F7941D", featured: true,
+    features: ["Yoga Alliance RYT 200", "Your own accommodation", "Morning & afternoon sessions"],
+    ctaLabel: "See pricing", ctaHref: "/yoga-teacher-training#pricing", cardHref: "/yoga-teacher-training#pricing",
+  },
+  {
+    id: "p-residential", badge: "", badgeColor: "#6B2D8B", category: "RYS 200 · Residential",
+    title: "Residential (200hr)", icon: "🏡", price: "USD 1,400", priceSub: "All-inclusive · full board",
+    priceNote: "USD 200 deposit", color: "#6B2D8B",
+    features: ["25 nights accommodation", "3 organic meals daily", "2 Ayurvedic massages"],
+    ctaLabel: "View program", ctaHref: "/yoga-teacher-training/residential", cardHref: "/yoga-teacher-training/residential",
+  },
+  {
+    id: "p-online", badge: "", badgeColor: "#8DC63F", category: "RYS 200 · Online",
+    title: "Online (200hr)", icon: "💻", price: "USD 500", priceSub: "Live · from anywhere",
+    priceNote: "Same RYT 200 certificate", color: "#8DC63F",
+    features: ["Live real-time classes", "Train from home", "Yoga Alliance RYT 200"],
+    ctaLabel: "View program", ctaHref: "/yoga-teacher-training/online", cardHref: "/yoga-teacher-training/online",
+  },
+  {
+    id: "p-300", badge: "", badgeColor: "#6B2D8B", category: "RYS 300 · Advanced",
+    title: "300hr Advanced", icon: "📜", price: "Advanced", priceSub: "For certified 200hr teachers",
+    priceNote: "Path to RYT 500", color: "#6B2D8B",
+    features: ["Advanced asana & philosophy", "Refined teaching methodology", "Combine for RYT 500"],
+    ctaLabel: "View program", ctaHref: "/yoga-teacher-training/300-hour", cardHref: "/yoga-teacher-training/300-hour",
+  },
+  {
+    id: "p-500", badge: "Highest Level", badgeColor: "#F7941D", category: "RYS 500 · Master",
+    title: "500hr Master", icon: "🏔", price: "USD 2,500", priceSub: "from · master pathway",
+    priceNote: "45-day immersion", color: "#F7941D",
+    features: ["Complete 200 + 300 pathway", "Two certificates", "Highest level of teaching"],
+    ctaLabel: "View program", ctaHref: "/yoga-teacher-training/500-hour", cardHref: "/yoga-teacher-training/500-hour",
+  },
+];
 
 export const COMMUTER_TIER: Tier = {
   id:        "commuter",
