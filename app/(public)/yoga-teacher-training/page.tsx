@@ -292,11 +292,18 @@ export default function YogaTeacherTrainingPage() {
                   Live and train on-site with all meals and accommodation included (USD 1,400), or earn the same RYT 200 certificate remotely with live online classes (USD 500).
                 </p>
               </div>
-              <Link href="/yoga-teacher-training/residential-online"
-                className="cta-lift shrink-0 inline-block text-center px-8 py-3.5 rounded-full font-medium text-sm"
-                style={{ background: "#F7941D", color: "#2A1208", boxShadow: "0 8px 24px rgba(247,148,29,0.4)" }}>
-                View Residential &amp; Online →
-              </Link>
+              <div className="shrink-0 flex flex-col sm:flex-row gap-3">
+                <Link href="/yoga-teacher-training/residential"
+                  className="cta-lift inline-block text-center px-7 py-3.5 rounded-full font-medium text-sm"
+                  style={{ background: "#F7941D", color: "#2A1208", boxShadow: "0 8px 24px rgba(247,148,29,0.4)" }}>
+                  Residential →
+                </Link>
+                <Link href="/yoga-teacher-training/online"
+                  className="cta-lift inline-block text-center px-7 py-3.5 rounded-full font-medium text-sm"
+                  style={{ background: "rgba(255,255,255,0.14)", color: "#FFFFFF", border: "1.5px solid rgba(255,255,255,0.35)" }}>
+                  Online →
+                </Link>
+              </div>
             </div>
           </div>
         </div>

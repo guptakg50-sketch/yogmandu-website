@@ -2316,7 +2316,7 @@ function AdminWorkspace({ onLogout }) {
 ───────────────────────────────────────────── */
 const DEFAULT_NAV = {
   serviceGroups: [
-    { label: "Yoga Classes", icon: "🧘", items: [
+    { label: "Yoga Classes", icon: "🧘", href: "/class-schedule", items: [
       { href: "/class-schedule",       label: "Class Schedule" },
       { href: "/yoga-for-beginners",   label: "Yoga for Beginners" },
       { href: "/book?service=drop-in", label: "Drop-In Sessions" },
@@ -2324,29 +2324,30 @@ const DEFAULT_NAV = {
       { href: "/book?service=private", label: "Private Classes" },
       { href: "/book?service=home",    label: "Yoga at Home" },
     ]},
-    { label: "Teacher Training", icon: "📜", items: [
-      { href: "/yoga-teacher-training",                    label: "Commuter (200hr)" },
-      { href: "/yoga-teacher-training/residential-online", label: "Residential & Online (200hr)" },
-      { href: "/yoga-teacher-training/300-hour",           label: "300hr Advanced Training" },
-      { href: "/yoga-teacher-training/500-hour",           label: "500hr Master Training" },
+    { label: "Teacher Training", icon: "📜", href: "/yoga-teacher-training", items: [
+      { href: "/yoga-teacher-training",             label: "Commuter (200hr)" },
+      { href: "/yoga-teacher-training/residential", label: "Residential (200hr)" },
+      { href: "/yoga-teacher-training/online",      label: "Online (200hr)" },
+      { href: "/yoga-teacher-training/300-hour",    label: "300hr Advanced Training" },
+      { href: "/yoga-teacher-training/500-hour",    label: "500hr Master Training" },
     ]},
-    { label: "Sound Healing", icon: "🎵", items: [
+    { label: "Sound Healing", icon: "🎵", href: "/sound-healing-therapy", items: [
       { href: "/sound-healing-therapy",               label: "Singing Bowls (Nepal)" },
       { href: "/sound-healing-therapy#sessions",      label: "Sound Healing Sessions" },
       { href: "/sound-healing-therapy#certification", label: "Sound Healing Certification" },
     ]},
-    { label: "Retreats & Special", icon: "⛰", items: [
+    { label: "Retreats & Special", icon: "⛰", href: "/yoga-retreat-nepal", items: [
       { href: "/yoga-retreat-nepal",     label: "Yoga Retreat" },
       { href: "/book?service=bootcamp",  label: "Weight Loss Bootcamp" },
       { href: "/book?service=corporate", label: "Corporate Yoga" },
       { href: "/book?service=trekking",  label: "Yoga Trekking" },
     ]},
-    { label: "Therapy & Wellness", icon: "🌿", items: [
+    { label: "Therapy & Wellness", icon: "🌿", href: "/services", items: [
       { href: "/book?service=therapy", label: "Yoga Therapy" },
       { href: "/book?service=reiki",   label: "Reiki Healing" },
       { href: "/book?service=diet",    label: "Diet Consultation" },
     ]},
-    { label: "For Specific Groups", icon: "🌱", items: [
+    { label: "For Specific Groups", icon: "🌱", href: "/services", items: [
       { href: "/book?service=prenatal", label: "Prenatal & Postnatal" },
       { href: "/book?service=children", label: "Children's Yoga" },
       { href: "/book?service=seniors",  label: "Senior Citizens" },
@@ -2468,8 +2469,12 @@ function ServiceGroupsEditor({ value, onChange }) {
             <Button variant="ghost" className="h-8 w-8 p-0" onClick={() => moveGroup(gi, 1)} disabled={gi === groups.length - 1} title="Move down">↓</Button>
             <Button variant="ghost" className="h-8 w-8 p-0 text-red-400 hover:text-red-600" onClick={() => removeGroup(gi)}><Trash2 size={14} /></Button>
           </div>
+          <div className="flex items-center gap-2 pl-2">
+            <span className="text-xs text-stone-500 whitespace-nowrap">Category page (click target):</span>
+            <TextInput className="flex-1 text-xs" value={g.href || ""} onChange={e => updateGroup(gi, "href", e.target.value)} placeholder="/services  — leave blank to just open the flyout" />
+          </div>
           <div className="pl-2 border-l-2 border-stone-100">
-            <LinkListEditor label="Links in this category" value={Array.isArray(g.items) ? g.items : []} onChange={items => updateItems(gi, items)} />
+            <LinkListEditor label="Links in this category (shown on hover)" value={Array.isArray(g.items) ? g.items : []} onChange={items => updateItems(gi, items)} />
           </div>
         </div>
       ))}

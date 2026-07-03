@@ -11,7 +11,7 @@ export const defaultNavConfig = {
   // of service links. Fully editable from the admin → Site Layout → Navigation.
   serviceGroups: [
     {
-      label: "Yoga Classes", icon: "🧘",
+      label: "Yoga Classes", icon: "🧘", href: "/class-schedule",
       items: [
         { href: "/class-schedule",       label: "Class Schedule" },
         { href: "/yoga-for-beginners",   label: "Yoga for Beginners" },
@@ -22,16 +22,17 @@ export const defaultNavConfig = {
       ],
     },
     {
-      label: "Teacher Training", icon: "📜",
+      label: "Teacher Training", icon: "📜", href: "/yoga-teacher-training",
       items: [
-        { href: "/yoga-teacher-training",                     label: "Commuter (200hr)" },
-        { href: "/yoga-teacher-training/residential-online",  label: "Residential & Online (200hr)" },
-        { href: "/yoga-teacher-training/300-hour",            label: "300hr Advanced Training" },
-        { href: "/yoga-teacher-training/500-hour",            label: "500hr Master Training" },
+        { href: "/yoga-teacher-training",             label: "Commuter (200hr)" },
+        { href: "/yoga-teacher-training/residential", label: "Residential (200hr)" },
+        { href: "/yoga-teacher-training/online",      label: "Online (200hr)" },
+        { href: "/yoga-teacher-training/300-hour",    label: "300hr Advanced Training" },
+        { href: "/yoga-teacher-training/500-hour",    label: "500hr Master Training" },
       ],
     },
     {
-      label: "Sound Healing", icon: "🎵",
+      label: "Sound Healing", icon: "🎵", href: "/sound-healing-therapy",
       items: [
         { href: "/sound-healing-therapy",               label: "Singing Bowls (Nepal)" },
         { href: "/sound-healing-therapy#sessions",      label: "Sound Healing Sessions" },
@@ -39,7 +40,7 @@ export const defaultNavConfig = {
       ],
     },
     {
-      label: "Retreats & Special", icon: "⛰",
+      label: "Retreats & Special", icon: "⛰", href: "/yoga-retreat-nepal",
       items: [
         { href: "/yoga-retreat-nepal",     label: "Yoga Retreat" },
         { href: "/book?service=bootcamp",  label: "Weight Loss Bootcamp" },
@@ -48,7 +49,7 @@ export const defaultNavConfig = {
       ],
     },
     {
-      label: "Therapy & Wellness", icon: "🌿",
+      label: "Therapy & Wellness", icon: "🌿", href: "/services",
       items: [
         { href: "/book?service=therapy", label: "Yoga Therapy" },
         { href: "/book?service=reiki",   label: "Reiki Healing" },
@@ -56,7 +57,7 @@ export const defaultNavConfig = {
       ],
     },
     {
-      label: "For Specific Groups", icon: "🌱",
+      label: "For Specific Groups", icon: "🌱", href: "/services",
       items: [
         { href: "/book?service=prenatal", label: "Prenatal & Postnatal" },
         { href: "/book?service=children", label: "Children's Yoga" },

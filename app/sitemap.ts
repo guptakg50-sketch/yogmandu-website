@@ -26,7 +26,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: base,                                    lastModified: mtime("app/(public)/page.tsx"),                       changeFrequency: "weekly",  priority: 1.0 },
     { url: `${base}/yoga-teacher-training`,         lastModified: mtime("app/(public)/yoga-teacher-training/page.tsx"), changeFrequency: "monthly", priority: 0.95 },
-    { url: `${base}/yoga-teacher-training/residential-online`, lastModified: mtime("app/(public)/yoga-teacher-training/residential-online/page.tsx"), changeFrequency: "monthly", priority: 0.85 },
+    { url: `${base}/yoga-teacher-training/residential`, lastModified: mtime("app/(public)/yoga-teacher-training/residential/page.tsx"), changeFrequency: "monthly", priority: 0.85 },
+    { url: `${base}/yoga-teacher-training/online`, lastModified: mtime("app/(public)/yoga-teacher-training/online/page.tsx"), changeFrequency: "monthly", priority: 0.85 },
     { url: `${base}/yoga-teacher-training/300-hour`, lastModified: mtime("app/(public)/yoga-teacher-training/300-hour/page.tsx"), changeFrequency: "monthly", priority: 0.85 },
     { url: `${base}/yoga-teacher-training/500-hour`, lastModified: mtime("app/(public)/yoga-teacher-training/500-hour/page.tsx"), changeFrequency: "monthly", priority: 0.85 },
     { url: `${base}/sound-healing-therapy`,         lastModified: mtime("app/(public)/sound-healing-therapy/page.tsx"), changeFrequency: "monthly", priority: 0.9 },

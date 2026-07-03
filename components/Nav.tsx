@@ -5,13 +5,13 @@ import { usePathname } from "next/navigation";
 
 type NavUser = { full_name: string; avatar_url: string } | null;
 type ServiceLeaf = { href: string; label: string };
-type ServiceGroup = { label: string; icon: string; items: ServiceLeaf[] };
+type ServiceGroup = { label: string; icon: string; href?: string; items: ServiceLeaf[] };
 
 const DEFAULT_CONFIG = {
   // Two-level Services menu: each category opens a flyout of its services.
   serviceGroups: [
     {
-      label: "Yoga Classes", icon: "🧘",
+      label: "Yoga Classes", icon: "🧘", href: "/class-schedule",
       items: [
         { href: "/class-schedule",       label: "Class Schedule" },
         { href: "/yoga-for-beginners",   label: "Yoga for Beginners" },
@@ -22,16 +22,17 @@ const DEFAULT_CONFIG = {
       ],
     },
     {
-      label: "Teacher Training", icon: "📜",
+      label: "Teacher Training", icon: "📜", href: "/yoga-teacher-training",
       items: [
-        { href: "/yoga-teacher-training",                    label: "Commuter (200hr)" },
-        { href: "/yoga-teacher-training/residential-online", label: "Residential & Online (200hr)" },
-        { href: "/yoga-teacher-training/300-hour",           label: "300hr Advanced Training" },
-        { href: "/yoga-teacher-training/500-hour",           label: "500hr Master Training" },
+        { href: "/yoga-teacher-training",             label: "Commuter (200hr)" },
+        { href: "/yoga-teacher-training/residential", label: "Residential (200hr)" },
+        { href: "/yoga-teacher-training/online",      label: "Online (200hr)" },
+        { href: "/yoga-teacher-training/300-hour",    label: "300hr Advanced Training" },
+        { href: "/yoga-teacher-training/500-hour",    label: "500hr Master Training" },
       ],
     },
     {
-      label: "Sound Healing", icon: "🎵",
+      label: "Sound Healing", icon: "🎵", href: "/sound-healing-therapy",
       items: [
         { href: "/sound-healing-therapy",               label: "Singing Bowls (Nepal)" },
         { href: "/sound-healing-therapy#sessions",      label: "Sound Healing Sessions" },
@@ -39,7 +40,7 @@ const DEFAULT_CONFIG = {
       ],
     },
     {
-      label: "Retreats & Special", icon: "⛰",
+      label: "Retreats & Special", icon: "⛰", href: "/yoga-retreat-nepal",
       items: [
         { href: "/yoga-retreat-nepal",     label: "Yoga Retreat" },
         { href: "/book?service=bootcamp",  label: "Weight Loss Bootcamp" },
@@ -48,7 +49,7 @@ const DEFAULT_CONFIG = {
       ],
     },
     {
-      label: "Therapy & Wellness", icon: "🌿",
+      label: "Therapy & Wellness", icon: "🌿", href: "/services",
       items: [
         { href: "/book?service=therapy", label: "Yoga Therapy" },
         { href: "/book?service=reiki",   label: "Reiki Healing" },
@@ -56,7 +57,7 @@ const DEFAULT_CONFIG = {
       ],
     },
     {
-      label: "For Specific Groups", icon: "🌱",
+      label: "For Specific Groups", icon: "🌱", href: "/services",
       items: [
         { href: "/book?service=prenatal", label: "Prenatal & Postnatal" },
         { href: "/book?service=children", label: "Children's Yoga" },
@@ -144,19 +145,14 @@ export default function Nav() {
 
           {/* Left */}
           <ul className="flex items-center gap-6 text-sm font-light">
-            <li ref={dropdownRef} style={{ position: "relative" }}
-              onMouseEnter={() => setServicesOpen(true)}
-              onMouseLeave={() => { setServicesOpen(false); setOpenGroup(null); }}>
-              {/* Hovering opens the flyout to pick an individual service; clicking
-                  "Services" goes to the full all-services page. */}
-              <Link
-                href="/services"
-                onClick={closeAll}
+            <li ref={dropdownRef} style={{ position: "relative" }}>
+              <button
+                onClick={() => setServicesOpen(o => !o)}
                 style={{
                   display: "flex", alignItems: "center", gap: 4,
                   color: servicesOpen ? "#F7941D" : "#2A1208",
                   fontSize: "0.875rem", fontWeight: 400,
-                  textDecoration: "none", cursor: "pointer",
+                  background: "none", border: "none", cursor: "pointer",
                   padding: "2px 0", transition: "color 0.2s",
                 }}
               >
@@ -165,15 +161,15 @@ export default function Nav() {
                   style={{ transform: servicesOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.25s" }}>
                   <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-              </Link>
+              </button>
 
               {servicesOpen && (
-                <div style={{ position: "absolute", top: "100%", left: "-8px", paddingTop: 14, zIndex: 200 }}>
                 <div style={{
-                  width: 260, background: "#FFFFFF", position: "relative",
+                  position: "absolute", top: "calc(100% + 14px)", left: "-8px",
+                  width: 260, background: "#FFFFFF",
                   border: "1px solid rgba(107,45,139,0.14)", borderRadius: "1rem",
                   boxShadow: "0 20px 60px rgba(42,18,8,0.14), 0 4px 16px rgba(107,45,139,0.08)",
-                  padding: "0.5rem",
+                  padding: "0.5rem", zIndex: 200,
                 }}>
                   <div style={{
                     position: "absolute", top: -6, left: 24, width: 12, height: 12,
@@ -183,26 +179,32 @@ export default function Nav() {
 
                   {cfg.serviceGroups.map((g) => {
                     const isOpen = openGroup === g.label;
+                    const headerStyle = {
+                      width: "100%", display: "flex", alignItems: "center", gap: 12,
+                      padding: "0.55rem 0.7rem", borderRadius: "0.6rem",
+                      background: isOpen ? "rgba(247,148,29,0.08)" : "transparent",
+                      border: "none", cursor: "pointer", textAlign: "left" as const,
+                      textDecoration: "none", transition: "background 0.18s",
+                    };
+                    const headerInner = (
+                      <>
+                        <span style={{ fontSize: "1.05rem", lineHeight: 1, flexShrink: 0 }}>{g.icon}</span>
+                        <span style={{ fontSize: "0.95rem", fontWeight: 500, color: "#2A1208", flex: 1 }}>{g.label}</span>
+                        <svg width="10" height="10" viewBox="0 0 12 12" fill="none"
+                          style={{ color: "#9A7860", flexShrink: 0 }}>
+                          <path d="M4 2l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </>
+                    );
                     return (
                       <div key={g.label} style={{ position: "relative" }}
                         onMouseEnter={() => setOpenGroup(g.label)}>
-                        <button
-                          onClick={() => setOpenGroup(o => (o === g.label ? null : g.label))}
-                          style={{
-                            width: "100%", display: "flex", alignItems: "center", gap: 12,
-                            padding: "0.55rem 0.7rem", borderRadius: "0.6rem",
-                            background: isOpen ? "rgba(247,148,29,0.08)" : "transparent",
-                            border: "none", cursor: "pointer", textAlign: "left",
-                            transition: "background 0.18s",
-                          }}
-                        >
-                          <span style={{ fontSize: "1.05rem", lineHeight: 1, flexShrink: 0 }}>{g.icon}</span>
-                          <span style={{ fontSize: "0.95rem", fontWeight: 500, color: "#2A1208", flex: 1 }}>{g.label}</span>
-                          <svg width="10" height="10" viewBox="0 0 12 12" fill="none"
-                            style={{ color: "#9A7860", flexShrink: 0 }}>
-                            <path d="M4 2l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </button>
+                        {/* Click the category → its overview page; hover → the items flyout. */}
+                        {g.href ? (
+                          <Link href={g.href} onClick={closeAll} style={headerStyle}>{headerInner}</Link>
+                        ) : (
+                          <button onClick={() => setOpenGroup(o => (o === g.label ? null : g.label))} style={headerStyle}>{headerInner}</button>
+                        )}
 
                         {/* second-level flyout */}
                         {isOpen && (
@@ -246,7 +248,6 @@ export default function Nav() {
                     <span style={{ fontSize: "1.05rem", lineHeight: 1, flexShrink: 0 }}>✨</span>
                     <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "#6B2D8B" }}>All Services →</span>
                   </Link>
-                </div>
                 </div>
               )}
             </li>
@@ -375,21 +376,30 @@ export default function Nav() {
               const isOpen = mobileGroup === g.label;
               return (
                 <div key={g.label} style={{ borderBottom: "1px solid rgba(42,18,8,0.05)" }}>
-                  <button
-                    onClick={() => setMobileGroup(o => (o === g.label ? null : g.label))}
-                    style={{
-                      width: "100%", display: "flex", alignItems: "center", gap: 10,
-                      padding: "0.7rem 0", background: "none", border: "none",
-                      cursor: "pointer", textAlign: "left",
-                    }}
-                  >
-                    <span style={{ fontSize: "1rem" }}>{g.icon}</span>
-                    <span style={{ flex: 1, fontSize: "0.92rem", fontWeight: 500, color: "#2A1208" }}>{g.label}</span>
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
-                      style={{ color: "#9A7860", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.25s" }}>
-                      <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </button>
+                  {/* Tap the category name → its overview page; tap the chevron → expand items. */}
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    {g.href ? (
+                      <Link href={g.href} onClick={() => setMobileOpen(false)}
+                        style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "0.7rem 0", textDecoration: "none" }}>
+                        <span style={{ fontSize: "1rem" }}>{g.icon}</span>
+                        <span style={{ fontSize: "0.92rem", fontWeight: 500, color: "#2A1208" }}>{g.label}</span>
+                      </Link>
+                    ) : (
+                      <button onClick={() => setMobileGroup(o => (o === g.label ? null : g.label))}
+                        style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "0.7rem 0", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}>
+                        <span style={{ fontSize: "1rem" }}>{g.icon}</span>
+                        <span style={{ fontSize: "0.92rem", fontWeight: 500, color: "#2A1208" }}>{g.label}</span>
+                      </button>
+                    )}
+                    <button onClick={() => setMobileGroup(o => (o === g.label ? null : g.label))}
+                      aria-label={`Show ${g.label} services`}
+                      style={{ padding: "0.7rem 0.4rem", background: "none", border: "none", cursor: "pointer" }}>
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
+                        style={{ color: "#9A7860", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.25s" }}>
+                        <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
                   {isOpen && (
                     <div style={{ paddingBottom: "0.4rem" }}>
                       {g.items.map((s) => (
