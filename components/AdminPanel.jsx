@@ -2287,7 +2287,8 @@ const DEFAULT_NAV = {
       { href: "/book?service=home",    label: "Yoga at Home" },
     ]},
     { label: "Teacher Training", icon: "📜", items: [
-      { href: "/yoga-teacher-training", label: "200hr Teacher Training" },
+      { href: "/yoga-teacher-training",                    label: "200hr Teacher Training" },
+      { href: "/yoga-teacher-training/residential-online", label: "Residential & Online (200hr)" },
       { href: "/yoga-teacher-training", label: "300hr Advanced Training" },
     ]},
     { label: "Sound Healing", icon: "🎵", items: [

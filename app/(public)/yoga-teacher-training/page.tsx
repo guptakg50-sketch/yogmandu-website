@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PricingSection from "./PricingSection";
+import { COMMUTER_TIER } from "./pricingTiers";
 import IntakeMonths from "./IntakeMonths";
 import LotusBackdrop from "@/components/LotusBackdropClient";
 
@@ -52,9 +53,7 @@ const courseSchema = {
     },
   },
   offers: [
-    { "@type": "Offer", priceCurrency: "USD", price: "600",  name: "Non-Residential" },
-    { "@type": "Offer", priceCurrency: "USD", price: "1400", name: "Residential (Full Board)" },
-    { "@type": "Offer", priceCurrency: "USD", price: "500",  name: "Online (Virtual)" },
+    { "@type": "Offer", priceCurrency: "USD", price: "600",  name: "Non-Residential (Commuter)" },
   ],
 };
 
@@ -261,8 +260,47 @@ export default function YogaTeacherTrainingPage() {
         </div>
       </section>
 
-      {/* Pricing — 3D interactive section */}
-      <PricingSection />
+      {/* Pricing — 3D interactive section (Commuter / non-residential format) */}
+      <PricingSection
+        tiers={[COMMUTER_TIER]}
+        eyebrow="Non-Residential Format"
+        title={<>Commuter <em style={{ color: "#6B2D8B" }}>program</em></>}
+        subtitle="Train with us by day and stay in your own accommodation in Kathmandu. Prefer to live on-site or study from home? Explore our Residential & Online formats below."
+      />
+
+      {/* Other formats — links to the Residential & Online sub-page */}
+      <section className="pb-24 px-6" style={{ background: "#FFF7E8" }}>
+        <div className="max-w-4xl mx-auto -mt-6">
+          <div className="rounded-3xl p-8 md:p-10 relative overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, #6B2D8B 0%, #4A1E63 100%)",
+              boxShadow: "0 18px 50px rgba(107,45,139,0.3)",
+            }}>
+            <div style={{
+              position: "absolute", top: -40, right: -40, width: 180, height: 180, borderRadius: "50%",
+              background: "radial-gradient(circle, rgba(247,148,29,0.25) 0%, transparent 70%)", pointerEvents: "none",
+            }} />
+            <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div>
+                <p className="text-[11px] tracking-[0.28em] uppercase font-semibold mb-3" style={{ color: "#F7941D" }}>
+                  Two more ways to train
+                </p>
+                <h3 className="text-2xl md:text-3xl font-light mb-2" style={{ fontFamily: "Cormorant Garamond, serif", color: "#FFFFFF" }}>
+                  Residential Full Board &amp; Online
+                </h3>
+                <p className="text-sm max-w-md" style={{ color: "rgba(255,255,255,0.8)" }}>
+                  Live and train on-site with all meals and accommodation included (USD 1,400), or earn the same RYT 200 certificate remotely with live online classes (USD 500).
+                </p>
+              </div>
+              <Link href="/yoga-teacher-training/residential-online"
+                className="cta-lift shrink-0 inline-block text-center px-8 py-3.5 rounded-full font-medium text-sm"
+                style={{ background: "#F7941D", color: "#2A1208", boxShadow: "0 8px 24px rgba(247,148,29,0.4)" }}>
+                View Residential &amp; Online →
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Beyond 200hr — 300hr Advanced & 500hr Master live inside this page */}
       <section className="py-20 px-6 relative overflow-hidden" style={{ background: "linear-gradient(160deg, #1a0a2e 0%, #3D1560 60%, #1a0a2e 100%)" }}>
@@ -437,7 +475,7 @@ export default function YogaTeacherTrainingPage() {
       <section className="py-20 px-6" style={{ background: "#F9F5FF" }}>
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#6B2D8B" }}>Residential Program</p>
+            <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#6B2D8B" }}>Daily Rhythm</p>
             <h2 className="text-3xl font-light" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>A typical day</h2>
           </div>
           <div style={{ border: "1px solid rgba(107,45,139,0.12)", borderRadius: "1.25rem", overflow: "hidden", background: "#FFFFFF" }}>

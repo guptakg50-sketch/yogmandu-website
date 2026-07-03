@@ -26,6 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: base,                                    lastModified: mtime("app/(public)/page.tsx"),                       changeFrequency: "weekly",  priority: 1.0 },
     { url: `${base}/yoga-teacher-training`,         lastModified: mtime("app/(public)/yoga-teacher-training/page.tsx"), changeFrequency: "monthly", priority: 0.95 },
+    { url: `${base}/yoga-teacher-training/residential-online`, lastModified: mtime("app/(public)/yoga-teacher-training/residential-online/page.tsx"), changeFrequency: "monthly", priority: 0.85 },
     { url: `${base}/sound-healing-therapy`,         lastModified: mtime("app/(public)/sound-healing-therapy/page.tsx"), changeFrequency: "monthly", priority: 0.9 },
     { url: `${base}/class-schedule`,                lastModified: mtime("app/(public)/class-schedule/page.tsx"),        changeFrequency: "weekly",  priority: 0.85 },
     { url: `${base}/yoga-for-beginners`,            lastModified: mtime("app/(public)/yoga-for-beginners/page.tsx"),    changeFrequency: "monthly", priority: 0.8 },

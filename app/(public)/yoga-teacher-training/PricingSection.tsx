@@ -1,93 +1,10 @@
 "use client";
 
 import { useCallback, useRef } from "react";
+import type { ReactNode } from "react";
 import Link from "next/link";
-
-type Tier = {
-  id:        string;
-  badge:     string;
-  badgeColor: string;
-  category:  string;
-  title:     string;
-  icon:      string;
-  price:     string;
-  priceSub:  string;
-  priceNote: string;
-  color:     string;        // accent
-  features:  string[];
-  ctaLabel:  string;
-  ctaHref:   string;
-  featured?: boolean;
-};
-
-const TIERS: Tier[] = [
-  {
-    id:        "commuter",
-    badge:     "Most Popular",
-    badgeColor: "#F7941D",
-    category:  "Non-Residential",
-    title:     "Commuter Program",
-    icon:      "🚪",
-    price:     "USD 600",
-    priceSub:  "NPR 45,000 early bird · NPR 70,000 regular",
-    priceNote: "(Nepalese citizens)",
-    color:     "#F7941D",
-    features: [
-      "Yoga Alliance RYT 200 Certificate",
-      "Yogmandu training manual",
-      "Tea & coffee daily",
-      "28-day program",
-      "Morning & afternoon sessions",
-    ],
-    ctaLabel:  "Apply Now",
-    ctaHref:   "https://wa.me/9779810263277",
-    featured:  true,
-  },
-  {
-    id:        "residential",
-    badge:     "",
-    badgeColor: "#6B2D8B",
-    category:  "Residential",
-    title:     "Full Board Program",
-    icon:      "🏡",
-    price:     "USD 1,400",
-    priceSub:  "USD 200 deposit on booking",
-    priceNote: "+ USD 1,200 due on arrival",
-    color:     "#6B2D8B",
-    features: [
-      "Yoga Alliance RYT 200 Certificate",
-      "Shared accommodation (25 days)",
-      "3 organic vegetarian meals daily",
-      "Unlimited herbal teas",
-      "Shatkarma kit",
-      "2 Ayurvedic massages",
-      "Training manual & notebook",
-    ],
-    ctaLabel:  "Apply Now",
-    ctaHref:   "https://wa.me/9779810263277",
-  },
-  {
-    id:        "virtual",
-    badge:     "",
-    badgeColor: "#8DC63F",
-    category:  "Virtual",
-    title:     "Online Program",
-    icon:      "💻",
-    price:     "USD 500",
-    priceSub:  "NPR 40,000 (Nepali citizens)",
-    priceNote: "Registration via Google Form",
-    color:     "#8DC63F",
-    features: [
-      "Yoga Alliance RYT 200 Certificate",
-      "Live online sessions",
-      "Training manual",
-      "Asanas, Pranayama & bandhas",
-      "Teaching methodology",
-    ],
-    ctaLabel:  "Get Details",
-    ctaHref:   "mailto:info@yogmandu.com",
-  },
-];
+import { COMMUTER_TIER, RESIDENTIAL_TIER, ONLINE_TIER } from "./pricingTiers";
+import type { Tier } from "./pricingTiers";
 
 // ── A single 3D tilt pricing card ─────────────────────────────────────
 function PricingCard({ tier }: { tier: Tier }) {
@@ -344,7 +261,26 @@ function PricingCard({ tier }: { tier: Tier }) {
 }
 
 // ── Section wrapper ───────────────────────────────────────────────────
-export default function PricingSection() {
+type PricingSectionProps = {
+  tiers?:    Tier[];
+  eyebrow?:  string;
+  title?:    ReactNode;
+  subtitle?: ReactNode;
+};
+
+export default function PricingSection({
+  tiers    = [COMMUTER_TIER, RESIDENTIAL_TIER, ONLINE_TIER],
+  eyebrow  = "Choose Your Format",
+  title    = <>Program options &amp; <em style={{ color: "#6B2D8B" }}>pricing</em></>,
+  subtitle = "Three formats, one certification. Pick the rhythm that fits your life — commute, immerse, or train remotely.",
+}: PricingSectionProps = {}) {
+  // Grid adapts to the number of tiers so a single card stays centered and a
+  // pair sits side-by-side instead of stretching across three columns.
+  const gridClass =
+    tiers.length === 1 ? "grid grid-cols-1 max-w-sm mx-auto"
+    : tiers.length === 2 ? "grid grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto gap-7 md:gap-8"
+    : "grid grid-cols-1 md:grid-cols-3 gap-7 md:gap-6";
+
   return (
     <section className="relative py-28 px-6 overflow-hidden"
       style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #FAF3FF 40%, #FFF7E8 100%)" }}>
@@ -466,20 +402,20 @@ export default function PricingSection() {
               boxShadow: "0 0 10px #F7941D", animation: "yttBgPulse 2.4s ease-in-out infinite",
             }} />
             <span className="text-[11px] tracking-[0.28em] uppercase font-semibold"
-              style={{ color: "#B86010" }}>Choose Your Format</span>
+              style={{ color: "#B86010" }}>{eyebrow}</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-light mb-4"
             style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>
-            Program options &amp; <em style={{ color: "#6B2D8B" }}>pricing</em>
+            {title}
           </h2>
           <p className="text-sm font-light max-w-xl mx-auto" style={{ color: "#6B5240" }}>
-            Three formats, one certification. Pick the rhythm that fits your life — commute, immerse, or train remotely.
+            {subtitle}
           </p>
         </div>
 
-        {/* ── 3-card grid ────────────────────────────────────────── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-7 md:gap-6 pt-8" style={{ perspective: "1500px" }}>
-          {TIERS.map((tier) => <PricingCard key={tier.id} tier={tier} />)}
+        {/* ── Card grid (adapts to tier count) ───────────────────── */}
+        <div className={`${gridClass} pt-8`} style={{ perspective: "1500px" }}>
+          {tiers.map((tier) => <PricingCard key={tier.id} tier={tier} />)}
         </div>
       </div>
     </section>
