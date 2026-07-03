@@ -260,7 +260,51 @@ export default function YogaTeacherTrainingPage() {
         </div>
       </section>
 
+      {/* All Teacher Training programs — hub grid (each links to its own page) */}
+      <section className="py-24 px-6" style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #FAF3FF 100%)" }}>
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-14">
+            <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#F7941D" }}>Our Programs</p>
+            <h2 className="text-4xl md:text-5xl font-light" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>
+              All teacher training <em style={{ color: "#6B2D8B" }}>pathways</em>
+            </h2>
+            <p className="text-sm font-light max-w-xl mx-auto mt-4" style={{ color: "#6B5240" }}>
+              Choose the 200-hour format that fits your life, then continue to advanced 300hr and 500hr certification.
+            </p>
+            <div className="section-divider mt-6" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { tag: "RYS 200 · Non-Residential", title: "Commuter (200hr)", href: "#pricing", color: "#F7941D",
+                body: "Train by day, stay in your own accommodation in Kathmandu. From USD 600." },
+              { tag: "RYS 200 · Residential",     title: "Residential Full Board (200hr)", href: "/yoga-teacher-training/residential", color: "#6B2D8B",
+                body: "Live-in immersion with accommodation and all organic meals included. USD 1,400." },
+              { tag: "RYS 200 · Online",          title: "Online (200hr)", href: "/yoga-teacher-training/online", color: "#8DC63F",
+                body: "Earn the same RYT 200 from home with live real-time classes. USD 500." },
+              { tag: "RYS 300 · Advanced",        title: "300hr Advanced Training", href: "/yoga-teacher-training/300-hour", color: "#6B2D8B",
+                body: "The next step for certified 200hr teachers — combine for RYT 500." },
+              { tag: "RYS 500 · Master",          title: "500hr Master Training", href: "/yoga-teacher-training/500-hour", color: "#F7941D",
+                body: "Our complete master pathway (200hr + 300hr) for the highest level of teaching." },
+            ].map((p) => (
+              <Link key={p.title} href={p.href} className="card-link group rounded-3xl p-7 relative overflow-hidden flex flex-col"
+                style={{ background: "#FFFFFF", border: `1.5px solid ${p.color}2A`, boxShadow: `0 8px 26px ${p.color}12` }}>
+                <div style={{ position: "absolute", top: -30, right: -30, width: 120, height: 120, borderRadius: "50%",
+                  background: `radial-gradient(circle, ${p.color}18 0%, transparent 70%)`, pointerEvents: "none" }} />
+                <span className="text-[11px] font-semibold tracking-[0.18em] uppercase self-start"
+                  style={{ color: p.color, background: `${p.color}15`, padding: "4px 12px", borderRadius: 99, border: `1px solid ${p.color}40` }}>
+                  {p.tag}
+                </span>
+                <h3 className="text-2xl font-light mt-4 mb-2" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>{p.title}</h3>
+                <p className="text-sm leading-relaxed flex-1" style={{ color: "#4A2E1A" }}>{p.body}</p>
+                <span className="text-sm font-medium mt-4" style={{ color: p.color }}>View program →</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Pricing — 3D interactive section (Commuter / non-residential format) */}
+      <div id="pricing" />
       <PricingSection
         tiers={[COMMUTER_TIER]}
         eyebrow="Non-Residential Format"
