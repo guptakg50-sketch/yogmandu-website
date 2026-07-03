@@ -30,7 +30,7 @@ export const PROGRAM_TIERS: Tier[] = [
     title: "Commuter (200hr)", icon: "🚪", price: "USD 600", priceSub: "NPR rates for Nepali citizens",
     priceNote: "28-day program", color: "#F7941D", featured: true,
     features: ["Yoga Alliance RYT 200", "Your own accommodation", "Morning & afternoon sessions"],
-    ctaLabel: "See pricing", ctaHref: "/yoga-teacher-training#pricing", cardHref: "/yoga-teacher-training#pricing",
+    ctaLabel: "View program", ctaHref: "/yoga-teacher-training/commuter", cardHref: "/yoga-teacher-training/commuter",
   },
   {
     id: "p-residential", badge: "", badgeColor: "#6B2D8B", category: "RYS 200 · Residential",

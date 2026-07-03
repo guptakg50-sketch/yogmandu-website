@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import PricingSection, { PricingCard } from "./PricingSection";
-import { COMMUTER_TIER, PROGRAM_TIERS } from "./pricingTiers";
+import { PricingCard } from "./PricingSection";
+import { PROGRAM_TIERS } from "./pricingTiers";
 import IntakeMonths from "./IntakeMonths";
 
 export const metadata: Metadata = {
@@ -277,15 +277,6 @@ export default function YogaTeacherTrainingPage() {
           </div>
         </div>
       </section>
-
-      {/* Pricing — 3D interactive section (Commuter / non-residential format) */}
-      <div id="pricing" />
-      <PricingSection
-        tiers={[COMMUTER_TIER]}
-        eyebrow="Non-Residential Format"
-        title={<>Commuter <em style={{ color: "#6B2D8B" }}>program</em></>}
-        subtitle="Train with us by day and stay in your own accommodation in Kathmandu. Prefer to live on-site or study from home? Explore our Residential & Online formats below."
-      />
 
       {/* 2026 Dates */}
       <section className="py-16 px-6" style={{ background: "#F9F5FF" }}>
