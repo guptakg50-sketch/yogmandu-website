@@ -2289,7 +2289,8 @@ const DEFAULT_NAV = {
     { label: "Teacher Training", icon: "📜", items: [
       { href: "/yoga-teacher-training",                    label: "200hr Teacher Training" },
       { href: "/yoga-teacher-training/residential-online", label: "Residential & Online (200hr)" },
-      { href: "/yoga-teacher-training", label: "300hr Advanced Training" },
+      { href: "/yoga-teacher-training/300-hour",           label: "300hr Advanced Training" },
+      { href: "/yoga-teacher-training/500-hour",           label: "500hr Master Training" },
     ]},
     { label: "Sound Healing", icon: "🎵", items: [
       { href: "/sound-healing-therapy",               label: "Singing Bowls (Nepal)" },

@@ -321,16 +321,16 @@ export default function YogaTeacherTrainingPage() {
             {[
               {
                 tag: "RYS 300", title: "300hr Advanced Training",
-                color: "#F7941D",
+                color: "#F7941D", href: "/yoga-teacher-training/300-hour",
                 body: "The next step for certified 200hr teachers — advanced asana, deeper philosophy, anatomy, and refined teaching methodology. Combine your 200hr + 300hr to qualify for Yoga Alliance RYT 500.",
               },
               {
                 tag: "RYS 500", title: "500hr Master Training",
-                color: "#8DC63F",
+                color: "#8DC63F", href: "/yoga-teacher-training/500-hour",
                 body: "Our complete master pathway (200hr + 300hr) for those committed to teaching at the highest level — a full immersion in classical yoga, therapy, and mentorship.",
               },
             ].map((c) => (
-              <div key={c.title} style={{
+              <Link key={c.title} href={c.href} className="card-link block" style={{
                 background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.14)",
                 borderRadius: "1.25rem", padding: "2rem", backdropFilter: "blur(4px)",
               }}>
@@ -341,18 +341,12 @@ export default function YogaTeacherTrainingPage() {
                 <h3 className="text-2xl font-light mt-4 mb-2" style={{ fontFamily: "Cormorant Garamond, serif", color: "#FFFFFF" }}>
                   {c.title}
                 </h3>
-                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.78)" }}>
+                <p className="text-sm leading-relaxed mb-3" style={{ color: "rgba(255,255,255,0.78)" }}>
                   {c.body}
                 </p>
-              </div>
+                <span className="text-sm font-medium" style={{ color: c.color }}>Explore {c.tag} →</span>
+              </Link>
             ))}
-          </div>
-          <div className="text-center mt-10">
-            <a href="https://wa.me/9779810263277" target="_blank" rel="noopener noreferrer"
-              className="cta-lift inline-block px-8 py-3.5 rounded-full font-medium text-sm text-white"
-              style={{ background: "#A65808", boxShadow: "0 6px 20px rgba(247,148,29,0.4)" }}>
-              Ask about 300hr &amp; 500hr
-            </a>
           </div>
         </div>
       </section>
