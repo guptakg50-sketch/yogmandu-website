@@ -883,6 +883,7 @@ function EmptyState({ icon: Icon, title, text, action }) {
 async function uploadFile(event, callback, options = {}) {
   const file = event.target.files?.[0];
   if (!file) return;
+  const report = (msg) => (options.onError ? options.onError(msg) : window.alert(msg));
   try {
     const formData = new FormData();
     formData.append("file", file);
@@ -897,8 +898,16 @@ async function uploadFile(event, callback, options = {}) {
       callback(payload.data.url, payload.data);
       return;
     }
+    // Only fall back to an inline base64 image when storage isn't set up at all
+    // (503, e.g. local dev without Supabase). For any other server error, surface
+    // it — silently embedding a huge data URL used to make later saves fail with
+    // "Request too large".
+    if (response.status !== 503) {
+      report(payload.error || `Upload failed (${response.status}). Please try again.`);
+      return;
+    }
   } catch {
-    // Fall through to local base64 storage for unconfigured development.
+    // Network error — fall through to local base64 storage for offline dev.
   }
   const reader = new FileReader();
   reader.onload = () => callback(reader.result, {
@@ -1402,10 +1411,21 @@ function SessionsManager({ sessions, setSessions, instructors, setInstructors, m
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useReducer((state, patch) => ({ ...state, ...patch }), { type: "All", instructor: "All", level: "All", status: "All", day: "All" });
   const [editing, setEditing] = useState(null);
-  const filtered = sessions.filter((session) => {
+  const matchesFilters = (session) => {
     const instructor = instructors.find((item) => item.id === session.instructorId)?.name || "";
     return (filters.type === "All" || session.type === filters.type) && (filters.instructor === "All" || session.instructorId === filters.instructor) && (filters.level === "All" || session.level === filters.level) && (filters.status === "All" || session.status === filters.status) && (filters.day === "All" || session.days.includes(filters.day)) && `${session.name} ${instructor} ${session.tags.join(" ")}`.toLowerCase().includes(query.toLowerCase());
-  });
+  };
+  // Organise by day of week (Sunday → Saturday), then by start time, so the list
+  // order is stable and predictable — renaming a class never makes it jump.
+  const filtered = sessions.filter(matchesFilters).sort(compareBySchedule);
+
+  // After editing, if the current search/filters would hide the saved session,
+  // clear them so the user never "loses" the class they were just editing.
+  const revealSaved = (saved) => {
+    if (matchesFilters(saved)) return;
+    setQuery("");
+    setFilters({ type: "All", instructor: "All", level: "All", status: "All", day: "All" });
+  };
 
   return (
     <div className="space-y-5">
@@ -1431,7 +1451,7 @@ function SessionsManager({ sessions, setSessions, instructors, setInstructors, m
 
       {tab === "Weekly Schedule" && <WeeklySchedule sessions={sessions} instructors={instructors} onEdit={setEditing} />}
       {tab === "Instructors" && <InstructorsManager instructors={instructors} setInstructors={setInstructors} sessions={sessions} toast={toast} />}
-      {editing && <SessionEditor session={editing} sessions={sessions} setSessions={setSessions} instructors={instructors} media={media} setMedia={setMedia} onClose={() => setEditing(null)} toast={toast} />}
+      {editing && <SessionEditor session={editing} sessions={sessions} setSessions={setSessions} instructors={instructors} media={media} setMedia={setMedia} onClose={() => setEditing(null)} onSaved={revealSaved} toast={toast} />}
     </div>
   );
 }
@@ -1453,6 +1473,23 @@ function SessionsTable({ sessions, instructors, onEdit, setSessions, toast }) {
 
 function SessionsGrid({ sessions, instructors, onEdit }) {
   return <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{sessions.map((session) => <article key={session.id} className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm"><img src={session.image || "https://images.unsplash.com/photo-1545389336-cf090694435e?w=900&auto=format&fit=crop"} alt="" className="h-44 w-full object-cover" /><div className="p-4"><div className="mb-2 flex items-center justify-between"><Badge className={typeColor(session.type)}>{session.type}</Badge><Badge className="bg-stone-100 text-stone-700">{session.status}</Badge></div><h3 className="text-lg font-semibold text-stone-900">{session.name}</h3><p className="mt-1 text-sm text-stone-500">{session.shortDescription}</p><p className="mt-3 text-sm text-stone-600">{instructors.find((item) => item.id === session.instructorId)?.name} - {session.days.join(", ")} {session.startTime}</p><Button className="mt-4 w-full" onClick={() => onEdit(session)}><Edit3 size={16} /> Edit Session</Button></div></article>)}</div>;
+}
+
+// Day-of-week rank (Sunday = 0 … Saturday = 6) for sorting. Accepts short or
+// full day names as stored on sessions (e.g. "Mon" or "Monday").
+const DAY_RANK = { Sun: 0, Sunday: 0, Mon: 1, Monday: 1, Tue: 2, Tuesday: 2, Wed: 3, Wednesday: 3, Thu: 4, Thursday: 4, Fri: 5, Friday: 5, Sat: 6, Saturday: 6 };
+function sessionDayRank(session) {
+  const ranks = (session.days || []).map((d) => DAY_RANK[d]).filter((n) => n != null);
+  return ranks.length ? Math.min(...ranks) : 99; // undated/one-off classes sort last
+}
+// Order sessions by their earliest weekday (Sun→Sat), then start time, then name.
+function compareBySchedule(a, b) {
+  const dr = sessionDayRank(a) - sessionDayRank(b);
+  if (dr !== 0) return dr;
+  const ta = timeToMinutes(a.startTime) ?? 9999;
+  const tb = timeToMinutes(b.startTime) ?? 9999;
+  if (ta !== tb) return ta - tb;
+  return (a.name || "").localeCompare(b.name || "");
 }
 
 // Minutes since midnight from an "HH:MM" (24h) time, or null if unparseable.
@@ -1488,7 +1525,7 @@ function sessionTimeConflicts(draft, sessions) {
   return out;
 }
 
-function SessionEditor({ session, sessions, setSessions, instructors, media, setMedia, onClose, toast }) {
+function SessionEditor({ session, sessions, setSessions, instructors, media, setMedia, onClose, onSaved, toast }) {
   const [draft, setDraft] = useState(session);
   const [tab, setTab] = useState("Basic");
   const exists = sessions.some((item) => item.id === session.id);
@@ -1507,6 +1544,7 @@ function SessionEditor({ session, sessions, setSessions, instructors, media, set
     }
     const next = { ...draft, duration: calculateDuration(draft.startTime, draft.endTime, draft.duration) };
     setSessions(exists ? sessions.map((item) => item.id === next.id ? next : item) : [next, ...sessions]);
+    onSaved?.(next);
     toast(conflicts.length ? "Session saved — note the time overlap" : "Session saved");
     onClose();
   };
@@ -2287,7 +2325,7 @@ const DEFAULT_NAV = {
       { href: "/book?service=home",    label: "Yoga at Home" },
     ]},
     { label: "Teacher Training", icon: "📜", items: [
-      { href: "/yoga-teacher-training",                    label: "200hr Teacher Training" },
+      { href: "/yoga-teacher-training",                    label: "Commuter (200hr)" },
       { href: "/yoga-teacher-training/residential-online", label: "Residential & Online (200hr)" },
       { href: "/yoga-teacher-training/300-hour",           label: "300hr Advanced Training" },
       { href: "/yoga-teacher-training/500-hour",           label: "500hr Master Training" },
@@ -2600,7 +2638,7 @@ function PopupManager({ media = [], setMedia, toast }) {
               <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700">
                 <Upload size={16} /> Upload image
                 <input type="file" accept="image/*" className="hidden"
-                  onChange={(e) => uploadFile(e, (url, item) => { setImageUrl(url); if (item) setMedia([item, ...media]); toast("Image uploaded"); }, { caption: "Popup image" })} />
+                  onChange={(e) => uploadFile(e, (url, item) => { setImageUrl(url); if (item) setMedia([item, ...media]); toast("Image uploaded"); }, { caption: "Popup image", onError: toast })} />
               </label>
               <Button variant="secondary" onClick={() => setPickerOpen(true)}><Image size={16} /> Choose from library</Button>
             </div>

@@ -1,5 +1,3 @@
-import sharp from "sharp";
-
 export interface OptimizedImage {
   /** The bytes to upload (WebP-compressed, or the original if untouched). */
   buffer: Buffer;
@@ -16,16 +14,33 @@ interface Options {
   quality?: number;
 }
 
+// sharp is a native (libvips) module. It works under Node (local dev, cPanel),
+// but it CANNOT load in the Cloudflare Workers runtime — importing it there
+// throws. So we load it lazily and cache the result; if it's unavailable we
+// simply skip optimization and store the original bytes. This keeps uploads
+// working on Workers instead of returning a 500 (which used to make the admin
+// fall back to an oversized base64 data URL and hit the request-size limit).
+type SharpModule = typeof import("sharp");
+let sharpPromise: Promise<SharpModule | null> | null = null;
+
+function loadSharp(): Promise<SharpModule | null> {
+  if (!sharpPromise) {
+    sharpPromise = import("sharp")
+      .then((m) => (m.default ?? m) as SharpModule)
+      .catch(() => null);
+  }
+  return sharpPromise;
+}
+
 /**
- * Compress an uploaded image to a web-optimized WebP using sharp:
- * auto-rotated to its EXIF orientation, downscaled to fit `maxDimension`,
- * metadata stripped. This is how we keep Supabase storage usage low and the
- * site fast no matter how large the source photo is.
+ * Compress an uploaded image to a web-optimized WebP using sharp when it's
+ * available: auto-rotated to its EXIF orientation, downscaled to fit
+ * `maxDimension`, metadata stripped.
  *
- * SVG and (animated) GIF are passed through untouched — converting them to a
- * static WebP would lose their vector/animation behavior. If sharp can't
- * decode the input for any reason, the original bytes are returned so an
- * upload never fails just because optimization didn't apply.
+ * SVG and (animated) GIF are passed through untouched. If sharp is unavailable
+ * (e.g. the Cloudflare Workers runtime) or can't decode the input, the original
+ * bytes are returned so an upload never fails just because optimization didn't
+ * apply.
  */
 export async function optimizeImage(
   input: Buffer,
@@ -34,12 +49,22 @@ export async function optimizeImage(
   { maxDimension = 2000, quality = 80 }: Options = {},
 ): Promise<OptimizedImage> {
   const type = (declaredType || "").toLowerCase();
+
+  const passthrough = (): OptimizedImage => ({
+    buffer: input,
+    contentType: declaredType || "application/octet-stream",
+    extension: (fallbackExt || "bin").toLowerCase(),
+  });
+
   if (type === "image/svg+xml") {
     return { buffer: input, contentType: "image/svg+xml", extension: "svg" };
   }
   if (type === "image/gif") {
     return { buffer: input, contentType: "image/gif", extension: "gif" };
   }
+
+  const sharp = await loadSharp();
+  if (!sharp) return passthrough();
 
   try {
     const buffer = await sharp(input, { failOn: "none" })
@@ -49,10 +74,6 @@ export async function optimizeImage(
       .toBuffer();
     return { buffer, contentType: "image/webp", extension: "webp" };
   } catch {
-    return {
-      buffer: input,
-      contentType: declaredType || "application/octet-stream",
-      extension: (fallbackExt || "bin").toLowerCase(),
-    };
+    return passthrough();
   }
 }

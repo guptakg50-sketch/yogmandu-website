@@ -24,8 +24,10 @@ const DEFAULT_CONFIG = {
     {
       label: "Teacher Training", icon: "📜",
       items: [
-        { href: "/yoga-teacher-training", label: "200hr Teacher Training" },
-        { href: "/yoga-teacher-training", label: "300hr Advanced Training" },
+        { href: "/yoga-teacher-training",                    label: "Commuter (200hr)" },
+        { href: "/yoga-teacher-training/residential-online", label: "Residential & Online (200hr)" },
+        { href: "/yoga-teacher-training/300-hour",           label: "300hr Advanced Training" },
+        { href: "/yoga-teacher-training/500-hour",           label: "500hr Master Training" },
       ],
     },
     {
@@ -142,14 +144,19 @@ export default function Nav() {
 
           {/* Left */}
           <ul className="flex items-center gap-6 text-sm font-light">
-            <li ref={dropdownRef} style={{ position: "relative" }}>
-              <button
-                onClick={() => setServicesOpen(o => !o)}
+            <li ref={dropdownRef} style={{ position: "relative" }}
+              onMouseEnter={() => setServicesOpen(true)}
+              onMouseLeave={() => { setServicesOpen(false); setOpenGroup(null); }}>
+              {/* Hovering opens the flyout to pick an individual service; clicking
+                  "Services" goes to the full all-services page. */}
+              <Link
+                href="/services"
+                onClick={closeAll}
                 style={{
                   display: "flex", alignItems: "center", gap: 4,
                   color: servicesOpen ? "#F7941D" : "#2A1208",
                   fontSize: "0.875rem", fontWeight: 400,
-                  background: "none", border: "none", cursor: "pointer",
+                  textDecoration: "none", cursor: "pointer",
                   padding: "2px 0", transition: "color 0.2s",
                 }}
               >
@@ -158,15 +165,15 @@ export default function Nav() {
                   style={{ transform: servicesOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.25s" }}>
                   <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-              </button>
+              </Link>
 
               {servicesOpen && (
+                <div style={{ position: "absolute", top: "100%", left: "-8px", paddingTop: 14, zIndex: 200 }}>
                 <div style={{
-                  position: "absolute", top: "calc(100% + 14px)", left: "-8px",
-                  width: 260, background: "#FFFFFF",
+                  width: 260, background: "#FFFFFF", position: "relative",
                   border: "1px solid rgba(107,45,139,0.14)", borderRadius: "1rem",
                   boxShadow: "0 20px 60px rgba(42,18,8,0.14), 0 4px 16px rgba(107,45,139,0.08)",
-                  padding: "0.5rem", zIndex: 200,
+                  padding: "0.5rem",
                 }}>
                   <div style={{
                     position: "absolute", top: -6, left: 24, width: 12, height: 12,
@@ -239,6 +246,7 @@ export default function Nav() {
                     <span style={{ fontSize: "1.05rem", lineHeight: 1, flexShrink: 0 }}>✨</span>
                     <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "#6B2D8B" }}>All Services →</span>
                   </Link>
+                </div>
                 </div>
               )}
             </li>
