@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ServiceHub } from "../service/ServiceHub";
+import { RETREATS_HUB } from "../service/hubContent";
 
 export const metadata: Metadata = {
   title: { absolute: "Yoga Retreat in Nepal — Kathmandu & Himalayas | Yogmandu" },
@@ -158,6 +160,9 @@ export default function YogaRetreatNepalPage() {
           </div>
         </div>
       </section>
+
+      {/* Retreats & special programs — service hub (same 3D cards as Teacher Training), up top */}
+      <ServiceHub {...RETREATS_HUB} />
 
       {/* Why Nepal */}
       <section className="py-24 px-6" style={{ background: "#F9F5FF" }}>

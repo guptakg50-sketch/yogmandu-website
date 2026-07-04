@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import SingingBowl from "@/components/SingingBowlClient";
 import StatsOrbs from "@/components/StatsOrbs";
 import CertPrice from "@/components/CertPrice";
+import { ServiceHub } from "../service/ServiceHub";
+import { SOUND_HEALING_HUB } from "../service/hubContent";
 
 export const metadata: Metadata = {
   title: { absolute: "Sound Healing Kathmandu — Tibetan Singing Bowls | Yogmandu" },
@@ -235,6 +237,9 @@ export default function SoundHealingPage() {
           ]}
         />
       </section>
+
+      {/* Sound healing offerings — service hub (same 3D cards as Teacher Training), up top */}
+      <ServiceHub {...SOUND_HEALING_HUB} />
 
       {/* How it works */}
       <section className="py-24 px-6" style={{ background: "#F9F5FF" }}>
