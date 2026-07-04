@@ -51,14 +51,17 @@ export const YOGA_CLASSES_HUB: HubConfig = {
 // ── Sound Healing → /sound-healing-therapy ─────────────────────────────
 export const SOUND_HEALING_HUB: HubConfig = {
   eyebrow: "Sound Healing", title: "Tibetan sound", titleEm: "journeys",
-  subtitle: "Authentic Himalayan singing-bowl therapy — as a relaxing session, or as a certified practitioner path.",
+  subtitle: "Authentic Himalayan singing-bowl therapy — as a relaxing session, or as a two-level certified practitioner course.",
   tiers: [
     card("s-session", "Restorative", "Sound Healing Sessions", "🎵", "From NPR 2,500", "Per session · 60 min",
       "Studio in Kathmandu", P, ["Tibetan singing bowls", "Deep nervous-system reset", "Individual or group"],
       "/sound-healing-therapy/sessions", { badge: "Most Booked", badgeColor: P, featured: true }),
-    card("s-cert", "Practitioner Path", "Sound Healing Certification", "📜", "On request", "Multi-level training",
-      "Certificate on completion", O, ["Learn to play & facilitate", "Theory of sound & chakras", "Practitioner certificate"],
-      "/sound-healing-therapy/certification"),
+    card("s-level1", "Course · Level I", "Course — Level I", "🌱", "20 hours", "Foundational",
+      "Certificate on completion", "#4A6418", ["Bowl history & technique", "Session structure & timing", "Foundational certificate"],
+      "/sound-healing-therapy/course-level-1"),
+    card("s-level2", "Course · Level II", "Course — Level II", "✨", "Advanced", "Level I required",
+      "Certificate on completion", P, ["Chakra mapping & client work", "Trauma-informed facilitation", "Advanced certificate"],
+      "/sound-healing-therapy/course-level-2"),
   ],
 };
 

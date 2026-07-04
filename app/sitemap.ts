@@ -54,7 +54,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/class-schedule/home`,                     lastModified: mtime("app/(public)/class-schedule/home/page.tsx"),                     changeFrequency: "monthly", priority: 0.7 },
 
     { url: `${base}/sound-healing-therapy/sessions`,         lastModified: mtime("app/(public)/sound-healing-therapy/sessions/page.tsx"),          changeFrequency: "monthly", priority: 0.7 },
-    { url: `${base}/sound-healing-therapy/certification`,    lastModified: mtime("app/(public)/sound-healing-therapy/certification/page.tsx"),     changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/sound-healing-therapy/course-level-1`,   lastModified: mtime("app/(public)/sound-healing-therapy/course-level-1/page.tsx"),    changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/sound-healing-therapy/course-level-2`,   lastModified: mtime("app/(public)/sound-healing-therapy/course-level-2/page.tsx"),    changeFrequency: "monthly", priority: 0.7 },
 
     { url: `${base}/yoga-retreat-nepal/weight-loss-bootcamp`, lastModified: mtime("app/(public)/yoga-retreat-nepal/weight-loss-bootcamp/page.tsx"), changeFrequency: "monthly", priority: 0.7 },
     { url: `${base}/yoga-retreat-nepal/corporate-yoga`,      lastModified: mtime("app/(public)/yoga-retreat-nepal/corporate-yoga/page.tsx"),       changeFrequency: "monthly", priority: 0.7 },

@@ -34,9 +34,10 @@ export const defaultNavConfig = {
     {
       label: "Sound Healing", icon: "🎵", href: "/sound-healing-therapy",
       items: [
-        { href: "/sound-healing-therapy",               label: "Singing Bowls (Nepal)" },
-        { href: "/sound-healing-therapy/sessions",      label: "Sound Healing Sessions" },
-        { href: "/sound-healing-therapy/certification", label: "Sound Healing Certification" },
+        { href: "/sound-healing-therapy",                label: "Singing Bowls (Nepal)" },
+        { href: "/sound-healing-therapy/sessions",       label: "Sound Healing Sessions" },
+        { href: "/sound-healing-therapy/course-level-1", label: "Course — Level I" },
+        { href: "/sound-healing-therapy/course-level-2", label: "Course — Level II" },
       ],
     },
     {
