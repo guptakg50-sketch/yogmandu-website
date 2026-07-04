@@ -43,6 +43,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/blog`,                          lastModified: mtime("app/(public)/blog/page.tsx"),                  changeFrequency: "weekly",  priority: 0.7 },
     { url: `${base}/privacy`,                       lastModified: mtime("app/(public)/privacy/page.tsx"),               changeFrequency: "yearly",  priority: 0.3 },
     { url: `${base}/terms`,                         lastModified: mtime("app/(public)/terms/page.tsx"),                 changeFrequency: "yearly",  priority: 0.3 },
+
+    // ── Service category hubs & individual service pages ──
+    { url: `${base}/therapy-wellness`,                        lastModified: mtime("app/(public)/therapy-wellness/page.tsx"),                        changeFrequency: "monthly", priority: 0.8 },
+    { url: `${base}/specialized-yoga`,                        lastModified: mtime("app/(public)/specialized-yoga/page.tsx"),                        changeFrequency: "monthly", priority: 0.8 },
+
+    { url: `${base}/class-schedule/drop-in`,                  lastModified: mtime("app/(public)/class-schedule/drop-in/page.tsx"),                  changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/class-schedule/virtual`,                  lastModified: mtime("app/(public)/class-schedule/virtual/page.tsx"),                  changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/class-schedule/private`,                  lastModified: mtime("app/(public)/class-schedule/private/page.tsx"),                  changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/class-schedule/home`,                     lastModified: mtime("app/(public)/class-schedule/home/page.tsx"),                     changeFrequency: "monthly", priority: 0.7 },
+
+    { url: `${base}/sound-healing-therapy/sessions`,         lastModified: mtime("app/(public)/sound-healing-therapy/sessions/page.tsx"),          changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/sound-healing-therapy/certification`,    lastModified: mtime("app/(public)/sound-healing-therapy/certification/page.tsx"),     changeFrequency: "monthly", priority: 0.7 },
+
+    { url: `${base}/yoga-retreat-nepal/weight-loss-bootcamp`, lastModified: mtime("app/(public)/yoga-retreat-nepal/weight-loss-bootcamp/page.tsx"), changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/yoga-retreat-nepal/corporate-yoga`,      lastModified: mtime("app/(public)/yoga-retreat-nepal/corporate-yoga/page.tsx"),       changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/yoga-retreat-nepal/yoga-trekking`,       lastModified: mtime("app/(public)/yoga-retreat-nepal/yoga-trekking/page.tsx"),        changeFrequency: "monthly", priority: 0.7 },
+
+    { url: `${base}/therapy-wellness/yoga-therapy`,          lastModified: mtime("app/(public)/therapy-wellness/yoga-therapy/page.tsx"),           changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/therapy-wellness/reiki-healing`,         lastModified: mtime("app/(public)/therapy-wellness/reiki-healing/page.tsx"),          changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/therapy-wellness/diet-consultation`,     lastModified: mtime("app/(public)/therapy-wellness/diet-consultation/page.tsx"),      changeFrequency: "monthly", priority: 0.7 },
+
+    { url: `${base}/specialized-yoga/prenatal`,              lastModified: mtime("app/(public)/specialized-yoga/prenatal/page.tsx"),               changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/specialized-yoga/childrens-yoga`,        lastModified: mtime("app/(public)/specialized-yoga/childrens-yoga/page.tsx"),         changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/specialized-yoga/senior-yoga`,           lastModified: mtime("app/(public)/specialized-yoga/senior-yoga/page.tsx"),            changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/specialized-yoga/school-yoga`,           lastModified: mtime("app/(public)/specialized-yoga/school-yoga/page.tsx"),            changeFrequency: "monthly", priority: 0.7 },
   ];
 
   // Dynamically add published blog posts
