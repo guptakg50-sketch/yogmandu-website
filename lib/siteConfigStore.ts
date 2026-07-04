@@ -13,12 +13,12 @@ export const defaultNavConfig = {
     {
       label: "Yoga Classes", icon: "🧘", href: "/class-schedule",
       items: [
-        { href: "/class-schedule",       label: "Class Schedule" },
-        { href: "/yoga-for-beginners",   label: "Yoga for Beginners" },
-        { href: "/book?service=drop-in", label: "Drop-In Sessions" },
-        { href: "/book?service=virtual", label: "Virtual Live Yoga" },
-        { href: "/book?service=private", label: "Private Classes" },
-        { href: "/book?service=home",    label: "Yoga at Home" },
+        { href: "/class-schedule",         label: "Class Schedule" },
+        { href: "/yoga-for-beginners",     label: "Yoga for Beginners" },
+        { href: "/class-schedule/drop-in", label: "Drop-In Sessions" },
+        { href: "/class-schedule/virtual", label: "Virtual Live Yoga" },
+        { href: "/class-schedule/private", label: "Private Classes" },
+        { href: "/class-schedule/home",    label: "Yoga at Home" },
       ],
     },
     {
