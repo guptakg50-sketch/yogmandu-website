@@ -156,6 +156,9 @@ export default async function ClassSchedulePage() {
         </Link>
       </div>
 
+      {/* ── Ways to practise — service hub (same 3D cards as Teacher Training), up top ── */}
+      <ServiceHub {...YOGA_CLASSES_HUB} />
+
       {/* ── Legend ── */}
       <div style={{ background: "#F9F5FF", padding: "1.25rem 2rem", borderBottom: "1px solid rgba(107,45,139,0.1)" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", flexWrap: "wrap", gap: "1.5rem", alignItems: "center" }}>
@@ -177,9 +180,6 @@ export default async function ClassSchedulePage() {
 
       {/* ── Interactive schedule grid (client component) ── */}
       <ScheduleGrid sessions={sessions} instructorMap={instructorMap} />
-
-      {/* ── Ways to practise — service hub (same 3D cards as Teacher Training) ── */}
-      <ServiceHub {...YOGA_CLASSES_HUB} />
     </main>
   );
 }
