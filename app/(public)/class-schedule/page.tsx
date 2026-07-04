@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ScheduleGrid from "./ScheduleGrid";
 import HeroDecor from "./HeroDecor";
+import { ServiceHub } from "../service/ServiceHub";
+import { YOGA_CLASSES_HUB } from "../service/hubContent";
 import { getActiveSessions, getInstructorMap } from "@/lib/publicData";
 
 export const revalidate = 60;
@@ -175,6 +177,9 @@ export default async function ClassSchedulePage() {
 
       {/* ── Interactive schedule grid (client component) ── */}
       <ScheduleGrid sessions={sessions} instructorMap={instructorMap} />
+
+      {/* ── Ways to practise — service hub (same 3D cards as Teacher Training) ── */}
+      <ServiceHub {...YOGA_CLASSES_HUB} />
     </main>
   );
 }

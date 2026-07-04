@@ -1,0 +1,20 @@
+import type { Metadata } from "next";
+import ServicePage from "../../service/ServicePage";
+import { PRIVATE_YOGA } from "../../service/serviceContent";
+
+export const metadata: Metadata = {
+  title: { absolute: "Private One-to-One Yoga Classes in Kathmandu | Yogmandu" },
+  description:
+    "Personalised private yoga classes in Kathmandu — one-to-one attention, a practice built around your body and goals. Studio or at your location.",
+  alternates: { canonical: "https://yogmandu.com/class-schedule/private" },
+  openGraph: {
+    title: "Private Yoga Classes Kathmandu | Yogmandu",
+    description: "One-to-one yoga tailored to you — faster progress with a teacher's full attention. Studio or your location.",
+    url: "https://yogmandu.com/class-schedule/private",
+    images: ["/opengraph-image.png"],
+  },
+};
+
+export default function Page() {
+  return <ServicePage config={PRIVATE_YOGA} />;
+}
