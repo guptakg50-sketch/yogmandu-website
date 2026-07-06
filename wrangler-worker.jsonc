@@ -12,6 +12,12 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  // Persist Worker logs so runtime errors (e.g. the 1102 resource-limit crash)
+  // are actually inspectable via `wrangler tail` and the dashboard Logs tab.
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
   "routes": [
     { "pattern": "yogmandu.com", "custom_domain": true },
     { "pattern": "www.yogmandu.com", "custom_domain": true }
