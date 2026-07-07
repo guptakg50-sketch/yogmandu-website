@@ -36,17 +36,6 @@ const includes = [
   { icon: "🧘", label: "Same curriculum", sub: "Identical to our residential course" },
 ];
 
-const dailySchedule = [
-  { time: "6:30 – 7:45 AM",  activity: "Shatkarma, Mantra Chanting, Pranayama" },
-  { time: "8:00 – 9:30 AM",  activity: "Asana Practice" },
-  { time: "9:30 – 10:30 AM", activity: "Breakfast Break" },
-  { time: "10:30 – 1:00 PM", activity: "Lectures (Philosophy / Anatomy)" },
-  { time: "1:00 – 2:00 PM",  activity: "Lunch Break" },
-  { time: "2:00 – 3:00 PM",  activity: "Self Study" },
-  { time: "3:00 – 4:45 PM",  activity: "Workshop / Teaching Practicum" },
-  { time: "5:00 – 6:30 PM",  activity: "Asana / Meditation Practice" },
-];
-
 const faqs = [
   { q: "What's the difference between the Commuter and Residential programs?", a: "The Commuter (non-residential) course is USD 600 and covers tuition only — you arrange your own accommodation in Kathmandu and commute to the studio each day. The Residential Full Board course includes accommodation and all meals on-site." },
   { q: "Do I need to arrange my own accommodation?", a: "Yes. Many students book a nearby guesthouse or apartment in Mid-Baneshwor — we're happy to recommend affordable options close to the studio." },
@@ -135,25 +124,6 @@ export default function CommuterPage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Daily schedule */}
-      <section className="py-20 px-6" style={{ background: "#F9F5FF" }}>
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#6B2D8B" }}>Daily Rhythm</p>
-            <h2 className="text-3xl font-light" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>A typical day</h2>
-          </div>
-          <div style={{ border: "1px solid rgba(107,45,139,0.12)", borderRadius: "1.25rem", overflow: "hidden", background: "#FFFFFF" }}>
-            {dailySchedule.map((row, i) => (
-              <div key={row.time} style={{ display: "flex", alignItems: "center", gap: 16, padding: "0.85rem 1.5rem", borderBottom: i < dailySchedule.length - 1 ? "1px solid rgba(107,45,139,0.07)" : "none", background: i % 2 === 0 ? "#FFFFFF" : "rgba(107,45,139,0.02)" }}>
-                <span style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "0.95rem", color: "#6B2D8B", minWidth: 130, flexShrink: 0 }}>{row.time}</span>
-                <span style={{ fontSize: "0.88rem", color: "#4A2E1A" }}>{row.activity}</span>
-              </div>
-            ))}
-          </div>
-          <p className="text-xs text-center mt-4" style={{ color: "#9A7860" }}>Evenings are your own — return to your accommodation to rest and self-study.</p>
         </div>
       </section>
 

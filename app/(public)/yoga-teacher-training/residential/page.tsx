@@ -3,7 +3,6 @@ import Link from "next/link";
 import PricingSection from "../PricingSection";
 import { RESIDENTIAL_TIER } from "../pricingTiers";
 import IntakeMonths from "../IntakeMonths";
-import LotusBackdrop from "@/components/LotusBackdropClient";
 
 export const metadata: Metadata = {
   title: { absolute: "Residential Full Board 200hr Yoga Teacher Training — Nepal | Yogmandu" },
@@ -38,16 +37,51 @@ const includes = [
   { icon: "📓", label: "Manual & notebook", sub: "Full Yogmandu curriculum" },
 ];
 
-const residentialDay = [
-  { time: "6:30 – 7:45 AM",  activity: "Shatkarma, Mantra Chanting, Pranayama" },
-  { time: "8:00 – 9:30 AM",  activity: "Asana Practice" },
-  { time: "9:30 – 10:30 AM", activity: "Breakfast" },
-  { time: "10:30 – 1:00 PM", activity: "Lectures" },
-  { time: "1:00 – 2:00 PM",  activity: "Lunch" },
-  { time: "3:00 – 4:45 PM",  activity: "Workshop / Lab Session" },
-  { time: "5:00 – 6:30 PM",  activity: "Asana / Meditation Practice" },
-  { time: "6:30 – 7:30 PM",  activity: "Dinner" },
-  { time: "7:30 – 9:30 PM",  activity: "Self Study" },
+const curriculum = [
+  {
+    title: "Techniques & Practice",
+    color: "#6B2D8B",
+    items: [
+      "Prayer & mantra chanting",
+      "Sukshma vyayama & asanas",
+      "Pranayama, bandha & shatkarma",
+      "Mudras, yoga nidra & meditation",
+      "Alignment & safety guidelines",
+    ],
+  },
+  {
+    title: "Teaching Methodology",
+    color: "#F7941D",
+    items: [
+      "Group dynamics & time management",
+      "Demonstration principles",
+      "Verbal cueing & observation",
+      "Correction techniques",
+      "Teacher qualities & ethics",
+    ],
+  },
+  {
+    title: "Anatomy & Physiology",
+    color: "#8DC63F",
+    items: [
+      "Human body systems",
+      "Bones, joints & muscles",
+      "Spiritual anatomy: chakras & nadis",
+      "Kundalini & pancha kosha",
+      "Yoga therapy foundations",
+    ],
+  },
+  {
+    title: "Philosophy & Ethics",
+    color: "#6B2D8B",
+    items: [
+      "History of yoga",
+      "Patanjali Yoga Sutras",
+      "Karma, bhakti & jnana yoga",
+      "Mantra yoga & Sanskrit",
+      "Ashtanga — the eight limbs",
+    ],
+  },
 ];
 
 const faqs = [
@@ -139,19 +173,46 @@ export default function ResidentialPage() {
         </div>
       </section>
 
-      {/* Daily rhythm */}
-      <section className="py-20 px-6 relative overflow-hidden" style={{ background: "linear-gradient(160deg, #1a0a2e 0%, #3D1560 60%, #1a0a2e 100%)" }}>
-        <LotusBackdrop />
-        <div className="max-w-3xl mx-auto relative z-10">
-          <div className="text-center mb-12">
-            <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#8DC63F" }}>On Campus</p>
-            <h2 className="text-3xl md:text-4xl font-light" style={{ fontFamily: "Cormorant Garamond, serif", color: "#FFFFFF" }}>A day in the residential program</h2>
+      {/* Curriculum */}
+      <section className="py-24 px-6" style={{ background: "#FFFFFF" }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#F7941D" }}>What You Will Learn</p>
+            <h2 className="text-4xl md:text-5xl font-light" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>
+              The curriculum
+            </h2>
+            <div className="section-divider mt-6" />
           </div>
-          <div style={{ border: "1px solid rgba(255,255,255,0.14)", borderRadius: "1.25rem", overflow: "hidden", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(4px)" }}>
-            {residentialDay.map((row, i) => (
-              <div key={row.time} style={{ display: "flex", alignItems: "center", gap: 16, padding: "0.85rem 1.5rem", borderBottom: i < residentialDay.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
-                <span style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "0.95rem", color: "#F7941D", minWidth: 130, flexShrink: 0 }}>{row.time}</span>
-                <span style={{ fontSize: "0.88rem", color: "rgba(255,255,255,0.85)" }}>{row.activity}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {curriculum.map(block => (
+              <div key={block.title} className="lift-3d rounded-2xl p-8 relative overflow-hidden"
+                style={{
+                  background: `linear-gradient(135deg, ${block.color}0C 0%, #F9F5FF 80%)`,
+                  borderLeft: `3px solid ${block.color}`,
+                  border: `1.5px solid ${block.color}22`,
+                  borderLeftWidth: 3,
+                  boxShadow: `0 6px 22px ${block.color}10`,
+                }}>
+                <div style={{
+                  position: "absolute", top: -30, right: -30, width: 110, height: 110, borderRadius: "50%",
+                  background: `radial-gradient(circle, ${block.color}22 0%, transparent 70%)`, pointerEvents: "none",
+                }} />
+                <div className="flex items-center gap-3 mb-4 relative">
+                  <span style={{
+                    width: 6, height: 6, borderRadius: "50%", background: block.color,
+                    boxShadow: `0 0 10px ${block.color}`,
+                  }} />
+                  <p className="text-xs tracking-[0.25em] uppercase font-semibold" style={{ color: block.color }}>{block.title}</p>
+                </div>
+                <ul className="space-y-2 relative">
+                  {block.items.map(item => (
+                    <li key={item} className="text-sm flex items-start gap-2" style={{ color: "#3D2515" }}>
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0"
+                        style={{ background: block.color, boxShadow: `0 0 6px ${block.color}80` }} />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
@@ -166,6 +227,47 @@ export default function ResidentialPage() {
           <p className="text-sm mb-10" style={{ color: "#7A5840" }}>Each cohort is limited to 12 students — reserve early.</p>
           <IntakeMonths />
           <p className="text-sm mt-6" style={{ color: "#7A5840" }}>Secure your place with a USD 200 deposit · Balance due on arrival</p>
+        </div>
+      </section>
+
+      {/* Graduation & Cancellation */}
+      <section className="py-20 px-6" style={{ background: "#FFFFFF" }}>
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div>
+            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Graduation</h3>
+            <p className="text-sm leading-relaxed mb-4" style={{ color: "#4A2E1A" }}>
+              All graduates receive an internationally recognised Yoga Alliance RYT 200 certificate and can register as Registered Yoga Teachers.
+            </p>
+            <ul className="space-y-2 text-sm" style={{ color: "#4A2E1A" }}>
+              {["Certificate presentation ceremony","108 Sun Salutations (optional)","Traditional Fire Ceremony (Hawan)"].map(i => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#8DC63F" }} />{i}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Cancellation Policy</h3>
+            <div style={{ border: "1px solid rgba(42,18,8,0.08)", borderRadius: "0.75rem", overflow: "hidden" }}>
+              {[
+                { when: "Week 1 cancellation", refund: "20% refund" },
+                { when: "Week 2 cancellation", refund: "15% refund" },
+                { when: "Week 3 cancellation", refund: "10% refund" },
+                { when: "Week 4+ cancellation", refund: "No refund" },
+              ].map((r, i) => (
+                <div key={r.when} style={{
+                  display: "flex", justifyContent: "space-between", padding: "0.75rem 1.25rem",
+                  borderBottom: i < 3 ? "1px solid rgba(42,18,8,0.06)" : "none",
+                  background: i % 2 === 0 ? "#FFFFFF" : "rgba(42,18,8,0.015)",
+                }}>
+                  <span style={{ fontSize: "0.85rem", color: "#4A2E1A" }}>{r.when}</span>
+                  <span style={{ fontSize: "0.85rem", fontWeight: 500,
+                    color: r.refund === "No refund" ? "#CC3333" : "#5A7A20" }}>{r.refund}</span>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs mt-3" style={{ color: "#9A7860" }}>USD 200 deposit is non-refundable but transferable within the same year.</p>
+          </div>
         </div>
       </section>
 
