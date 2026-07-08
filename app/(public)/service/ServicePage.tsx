@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ServiceConfig } from "./serviceContent";
+import TimingNotice from "@/components/TimingNotice";
 
 // Reusable rich service page — same section rhythm as the Teacher Training
 // child pages (CourseProgram): hero → overview → who-it's-for + what's-included
@@ -150,6 +151,11 @@ export default function ServicePage({ config: c }: { config: ServiceConfig }) {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Timings-not-fixed notice */}
+      <section className="px-6" style={{ background: "#FFFFFF", paddingTop: "2.5rem" }}>
+        <TimingNotice variant="inline" />
       </section>
 
       {/* FAQ */}

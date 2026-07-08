@@ -3,6 +3,7 @@ import Link from "next/link";
 import PricingSection from "../PricingSection";
 import { COMMUTER_TIER } from "../pricingTiers";
 import IntakeMonths from "../IntakeMonths";
+import TimingNotice from "@/components/TimingNotice";
 
 export const metadata: Metadata = {
   title: { absolute: "Commuter (Non-Residential) 200hr Yoga Teacher Training — Nepal | Yogmandu" },
@@ -34,6 +35,90 @@ const includes = [
   { icon: "🗓", label: "28-day program", sub: "Morning & afternoon sessions" },
   { icon: "🏠", label: "Your own accommodation", sub: "Stay where you like in Kathmandu" },
   { icon: "🧘", label: "Same curriculum", sub: "Identical to our residential course" },
+];
+
+// Course Content — identical to the Residential syllabus (ported from the
+// original Yogmandu curriculum), grouped into the four Yoga Alliance domains.
+const curriculum = [
+  {
+    title: "Techniques & Practice",
+    color: "#6B2D8B",
+    items: [
+      "Prayer & mantra chanting",
+      "Sukshma vyayama, warm-ups & sun salutation",
+      "Asanas, bandha & pranayama",
+      "Shatkarma & mudras",
+      "Yoga nidra, meditation, alignment & safety",
+    ],
+  },
+  {
+    title: "Teaching Methodology",
+    color: "#F7941D",
+    items: [
+      "Group dynamics & time management",
+      "Principles of demonstration",
+      "Verbal cueing & observation",
+      "Correcting techniques",
+      "Qualities of a good teacher",
+    ],
+  },
+  {
+    title: "Anatomy & Physiology",
+    color: "#8DC63F",
+    items: [
+      "Constituents of the human body",
+      "Bones, joints & muscles",
+      "Human body systems",
+      "Spiritual anatomy: chakras & nadis",
+      "Kundalini & pancha kosha",
+    ],
+  },
+  {
+    title: "Philosophy, Lifestyle & Ethics",
+    color: "#6B2D8B",
+    items: [
+      "Meaning & history of yoga",
+      "Patanjali Yoga Sutras",
+      "Forms of yoga",
+      "Karma, bhakti & mantra yoga",
+      "Jnana yoga",
+    ],
+  },
+];
+
+const eligibility = [
+  "Prior experience is good but not compulsory.",
+  "Proficiency in verbal and written communication.",
+  "18 years old or more.",
+];
+
+const evaluation = [
+  "Class participation",
+  "Lesson planning",
+  "Conducting a workshop",
+  "Mantra chanting",
+  "Observations of the teacher",
+  "Communication during the class",
+  "Practicum",
+];
+
+const graduation = [
+  "Certificate distribution",
+  "108 Sun Salutations (optional)",
+  "Special Fire Ceremony (optional)",
+];
+
+// Course Overview "at a glance" — ported from the original site's overview table
+// (fee omitted here; the current price is shown in the pricing section above).
+const courseFacts = [
+  { icon: "🗓", label: "Duration", value: "28 days" },
+  { icon: "⏰", label: "Timings", value: "Morning & afternoon" },
+  { icon: "📈", label: "Level", value: "Beginner to intermediate" },
+  { icon: "🧘", label: "Yoga style", value: "Sanatan & Hatha Yoga" },
+  { icon: "🏫", label: "Format", value: "Non-residential — 100–110 hrs in-studio + 90–100 hrs online / self-study" },
+  { icon: "🗣", label: "Language", value: "English & Nepali" },
+  { icon: "📜", label: "Certification", value: "RYT 200 · Yoga Alliance (USA)" },
+  { icon: "📍", label: "Venue", value: "Yogmandu Yoga, Mid-Baneshwor, Kathmandu" },
 ];
 
 const faqs = [
@@ -105,6 +190,28 @@ export default function CommuterPage() {
         subtitle="Tuition only — you arrange your own stay in Kathmandu. Same 28-day curriculum and RYT 200 certificate."
       />
 
+      {/* Course overview — at a glance */}
+      <section className="py-20 px-6" style={{ background: "#F9F5FF" }}>
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#6B2D8B" }}>Course Overview</p>
+            <h2 className="text-4xl md:text-5xl font-light" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>At a glance</h2>
+            <div className="section-divider mt-6" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {courseFacts.map((f) => (
+              <div key={f.label} className="flex items-start gap-3 rounded-2xl p-5" style={{ background: "#FFFFFF", border: "1px solid rgba(107,45,139,0.14)" }}>
+                <span style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "1.1rem", background: "rgba(107,45,139,0.08)", border: "1px solid rgba(107,45,139,0.18)" }}>{f.icon}</span>
+                <span>
+                  <span className="block text-xs tracking-[0.15em] uppercase font-semibold mb-0.5" style={{ color: "#6B2D8B" }}>{f.label}</span>
+                  <span className="block text-sm" style={{ color: "#2A1208" }}>{f.value}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* What's included */}
       <section className="py-24 px-6" style={{ background: "#FFFFFF" }}>
         <div className="max-w-4xl mx-auto">
@@ -127,6 +234,113 @@ export default function CommuterPage() {
         </div>
       </section>
 
+      {/* Curriculum / Course Content */}
+      <section className="py-24 px-6" style={{ background: "#F9F5FF" }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#F7941D" }}>What You Will Learn</p>
+            <h2 className="text-4xl md:text-5xl font-light" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>
+              The course content
+            </h2>
+            <p className="text-sm mt-4 max-w-xl mx-auto" style={{ color: "#7A5840" }}>
+              The same Yoga Alliance syllabus as our residential course — covering practice, teaching, anatomy and philosophy.
+            </p>
+            <div className="section-divider mt-6" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {curriculum.map(block => (
+              <div key={block.title} className="lift-3d rounded-2xl p-8 relative overflow-hidden"
+                style={{
+                  background: `linear-gradient(135deg, ${block.color}0C 0%, #FFFFFF 80%)`,
+                  borderLeft: `3px solid ${block.color}`,
+                  border: `1.5px solid ${block.color}22`,
+                  borderLeftWidth: 3,
+                  boxShadow: `0 6px 22px ${block.color}10`,
+                }}>
+                <div style={{
+                  position: "absolute", top: -30, right: -30, width: 110, height: 110, borderRadius: "50%",
+                  background: `radial-gradient(circle, ${block.color}22 0%, transparent 70%)`, pointerEvents: "none",
+                }} />
+                <div className="flex items-center gap-3 mb-4 relative">
+                  <span style={{
+                    width: 6, height: 6, borderRadius: "50%", background: block.color,
+                    boxShadow: `0 0 10px ${block.color}`,
+                  }} />
+                  <p className="text-xs tracking-[0.25em] uppercase font-semibold" style={{ color: block.color }}>{block.title}</p>
+                </div>
+                <ul className="space-y-2 relative">
+                  {block.items.map(item => (
+                    <li key={item} className="text-sm flex items-start gap-2" style={{ color: "#3D2515" }}>
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0"
+                        style={{ background: block.color, boxShadow: `0 0 6px ${block.color}80` }} />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Eligibility · Certification · Evaluation */}
+      <section className="py-24 px-6" style={{ background: "#FFFFFF" }}>
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div>
+            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Eligibility</h3>
+            <ul className="space-y-2 text-sm" style={{ color: "#4A2E1A" }}>
+              {eligibility.map(i => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#8DC63F" }} />{i}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Certification</h3>
+            <p className="text-sm leading-relaxed" style={{ color: "#4A2E1A" }}>
+              On completing the course, and following proper evaluation, participants receive the internationally
+              recognised <strong>Yoga Alliance RYT 200</strong> certificate — identical to our residential and online
+              formats — and can register as a Registered Yoga Teacher.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Evaluation</h3>
+            <ul className="space-y-2 text-sm" style={{ color: "#4A2E1A" }}>
+              {evaluation.map(i => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#F7941D" }} />{i}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Graduation */}
+      <section className="py-20 px-6" style={{ background: "#F9F5FF" }}>
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+          <div>
+            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Graduation ceremony</h3>
+            <ul className="space-y-2 text-sm" style={{ color: "#4A2E1A" }}>
+              {graduation.map(i => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#8DC63F" }} />{i}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div style={{ borderRadius: "0.9rem", background: "#FFFFFF", border: "1px solid rgba(107,45,139,0.14)", padding: "1.5rem 1.75rem" }}>
+            <p className="text-xs tracking-[0.2em] uppercase font-semibold mb-2" style={{ color: "#6B2D8B" }}>Please note</p>
+            <p className="text-sm leading-relaxed" style={{ color: "#4A2E1A" }}>
+              If, for any reason, a participant is found unfit to complete the course, Yogmandu reserves the right to
+              discontinue their course without a refund. In some unavoidable situations, we may allow participants to
+              complete the course in the near future at no additional charge.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Intake */}
       <section className="py-16 px-6" style={{ background: "#FFFFFF" }}>
         <div className="max-w-5xl mx-auto text-center">
@@ -134,6 +348,9 @@ export default function CommuterPage() {
           <h2 className="text-3xl font-light mb-3" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Choose your intake month</h2>
           <p className="text-sm mb-10" style={{ color: "#7A5840" }}>Each cohort is limited to 12 students — reserve early.</p>
           <IntakeMonths />
+          <div className="mt-12">
+            <TimingNotice variant="inline" />
+          </div>
         </div>
       </section>
 

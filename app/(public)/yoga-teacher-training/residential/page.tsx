@@ -3,6 +3,7 @@ import Link from "next/link";
 import PricingSection from "../PricingSection";
 import { RESIDENTIAL_TIER } from "../pricingTiers";
 import IntakeMonths from "../IntakeMonths";
+import TimingNotice from "@/components/TimingNotice";
 
 export const metadata: Metadata = {
   title: { absolute: "Residential Full Board 200hr Yoga Teacher Training — Nepal | Yogmandu" },
@@ -30,11 +31,42 @@ export const metadata: Metadata = {
 
 const includes = [
   { icon: "🛏", label: "Shared accommodation", sub: "25 nights at the Yogmandu campus" },
-  { icon: "🥗", label: "3 organic meals daily", sub: "Vegetarian, sattvic kitchen" },
+  { icon: "🥗", label: "3 organic meals daily", sub: "Vegetarian (vegan on request)" },
   { icon: "🍵", label: "Unlimited herbal teas", sub: "Throughout the day" },
   { icon: "💆", label: "2 Ayurvedic massages", sub: "Rest & recovery" },
   { icon: "🧺", label: "Shatkarma kit", sub: "For cleansing practices" },
   { icon: "📓", label: "Manual & notebook", sub: "Full Yogmandu curriculum" },
+];
+
+// Fine print ported from the original Yogmandu residential course listing.
+const alsoIncluded = [
+  "Yoga textbook & notebook",
+  "Yoga Alliance RYT 200 certificate",
+  "13% VAT and 10% service charge",
+];
+
+const excluded = [
+  "Travel to & from the retreat, incl. airfare and airport/hotel transfers",
+  "Expenses during outings or day trips",
+  "Travel and medical insurance",
+  "Laundry (available for an extra charge)",
+];
+
+const eligibility = [
+  "Prior experience is good but not compulsory.",
+  "Proficiency in verbal and written communication.",
+  "18 years old or more.",
+];
+
+const evaluation = [
+  "Class participation",
+  "Lesson planning",
+  "Conducting a workshop",
+  "Mantra chanting",
+  "Philosophy lessons",
+  "Observations of the teacher",
+  "Communication during the class",
+  "Practicum",
 ];
 
 const curriculum = [
@@ -170,6 +202,30 @@ export default function ResidentialPage() {
               </div>
             ))}
           </div>
+
+          {/* Fine print — also included / not included */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+            <div className="rounded-2xl p-6" style={{ background: "rgba(141,198,63,0.06)", border: "1px solid rgba(141,198,63,0.28)" }}>
+              <p className="text-xs tracking-[0.2em] uppercase font-semibold mb-3" style={{ color: "#5A7A20" }}>Also included</p>
+              <ul className="space-y-2 text-sm" style={{ color: "#4A2E1A" }}>
+                {alsoIncluded.map(i => (
+                  <li key={i} className="flex items-start gap-2">
+                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#8DC63F" }} />{i}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-2xl p-6" style={{ background: "rgba(42,18,8,0.02)", border: "1px solid rgba(42,18,8,0.08)" }}>
+              <p className="text-xs tracking-[0.2em] uppercase font-semibold mb-3" style={{ color: "#9A7860" }}>Not included</p>
+              <ul className="space-y-2 text-sm" style={{ color: "#4A2E1A" }}>
+                {excluded.map(i => (
+                  <li key={i} className="flex items-start gap-2">
+                    <span className="mt-1.5 flex-shrink-0" style={{ color: "#B8926F" }}>–</span>{i}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -219,19 +275,56 @@ export default function ResidentialPage() {
         </div>
       </section>
 
+      {/* Eligibility · Evaluation */}
+      <section className="py-24 px-6" style={{ background: "#F9F5FF" }}>
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div>
+            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Eligibility</h3>
+            <ul className="space-y-2 text-sm" style={{ color: "#4A2E1A" }}>
+              {eligibility.map(i => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#8DC63F" }} />{i}
+                </li>
+              ))}
+            </ul>
+            <p className="text-xs mt-4 leading-relaxed" style={{ color: "#9A7860" }}>
+              If a participant is found unfit to complete the course, Yogmandu reserves the right to discontinue it
+              without a refund. In some unavoidable situations, we may allow completion in the near future at no
+              additional charge.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Evaluation</h3>
+            <p className="text-sm leading-relaxed mb-4" style={{ color: "#4A2E1A" }}>
+              Participants are assessed throughout the course on:
+            </p>
+            <ul className="space-y-2 text-sm" style={{ color: "#4A2E1A" }}>
+              {evaluation.map(i => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#F7941D" }} />{i}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
       {/* Intake */}
-      <section className="py-16 px-6" style={{ background: "#F9F5FF" }}>
+      <section className="py-16 px-6" style={{ background: "#FFFFFF" }}>
         <div className="max-w-5xl mx-auto text-center">
           <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#6B2D8B" }}>Plan Ahead</p>
           <h2 className="text-3xl font-light mb-3" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Choose your intake month</h2>
           <p className="text-sm mb-10" style={{ color: "#7A5840" }}>Each cohort is limited to 12 students — reserve early.</p>
           <IntakeMonths />
           <p className="text-sm mt-6" style={{ color: "#7A5840" }}>Secure your place with a USD 200 deposit · Balance due on arrival</p>
+          <div className="mt-12">
+            <TimingNotice variant="inline" />
+          </div>
         </div>
       </section>
 
       {/* Graduation & Cancellation */}
-      <section className="py-20 px-6" style={{ background: "#FFFFFF" }}>
+      <section className="py-20 px-6" style={{ background: "#F9F5FF" }}>
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
           <div>
             <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Graduation</h3>
@@ -250,9 +343,9 @@ export default function ResidentialPage() {
             <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Cancellation Policy</h3>
             <div style={{ border: "1px solid rgba(42,18,8,0.08)", borderRadius: "0.75rem", overflow: "hidden" }}>
               {[
-                { when: "Week 1 cancellation", refund: "20% refund" },
-                { when: "Week 2 cancellation", refund: "15% refund" },
-                { when: "Week 3 cancellation", refund: "10% refund" },
+                { when: "Week 1 cancellation", refund: "50% refund" },
+                { when: "Week 2 cancellation", refund: "40% refund" },
+                { when: "Week 3 cancellation", refund: "25% refund" },
                 { when: "Week 4+ cancellation", refund: "No refund" },
               ].map((r, i) => (
                 <div key={r.when} style={{
@@ -266,7 +359,45 @@ export default function ResidentialPage() {
                 </div>
               ))}
             </div>
-            <p className="text-xs mt-3" style={{ color: "#9A7860" }}>USD 200 deposit is non-refundable but transferable within the same year.</p>
+            <p className="text-xs mt-3 leading-relaxed" style={{ color: "#9A7860" }}>
+              A USD 200 deposit reserves your place; the remaining USD 1,200 is due on arrival. If Yogmandu cancels
+              your reservation you are refunded in full, and in the event of illness or government restrictions you
+              may reschedule to a later course.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Terms & house rules */}
+      <section className="py-20 px-6" style={{ background: "#FFFFFF" }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#6B2D8B" }}>Good to Know</p>
+            <h2 className="text-3xl md:text-4xl font-light" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Terms &amp; house rules</h2>
+            <div className="section-divider mt-6" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="rounded-2xl p-6 md:p-7" style={{ background: "#F9F5FF", border: "1px solid rgba(107,45,139,0.14)" }}>
+              <h3 className="text-lg font-medium mb-3" style={{ color: "#2A1208" }}>📷 Photography &amp; video</h3>
+              <p className="text-sm leading-relaxed" style={{ color: "#4A2E1A" }}>
+                During the course we may photograph or film students for marketing purposes, shared on Yogmandu&apos;s
+                social channels. If you&apos;d prefer not to be included, please let us know beforehand.
+              </p>
+            </div>
+            <div className="rounded-2xl p-6 md:p-7" style={{ background: "#F9F5FF", border: "1px solid rgba(107,45,139,0.14)" }}>
+              <h3 className="text-lg font-medium mb-3" style={{ color: "#2A1208" }}>🕉 House rules</h3>
+              <ul className="space-y-2 text-sm" style={{ color: "#4A2E1A" }}>
+                {[
+                  "No smoking, alcohol or drugs during the course",
+                  "No meat consumption within the retreat grounds",
+                  "No violence, swearing or vulgar behaviour",
+                ].map(r => (
+                  <li key={r} className="flex items-start gap-2">
+                    <span className="mt-1.5 flex-shrink-0" style={{ color: "#B8926F" }}>–</span>{r}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </section>

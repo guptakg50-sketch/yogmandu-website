@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ScheduleGrid from "./ScheduleGrid";
 import HeroDecor from "./HeroDecor";
+import TimingNotice from "@/components/TimingNotice";
 import { ServiceHub } from "../service/ServiceHub";
 import { YOGA_CLASSES_HUB } from "../service/hubContent";
 import { getActiveSessions, getInstructorMap } from "@/lib/publicData";
@@ -176,6 +177,11 @@ export default async function ClassSchedulePage() {
             📍 Mid-Baneshwor, Kathmandu · All times local (NPT UTC+5:45)
           </span>
         </div>
+      </div>
+
+      {/* ── Timings-not-fixed notice ── */}
+      <div style={{ padding: "1.75rem 1.5rem 0" }}>
+        <TimingNotice />
       </div>
 
       {/* ── Interactive schedule grid (client component) ── */}

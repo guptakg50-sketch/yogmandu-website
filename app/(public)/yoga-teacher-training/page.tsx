@@ -61,8 +61,20 @@ const courseSchema = {
 // apart (Google requires FAQ markup to match content visible on the page).
 const faqs = [
   {
+    q: "What exactly is a Yoga Teacher Training (YTT) course?",
+    a: "A Yoga Teacher Training course is a comprehensive program that gives you the foundational knowledge, skills and confidence to teach yoga. It covers yoga philosophy, asanas (postures), pranayama (breathwork), meditation, teaching methodology, anatomy and physiology, and much more.",
+  },
+  {
     q: "Is the 200-hour yoga teacher training Yoga Alliance certified?",
     a: "Yes. Yogmandu is a Yoga Alliance Registered Yoga School (RYS 200). Graduates receive a certificate eligible for Yoga Alliance RYT 200 registration worldwide.",
+  },
+  {
+    q: "Can I join even if I don't want to become a yoga instructor?",
+    a: "Absolutely. While many students enrol to become certified instructors, others join to deepen their personal practice and understanding of yoga. Everyone is welcome.",
+  },
+  {
+    q: "Is yoga teacher training hard?",
+    a: "It can be challenging, both physically and mentally — but we wouldn't call it hard. With a willing attitude you'll find it demanding yet rewarding, and our teachers support you at every step.",
   },
   {
     q: "What is the difference between residential and non-residential training?",
@@ -83,6 +95,26 @@ const faqs = [
   {
     q: "Who teaches the 200-hour yoga teacher training at Yogmandu?",
     a: "The program is led by Dr. Chintamani Gautam (PhD Yogic Science, E-RYT 500) and supported by senior faculty including Yogi Arjun Rakhal and Dr. Dipika. Dr. Gautam has trained 3,000+ teachers from 50+ countries.",
+  },
+  {
+    q: "How many students are in each class?",
+    a: "We cap each cohort at 15 students so the class never feels overcrowded and every trainee receives personal attention and feedback.",
+  },
+  {
+    q: "Do I need to speak good English?",
+    a: "Classes are taught primarily in English, so a basic understanding of spoken and written English is needed to follow along and complete the assessments.",
+  },
+  {
+    q: "Do you offer airport pick-up and drop-off?",
+    a: "We don't provide airport transfers, but taxis are readily available to and from Tribhuvan International Airport, and we're happy to help you arrange one.",
+  },
+  {
+    q: "Do I need vaccinations to train in Nepal?",
+    a: "Vaccinations are not mandatory. We recommend checking the CDC's Nepal travel page for current health guidance before you travel.",
+  },
+  {
+    q: "Are the teachings religious?",
+    a: "The course follows Nepal's traditional teachings, so some elements — such as the graduation fire ceremony and mantra chanting — are influenced by Hindu tradition. Everyone is welcome regardless of background.",
   },
 ];
 

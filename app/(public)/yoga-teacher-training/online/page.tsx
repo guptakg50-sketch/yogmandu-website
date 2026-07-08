@@ -3,6 +3,7 @@ import Link from "next/link";
 import PricingSection from "../PricingSection";
 import { ONLINE_TIER } from "../pricingTiers";
 import IntakeMonths from "../IntakeMonths";
+import TimingNotice from "@/components/TimingNotice";
 
 export const metadata: Metadata = {
   title: { absolute: "Online 200hr Yoga Teacher Training — Live Virtual | Yogmandu" },
@@ -41,6 +42,83 @@ const howItWorks = [
   { n: "1", t: "Register via Google Form", b: "Message us for the registration link and reserve your place in the next live cohort." },
   { n: "2", t: "Join the live classes", b: "Practice and study in real time over Zoom alongside the resident cohort — ask questions and get feedback live." },
   { n: "3", t: "Get certified", b: "Complete the practicum and assessment to earn your Yoga Alliance RYT 200 certificate." },
+];
+
+// Course Content — same Yoga Alliance syllabus as our in-person formats,
+// delivered live online (ported from the original Yogmandu curriculum).
+const curriculum = [
+  {
+    title: "Techniques & Practice",
+    color: "#6B2D8B",
+    items: [
+      "Prayer & mantra chanting",
+      "Sukshma vyayama, warm-ups & sun salutation",
+      "Asanas, bandha & pranayama",
+      "Shatkarma & mudras",
+      "Yoga nidra, meditation, alignment & safety",
+    ],
+  },
+  {
+    title: "Teaching Methodology",
+    color: "#F7941D",
+    items: [
+      "Group dynamics & time management",
+      "Principles of demonstration",
+      "Verbal cueing & observation",
+      "Correction techniques",
+      "Qualities of a good teacher",
+    ],
+  },
+  {
+    title: "Anatomy & Physiology",
+    color: "#8DC63F",
+    items: [
+      "Constituents of the human body",
+      "Bones, joints & muscles",
+      "Human body systems",
+      "Spiritual anatomy: chakras & nadis",
+      "Kundalini & pancha kosha",
+    ],
+  },
+  {
+    title: "Philosophy, Lifestyle & Ethics",
+    color: "#6B2D8B",
+    items: [
+      "Meaning & history of yoga",
+      "Patanjali Yoga Sutras",
+      "Forms of yoga",
+      "Karma, bhakti & mantra yoga",
+      "Jnana yoga",
+    ],
+  },
+];
+
+const eligibility = [
+  "Prior experience is good but not compulsory.",
+  "Proficiency in verbal and written communication.",
+  "16 years old or more.",
+];
+
+const evaluation = [
+  "Class participation",
+  "Lesson planning",
+  "Conducting a workshop",
+  "Mantra chanting",
+  "Observations of the teacher",
+  "Communication during the class",
+  "Practicum",
+];
+
+// Course Overview "at a glance" — ported from the original site's overview table
+// (fee omitted here; the current price is shown in the pricing section above).
+const courseFacts = [
+  { icon: "🗓", label: "Duration", value: "28 days" },
+  { icon: "⏰", label: "Timings", value: "Morning & afternoon" },
+  { icon: "📈", label: "Level", value: "Beginner to intermediate" },
+  { icon: "🧘", label: "Yoga style", value: "Sanatan & Hatha Yoga" },
+  { icon: "💻", label: "Format", value: "Live virtual — real-time on Zoom" },
+  { icon: "🗣", label: "Language", value: "English & Nepali" },
+  { icon: "📜", label: "Certification", value: "RYT 200 · Yoga Alliance (USA)" },
 ];
 
 const faqs = [
@@ -109,6 +187,28 @@ export default function OnlinePage() {
         subtitle="Live real-time training from home — the same RYT 200 certificate at the most accessible price."
       />
 
+      {/* Course overview — at a glance */}
+      <section className="py-20 px-6" style={{ background: "#F9F5FF" }}>
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#6B2D8B" }}>Course Overview</p>
+            <h2 className="text-4xl md:text-5xl font-light" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>At a glance</h2>
+            <div className="section-divider mt-6" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {courseFacts.map((f) => (
+              <div key={f.label} className="flex items-start gap-3 rounded-2xl p-5" style={{ background: "#FFFFFF", border: "1px solid rgba(107,45,139,0.14)" }}>
+                <span style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "1.1rem", background: "rgba(107,45,139,0.08)", border: "1px solid rgba(107,45,139,0.18)" }}>{f.icon}</span>
+                <span>
+                  <span className="block text-xs tracking-[0.15em] uppercase font-semibold mb-0.5" style={{ color: "#6B2D8B" }}>{f.label}</span>
+                  <span className="block text-sm" style={{ color: "#2A1208" }}>{f.value}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* What's included */}
       <section className="py-24 px-6" style={{ background: "#FFFFFF" }}>
         <div className="max-w-4xl mx-auto">
@@ -153,6 +253,89 @@ export default function OnlinePage() {
         </div>
       </section>
 
+      {/* Curriculum / Course Content */}
+      <section className="py-24 px-6" style={{ background: "#FFFFFF" }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#F7941D" }}>What You Will Learn</p>
+            <h2 className="text-4xl md:text-5xl font-light" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>
+              The course content
+            </h2>
+            <p className="text-sm mt-4 max-w-xl mx-auto" style={{ color: "#7A5840" }}>
+              The identical Yoga Alliance syllabus as our in-person course — practice, teaching, anatomy and philosophy, delivered live.
+            </p>
+            <div className="section-divider mt-6" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {curriculum.map(block => (
+              <div key={block.title} className="lift-3d rounded-2xl p-8 relative overflow-hidden"
+                style={{
+                  background: `linear-gradient(135deg, ${block.color}0C 0%, #F9F5FF 80%)`,
+                  borderLeft: `3px solid ${block.color}`,
+                  border: `1.5px solid ${block.color}22`,
+                  borderLeftWidth: 3,
+                  boxShadow: `0 6px 22px ${block.color}10`,
+                }}>
+                <div style={{
+                  position: "absolute", top: -30, right: -30, width: 110, height: 110, borderRadius: "50%",
+                  background: `radial-gradient(circle, ${block.color}22 0%, transparent 70%)`, pointerEvents: "none",
+                }} />
+                <div className="flex items-center gap-3 mb-4 relative">
+                  <span style={{
+                    width: 6, height: 6, borderRadius: "50%", background: block.color,
+                    boxShadow: `0 0 10px ${block.color}`,
+                  }} />
+                  <p className="text-xs tracking-[0.25em] uppercase font-semibold" style={{ color: block.color }}>{block.title}</p>
+                </div>
+                <ul className="space-y-2 relative">
+                  {block.items.map(item => (
+                    <li key={item} className="text-sm flex items-start gap-2" style={{ color: "#3D2515" }}>
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0"
+                        style={{ background: block.color, boxShadow: `0 0 6px ${block.color}80` }} />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Eligibility · Certification · Evaluation */}
+      <section className="py-24 px-6" style={{ background: "#F9F5FF" }}>
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div>
+            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Eligibility</h3>
+            <ul className="space-y-2 text-sm" style={{ color: "#4A2E1A" }}>
+              {eligibility.map(i => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#8DC63F" }} />{i}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Certification</h3>
+            <p className="text-sm leading-relaxed" style={{ color: "#4A2E1A" }}>
+              The internationally recognised <strong>Yoga Alliance RYT 200</strong> certificate is awarded on completion
+              of the online training — the same certificate as our Commuter and Residential formats — allowing you to
+              register as a Registered Yoga Teacher.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Evaluation</h3>
+            <ul className="space-y-2 text-sm" style={{ color: "#4A2E1A" }}>
+              {evaluation.map(i => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#F7941D" }} />{i}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
       {/* Intake */}
       <section className="py-16 px-6" style={{ background: "#FFFFFF" }}>
         <div className="max-w-5xl mx-auto text-center">
@@ -160,6 +343,9 @@ export default function OnlinePage() {
           <h2 className="text-3xl font-light mb-3" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Choose your intake month</h2>
           <p className="text-sm mb-10" style={{ color: "#7A5840" }}>Cohorts are kept small for personalised feedback — reserve early.</p>
           <IntakeMonths />
+          <div className="mt-12">
+            <TimingNotice variant="inline" />
+          </div>
         </div>
       </section>
 
