@@ -186,6 +186,48 @@ export default async function ClassSchedulePage() {
 
       {/* ── Interactive schedule grid (client component) ── */}
       <ScheduleGrid sessions={sessions} instructorMap={instructorMap} />
+
+      {/* ── Inside the studio ── */}
+      <section style={{ background: "#F9F5FF", padding: "5rem 1.5rem" }}>
+        <div style={{ maxWidth: 1000, margin: "0 auto", display: "grid", gap: "3rem",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", alignItems: "center" }}>
+          <div style={{ borderRadius: "1.25rem", overflow: "hidden", border: "1px solid rgba(107,45,139,0.14)",
+            boxShadow: "0 18px 48px rgba(107,45,139,0.16)", maxWidth: 440, margin: "0 auto" }}>
+            <img src="/images/schedule/group-class.webp" alt="A morning group yoga class at the Yogmandu studio in Mid-Baneshwor, Kathmandu"
+              width={900} height={1200} loading="lazy" decoding="async"
+              style={{ display: "block", width: "100%", height: "auto" }} />
+          </div>
+          <div>
+            <p style={{ fontSize: "0.85rem", letterSpacing: "0.3em", textTransform: "uppercase",
+              color: "#6B2D8B", marginBottom: 14, fontWeight: 500 }}>
+              Inside the Studio
+            </p>
+            <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(2rem,4vw,2.8rem)",
+              fontWeight: 300, color: "#2A1208", lineHeight: 1.15, marginBottom: 18 }}>
+              Real classes, <em style={{ color: "#A65808" }}>every day</em>
+            </h2>
+            <p style={{ fontSize: "0.98rem", color: "#4A2E1A", lineHeight: 1.8, marginBottom: 28, maxWidth: 460 }}>
+              This is what a regular morning looks like at Yogmandu — a full room of students of all ages
+              and levels practising together in our Mid-Baneshwor studio. Whether it&apos;s your first class
+              or your five-hundredth, roll out a mat and join us.
+            </p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
+              <Link href="/book" className="cta-lift" style={{
+                display: "inline-block", padding: "0.8rem 2rem", borderRadius: 999,
+                background: "#6B2D8B", color: "#fff", fontSize: "0.9rem", fontWeight: 500,
+                boxShadow: "0 6px 20px rgba(107,45,139,0.3)", textDecoration: "none" }}>
+                Book a Class
+              </Link>
+              <a href="https://wa.me/9779810263277" target="_blank" rel="noopener noreferrer" className="cta-lift" style={{
+                display: "inline-block", padding: "0.8rem 2rem", borderRadius: 999,
+                border: "1.5px solid #6B2D8B", color: "#6B2D8B", fontSize: "0.9rem", fontWeight: 500,
+                textDecoration: "none" }}>
+                WhatsApp Us
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

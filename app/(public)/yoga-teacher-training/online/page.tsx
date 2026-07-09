@@ -334,6 +334,14 @@ export default function OnlinePage() {
             </ul>
           </div>
         </div>
+        <div className="max-w-5xl mx-auto mt-12" style={{ borderRadius: "0.9rem", background: "#FFFFFF", border: "1px solid rgba(107,45,139,0.14)", padding: "1.5rem 1.75rem" }}>
+          <p className="text-xs tracking-[0.2em] uppercase font-semibold mb-2" style={{ color: "#6B2D8B" }}>Please note</p>
+          <p className="text-sm leading-relaxed" style={{ color: "#4A2E1A" }}>
+            If, for any reason, a participant is found unfit to complete the course, Yogmandu reserves the right to
+            discontinue their course without a refund. In some unavoidable situations, we may allow participants to
+            complete the course in the near future at no additional charge.
+          </p>
+        </div>
       </section>
 
       {/* Intake */}
