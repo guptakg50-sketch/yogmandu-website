@@ -411,7 +411,13 @@ export default function YogaTeacherTrainingPage() {
 
       {/* Graduation & Cancellation */}
       <section className="py-20 px-6" style={{ background: "#FFFFFF" }}>
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
+          <div style={{ borderRadius: "1.25rem", overflow: "hidden", border: "1px solid rgba(107,45,139,0.14)",
+            boxShadow: "0 18px 48px rgba(107,45,139,0.16)", maxWidth: 380, margin: "0 auto" }}>
+            <img src="/images/ytt/graduation.webp" alt="Yogmandu teacher training graduates holding their certificates, wearing marigold garlands at the graduation ceremony in Kathmandu"
+              width={900} height={1200} loading="lazy" decoding="async"
+              style={{ display: "block", width: "100%", height: "auto" }} />
+          </div>
           <div>
             <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Graduation</h3>
             <p className="text-sm leading-relaxed mb-4" style={{ color: "#4A2E1A" }}>
@@ -429,9 +435,9 @@ export default function YogaTeacherTrainingPage() {
             <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Cancellation Policy</h3>
             <div style={{ border: "1px solid rgba(42,18,8,0.08)", borderRadius: "0.75rem", overflow: "hidden" }}>
               {[
-                { when: "Week 1 cancellation", refund: "20% refund" },
-                { when: "Week 2 cancellation", refund: "15% refund" },
-                { when: "Week 3 cancellation", refund: "10% refund" },
+                { when: "Week 1 cancellation", refund: "50% refund" },
+                { when: "Week 2 cancellation", refund: "40% refund" },
+                { when: "Week 3 cancellation", refund: "25% refund" },
                 { when: "Week 4+ cancellation", refund: "No refund" },
               ].map((r, i) => (
                 <div key={r.when} style={{

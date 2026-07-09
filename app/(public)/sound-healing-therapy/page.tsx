@@ -348,6 +348,35 @@ export default function SoundHealingPage() {
         </div>
       </section>
 
+      {/* In session — real photos */}
+      <section className="py-24 px-6" style={{ background: "#F9F5FF" }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#6B2D8B" }}>In Session</p>
+            <h2 className="text-4xl md:text-5xl font-light" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>
+              The sound bath <em style={{ color: "#A65808" }}>experience</em>
+            </h2>
+            <p className="text-sm font-light max-w-xl mx-auto mt-4" style={{ color: "#6B5240" }}>
+              A group sound bath at our Mid-Baneshwor studio — students rest under warm blankets while
+              traditional Tibetan bowls, bells and mallets carry them into deep relaxation.
+            </p>
+            <div className="section-divider mt-6" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-3xl mx-auto">
+            {[
+              { src: "/images/sound/sound-bath.webp", alt: "Students resting under maroon blankets during a group sound bath session at the Yogmandu studio in Kathmandu" },
+              { src: "/images/sound/sound-tools.webp", alt: "Traditional Tibetan bell and felt-tipped singing bowl mallets resting on a cushion before a sound healing session" },
+            ].map((p) => (
+              <div key={p.src} style={{ borderRadius: "1.25rem", overflow: "hidden", border: "1px solid rgba(107,45,139,0.14)",
+                boxShadow: "0 18px 48px rgba(107,45,139,0.16)" }}>
+                <img src={p.src} alt={p.alt} width={900} height={1200} loading="lazy" decoding="async"
+                  style={{ display: "block", width: "100%", height: "auto" }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section className="py-24 px-6" style={{ background: "#FFFFFF" }}>
         <div className="max-w-3xl mx-auto">
