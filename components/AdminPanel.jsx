@@ -2278,6 +2278,7 @@ function AdminWorkspace({ onLogout }) {
     ["dashboard",   "Dashboard",    LayoutDashboard],
     ["bookings",    "Bookings",     FileText],
     ["siteLayout",  "Site Layout",  Globe2],
+    ["pageContent", "Page Content", Edit3],
     ["seo",         "SEO Manager",  ShieldCheck],
     ["sitemap",     "Sitemap",      Link],
     ["blog",        "Blog Manager", BookOpen],
@@ -2317,6 +2318,7 @@ function AdminWorkspace({ onLogout }) {
           {active === "dashboard"  && <Dashboard data={state} setActive={setActive} toast={notify} />}
           {active === "bookings"   && <BookingsManager toast={notify} />}
           {active === "siteLayout" && <SiteLayoutManager toast={notify} />}
+          {active === "pageContent" && <PageContentManager toast={notify} />}
           {active === "seo"        && <SeoManager pages={state.seoPages} setPages={setPart("seoPages")} toast={notify} />}
           {active === "sitemap"    && <SitemapManager toast={notify} />}
           {active === "blog" && <BlogManager blogs={state.blogs} setBlogs={setPart("blogs")} media={state.media} setMedia={setPart("media")} toast={notify} />}
@@ -3275,4 +3277,346 @@ export default function AdminPanel() {
   }
 
   return <AdminWorkspace onLogout={() => setAuth((current) => ({ ...current, authenticated: false }))} />;
+}
+
+/* ─────────────────────────────────────────────
+   Page Content Manager — edits the copy, photos and pricing cards that used
+   to be hardcoded in the page files. Every document here is stored as a
+   Supabase override merged over the code default, so pages always render and
+   "Reset to original" simply deletes the override.
+───────────────────────────────────────────── */
+
+function LinesArea({ value, onChange, rows = 4, placeholder }) {
+  const [text, setText] = useState((value || []).join("\n"));
+  return (
+    <TextArea rows={rows} value={text} placeholder={placeholder}
+      onChange={(e) => { setText(e.target.value); onChange(e.target.value.split("\n").map((s) => s.trim()).filter(Boolean)); }} />
+  );
+}
+
+function ParagraphsArea({ value, onChange, rows = 8 }) {
+  const [text, setText] = useState((value || []).join("\n\n"));
+  return (
+    <TextArea rows={rows} value={text}
+      onChange={(e) => { setText(e.target.value); onChange(e.target.value.split(/\n\s*\n/).map((s) => s.trim()).filter(Boolean)); }} />
+  );
+}
+
+function ImageField({ value, onChange, toast }) {
+  return (
+    <div className="space-y-2">
+      {value && <img src={value} alt="" className="h-44 w-auto max-w-full rounded-lg border border-stone-200 object-cover" />}
+      <TextInput value={value || ""} placeholder="/images/… or https://…" onChange={(e) => onChange(e.target.value)} />
+      <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700">
+        <Upload size={15} /> Upload new photo
+        <input type="file" accept="image/*" className="hidden" onChange={(e) => uploadFile(e, (url) => onChange(url), { onError: toast })} />
+      </label>
+    </div>
+  );
+}
+
+// Form for the bespoke sections — the field list comes from the server registry.
+function SectionFields({ fields, draft, setDraft, toast }) {
+  const set = (name, value) => setDraft({ ...draft, [name]: value });
+  return (
+    <div className="grid gap-4">
+      {fields.map((f) => {
+        if (f.type === "textarea") return <Field key={f.name} label={f.label}><TextArea rows={4} value={draft[f.name] || ""} onChange={(e) => set(f.name, e.target.value)} /></Field>;
+        if (f.type === "image") return <Field key={f.name} label={f.label}><ImageField value={draft[f.name]} onChange={(v) => set(f.name, v)} toast={toast} /></Field>;
+        if (f.type === "lines") return <Field key={f.name} label={f.label}><LinesArea value={draft[f.name]} onChange={(v) => set(f.name, v)} /></Field>;
+        if (f.type === "pairs") {
+          const rows = draft[f.name] || [];
+          const setRow = (i, patch) => set(f.name, rows.map((r, j) => (j === i ? { ...r, ...patch } : r)));
+          return (
+            <Field key={f.name} label={f.label}>
+              <div className="space-y-2">
+                {rows.map((r, i) => (
+                  <div key={i} className="flex gap-2">
+                    <TextInput value={r.when} placeholder="Week 1 cancellation" onChange={(e) => setRow(i, { when: e.target.value })} />
+                    <TextInput value={r.refund} placeholder="50% refund" onChange={(e) => setRow(i, { refund: e.target.value })} />
+                    <Button variant="ghost" onClick={() => set(f.name, rows.filter((_, j) => j !== i))}><Trash2 size={15} /></Button>
+                  </div>
+                ))}
+                <Button variant="secondary" onClick={() => set(f.name, [...rows, { when: "", refund: "" }])}><Plus size={15} /> Add row</Button>
+              </div>
+            </Field>
+          );
+        }
+        if (f.type === "photos") {
+          const photos = draft[f.name] || [];
+          const setPhoto = (i, patch) => set(f.name, photos.map((p, j) => (j === i ? { ...p, ...patch } : p)));
+          return (
+            <Field key={f.name} label={f.label}>
+              <div className="space-y-4">
+                {photos.map((p, i) => (
+                  <div key={i} className="rounded-xl border border-stone-200 bg-white p-3">
+                    <ImageField value={p.src} onChange={(v) => setPhoto(i, { src: v })} toast={toast} />
+                    <div className="mt-2"><TextInput value={p.alt || ""} placeholder="Describe the photo (alt text for SEO)" onChange={(e) => setPhoto(i, { alt: e.target.value })} /></div>
+                    <Button variant="ghost" className="mt-2" onClick={() => set(f.name, photos.filter((_, j) => j !== i))}><Trash2 size={15} /> Remove photo</Button>
+                  </div>
+                ))}
+                <Button variant="secondary" onClick={() => set(f.name, [...photos, { src: "", alt: "" }])}><Plus size={15} /> Add photo</Button>
+              </div>
+            </Field>
+          );
+        }
+        return <Field key={f.name} label={f.label}><TextInput value={draft[f.name] || ""} onChange={(e) => set(f.name, e.target.value)} /></Field>;
+      })}
+    </div>
+  );
+}
+
+// Form for one service page (hero → overview → lists → steps → price → FAQs).
+function ServiceFields({ draft, setDraft }) {
+  const set = (name, value) => setDraft({ ...draft, [name]: value });
+  const steps = draft.steps || [];
+  const faqs = draft.faqs || [];
+  return (
+    <div className="grid gap-4">
+      <div className="grid gap-4 md:grid-cols-2">
+        <Field label="Eyebrow (small caps over the title)"><TextInput value={draft.eyebrow || ""} onChange={(e) => set("eyebrow", e.target.value)} /></Field>
+        <Field label="Meta line (under the lead)"><TextInput value={draft.heroMeta || ""} onChange={(e) => set("heroMeta", e.target.value)} /></Field>
+        <Field label="Page title"><TextInput value={draft.heroTitleA || ""} onChange={(e) => set("heroTitleA", e.target.value)} /></Field>
+        <Field label="Page title — accented tail"><TextInput value={draft.heroTitleEm || ""} onChange={(e) => set("heroTitleEm", e.target.value)} /></Field>
+      </div>
+      <Field label="Lead paragraph"><TextArea rows={3} value={draft.heroLead || ""} onChange={(e) => set("heroLead", e.target.value)} /></Field>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Field label="Book button label"><TextInput value={draft.bookLabel || ""} onChange={(e) => set("bookLabel", e.target.value)} /></Field>
+        <Field label="Overview heading"><TextInput value={draft.overviewHeading || ""} onChange={(e) => set("overviewHeading", e.target.value)} /></Field>
+      </div>
+      <Field label="Overview paragraphs" hint="separate paragraphs with a blank line">
+        <ParagraphsArea value={draft.overviewBody} onChange={(v) => set("overviewBody", v)} />
+      </Field>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Field label="Who it's for (one per line)"><LinesArea value={draft.forYou} onChange={(v) => set("forYou", v)} /></Field>
+        <Field label="What's included (one per line)"><LinesArea value={draft.included} onChange={(v) => set("included", v)} /></Field>
+      </div>
+      <Field label="How it works — 3 steps">
+        <div className="space-y-3">
+          {steps.map((s, i) => (
+            <div key={i} className="rounded-xl border border-stone-200 bg-white p-3">
+              <TextInput value={s.t} placeholder={`Step ${i + 1} title`} onChange={(e) => set("steps", steps.map((x, j) => (j === i ? { ...x, t: e.target.value } : x)))} />
+              <div className="mt-2"><TextArea rows={2} value={s.b} placeholder="Step text" onChange={(e) => set("steps", steps.map((x, j) => (j === i ? { ...x, b: e.target.value } : x)))} /></div>
+            </div>
+          ))}
+        </div>
+      </Field>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Field label="Price" hint="e.g. NPR 35,000 / USD 350 — leave blank to hide"><TextInput value={draft.price || ""} onChange={(e) => set("price", e.target.value)} /></Field>
+        <Field label="Price note"><TextInput value={draft.priceNote || ""} onChange={(e) => set("priceNote", e.target.value)} /></Field>
+      </div>
+      <Field label="FAQs">
+        <div className="space-y-3">
+          {faqs.map((f, i) => (
+            <div key={i} className="rounded-xl border border-stone-200 bg-white p-3">
+              <TextInput value={f.q} placeholder="Question" onChange={(e) => set("faqs", faqs.map((x, j) => (j === i ? { ...x, q: e.target.value } : x)))} />
+              <div className="mt-2"><TextArea rows={3} value={f.a} placeholder="Answer" onChange={(e) => set("faqs", faqs.map((x, j) => (j === i ? { ...x, a: e.target.value } : x)))} /></div>
+              <Button variant="ghost" className="mt-2" onClick={() => set("faqs", faqs.filter((_, j) => j !== i))}><Trash2 size={15} /> Remove</Button>
+            </div>
+          ))}
+          <Button variant="secondary" onClick={() => set("faqs", [...faqs, { q: "", a: "" }])}><Plus size={15} /> Add FAQ</Button>
+        </div>
+      </Field>
+    </div>
+  );
+}
+
+// Form for a list of pricing/hub cards (Tier objects).
+function TierListFields({ tiers, onChange }) {
+  const setTier = (i, patch) => onChange(tiers.map((t, j) => (j === i ? { ...t, ...patch } : t)));
+  return (
+    <div className="space-y-4">
+      {tiers.map((t, i) => (
+        <div key={t.id || i} className="rounded-xl border border-stone-200 bg-white p-4">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-emerald-700">{t.title || `Card ${i + 1}`}</p>
+          <div className="grid gap-3 md:grid-cols-2">
+            <Field label="Title"><TextInput value={t.title} onChange={(e) => setTier(i, { title: e.target.value })} /></Field>
+            <Field label="Category line"><TextInput value={t.category} onChange={(e) => setTier(i, { category: e.target.value })} /></Field>
+            <Field label="Badge" hint="leave blank for no badge"><TextInput value={t.badge || ""} onChange={(e) => setTier(i, { badge: e.target.value })} /></Field>
+            <Field label="Icon (emoji)"><TextInput value={t.icon || ""} onChange={(e) => setTier(i, { icon: e.target.value })} /></Field>
+            <Field label="Price"><TextInput value={t.price} onChange={(e) => setTier(i, { price: e.target.value })} /></Field>
+            <Field label="Price subtitle"><TextInput value={t.priceSub || ""} onChange={(e) => setTier(i, { priceSub: e.target.value })} /></Field>
+            <Field label="Price note"><TextInput value={t.priceNote || ""} onChange={(e) => setTier(i, { priceNote: e.target.value })} /></Field>
+            <Field label="Button label"><TextInput value={t.ctaLabel || ""} onChange={(e) => setTier(i, { ctaLabel: e.target.value })} /></Field>
+            <Field label="Button link"><TextInput value={t.ctaHref || ""} onChange={(e) => setTier(i, { ctaHref: e.target.value })} /></Field>
+          </div>
+          <div className="mt-3"><Field label="Feature list (one per line)"><LinesArea value={t.features} onChange={(v) => setTier(i, { features: v })} /></Field></div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Form for a page's curriculum module cards (title + optional icon + topic list).
+function CurriculumFields({ modules, onChange }) {
+  const setModule = (i, patch) => onChange(modules.map((m, j) => (j === i ? { ...m, ...patch } : m)));
+  const move = (i, dir) => {
+    const j = i + dir;
+    if (j < 0 || j >= modules.length) return;
+    const next = [...modules];
+    [next[i], next[j]] = [next[j], next[i]];
+    onChange(next);
+  };
+  return (
+    <div className="space-y-4">
+      {modules.map((m, i) => (
+        <div key={i} className="rounded-xl border border-stone-200 bg-white p-4">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">{m.title || `Module ${i + 1}`}</p>
+            <div className="flex gap-1">
+              <Button variant="ghost" onClick={() => move(i, -1)} disabled={i === 0}>↑</Button>
+              <Button variant="ghost" onClick={() => move(i, 1)} disabled={i === modules.length - 1}>↓</Button>
+              <Button variant="ghost" onClick={() => { if (window.confirm(`Remove the "${m.title || "untitled"}" module?`)) onChange(modules.filter((_, j) => j !== i)); }}><Trash2 size={15} /></Button>
+            </div>
+          </div>
+          <div className="grid gap-3 md:grid-cols-3">
+            <Field label="Module title"><TextInput value={m.title || ""} onChange={(e) => setModule(i, { title: e.target.value })} /></Field>
+            <Field label="Icon (emoji)" hint="only shown on 300/500-hour pages"><TextInput value={m.icon || ""} onChange={(e) => setModule(i, { icon: e.target.value })} /></Field>
+            <Field label="Accent colour" hint="hex, e.g. #6B2D8B">
+              <div className="flex items-center gap-2">
+                <span className="inline-block h-6 w-6 flex-shrink-0 rounded-full border border-stone-300" style={{ background: m.color || "#6B2D8B" }} />
+                <TextInput value={m.color || ""} onChange={(e) => setModule(i, { color: e.target.value })} />
+              </div>
+            </Field>
+          </div>
+          <div className="mt-3"><Field label="Topics (one per line)"><LinesArea value={m.items} onChange={(v) => setModule(i, { items: v })} /></Field></div>
+        </div>
+      ))}
+      <Button variant="secondary" onClick={() => onChange([...modules, { title: "", color: "#6B2D8B", items: [] }])}><Plus size={15} /> Add module</Button>
+    </div>
+  );
+}
+
+function ContentDocEditor({ doc, toast, onSaved, onReset, onClose }) {
+  const [draft, setDraft] = useState(doc.data);
+  const [busy, setBusy] = useState(false);
+
+  const save = async () => {
+    setBusy(true);
+    try {
+      await fetchJson("/api/admin/page-content", { method: "PUT", body: JSON.stringify({ key: doc.key, data: draft }) });
+      toast("Saved — live on the site within a minute");
+      onSaved(doc.key, draft);
+      onClose();
+    } catch (error) {
+      toast(error.message || "Save failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const reset = async () => {
+    if (!window.confirm("Reset this content to the original version? Your saved edits will be removed.")) return;
+    setBusy(true);
+    try {
+      await fetchJson("/api/admin/page-content", { method: "DELETE", body: JSON.stringify({ key: doc.key }) });
+      toast("Reset to original");
+      onReset();
+      onClose();
+    } catch (error) {
+      toast(error.message || "Reset failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Modal title={doc.label} onClose={onClose} wide>
+      <div className="max-h-[70vh] space-y-4 overflow-y-auto p-5">
+        <p className="text-sm text-stone-500">Shown on <span className="font-medium text-stone-700">{doc.page}</span></p>
+        {doc.kind === "section" && <SectionFields fields={doc.fields || []} draft={draft} setDraft={setDraft} toast={toast} />}
+        {doc.kind === "service" && <ServiceFields draft={draft} setDraft={setDraft} />}
+        {doc.kind === "tiers" && <TierListFields tiers={draft.tiers || []} onChange={(tiers) => setDraft({ ...draft, tiers })} />}
+        {doc.kind === "curriculum" && <CurriculumFields modules={draft.modules || []} onChange={(modules) => setDraft({ ...draft, modules })} />}
+        {doc.kind === "hub" && (
+          <div className="grid gap-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <Field label="Eyebrow"><TextInput value={draft.eyebrow || ""} onChange={(e) => setDraft({ ...draft, eyebrow: e.target.value })} /></Field>
+              <Field label="Subtitle"><TextInput value={draft.subtitle || ""} onChange={(e) => setDraft({ ...draft, subtitle: e.target.value })} /></Field>
+              <Field label="Heading"><TextInput value={draft.title || ""} onChange={(e) => setDraft({ ...draft, title: e.target.value })} /></Field>
+              <Field label="Heading — accented tail"><TextInput value={draft.titleEm || ""} onChange={(e) => setDraft({ ...draft, titleEm: e.target.value })} /></Field>
+            </div>
+            <Field label="Cards"><TierListFields tiers={draft.tiers || []} onChange={(tiers) => setDraft({ ...draft, tiers })} /></Field>
+          </div>
+        )}
+      </div>
+      <div className="flex items-center justify-between gap-2 border-t border-stone-200 bg-white p-4">
+        <div>{doc.overridden && <Button variant="danger" onClick={reset} disabled={busy}><RefreshCw size={15} /> Reset to original</Button>}</div>
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={onClose} disabled={busy}>Cancel</Button>
+          <Button onClick={save} disabled={busy}><Save size={16} /> {busy ? "Saving…" : "Save & Publish"}</Button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+const PAGE_CONTENT_TABS = [
+  { id: "Sections", match: (d) => d.kind === "section", blurb: "Photo sections, disclaimers and notices that appear on specific pages." },
+  { id: "Service Pages", match: (d) => d.kind === "service", blurb: "The full copy of every individual service page — titles, overview, lists, price and FAQs." },
+  { id: "Cards & Pricing", match: (d) => d.kind === "tiers" || d.kind === "hub", blurb: "The 3D program/pricing cards on the Teacher Training pages and every hub page." },
+  { id: "Curriculum", match: (d) => d.kind === "curriculum", blurb: "The curriculum module cards on every Teacher Training page — add, reorder or edit modules and their topics." },
+];
+
+function PageContentManager({ toast }) {
+  const [items, setItems] = useState(null);
+  const [error, setError] = useState("");
+  const [tab, setTab] = useState("Sections");
+  const [editingKey, setEditingKey] = useState(null);
+
+  const load = () => {
+    setError("");
+    fetchJson("/api/admin/page-content")
+      .then((res) => setItems(res.items || []))
+      .catch((err) => { setItems([]); setError(err.message || "Could not load page content"); });
+  };
+  useEffect(load, []);
+
+  if (items === null) {
+    return <div className="space-y-4">{Array.from({ length: 4 }, (_, i) => <div key={i} className="h-20 animate-pulse rounded-xl bg-stone-200" />)}</div>;
+  }
+  if (error) {
+    return <EmptyState icon={AlertTriangle} title="Couldn't load page content" text={error} action={<Button onClick={load}><RefreshCw size={16} /> Retry</Button>} />;
+  }
+
+  const activeTab = PAGE_CONTENT_TABS.find((t) => t.id === tab) || PAGE_CONTENT_TABS[0];
+  const visible = items.filter(activeTab.match);
+  const editing = editingKey ? items.find((d) => d.key === editingKey) : null;
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-lg font-semibold text-stone-900">Page Content</h2>
+        <p className="text-sm text-stone-500">Everything here is live site copy. Edit, save, and the page updates within a minute — &ldquo;Reset to original&rdquo; brings back the built-in version.</p>
+      </div>
+      <div className="flex gap-2">
+        {PAGE_CONTENT_TABS.map((t) => <Button key={t.id} variant={tab === t.id ? "primary" : "secondary"} onClick={() => setTab(t.id)}>{t.id}</Button>)}
+      </div>
+      <p className="text-sm text-stone-500">{activeTab.blurb}</p>
+      <div className="grid gap-3">
+        {visible.map((doc) => (
+          <div key={doc.key} className="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white p-4">
+            <div className="min-w-0">
+              <p className="truncate font-medium text-stone-900">{doc.label}</p>
+              <p className="truncate text-sm text-stone-500">{doc.page}</p>
+            </div>
+            <div className="flex flex-shrink-0 items-center gap-2">
+              {doc.overridden && <Badge className="bg-emerald-100 text-emerald-700">Edited</Badge>}
+              <Button variant="secondary" onClick={() => setEditingKey(doc.key)}><Edit3 size={15} /> Edit</Button>
+            </div>
+          </div>
+        ))}
+      </div>
+      {editing && (
+        <ContentDocEditor
+          key={editing.key}
+          doc={editing}
+          toast={toast}
+          onSaved={(key, data) => setItems(items.map((d) => (d.key === key ? { ...d, data, overridden: true } : d)))}
+          onReset={load}
+          onClose={() => setEditingKey(null)}
+        />
+      )}
+    </div>
+  );
 }

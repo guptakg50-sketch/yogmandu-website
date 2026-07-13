@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import CategoryHub from "../service/CategoryHub";
-import { SPECIALIZED_HUB } from "../service/hubContent";
+import { getHubConfig } from "@/lib/pageContent";
+
+// Hub cards are admin-editable (Page Content → Cards & Pricing).
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: { absolute: "Prenatal, Kids, Senior & School Yoga in Kathmandu | Yogmandu" },
@@ -24,7 +27,8 @@ const breadcrumbSchema = {
   ],
 };
 
-export default function Page() {
+export default async function Page() {
+  const hub = await getHubConfig("SPECIALIZED");
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
@@ -34,7 +38,7 @@ export default function Page() {
         titleEm: "every stage of life",
         lead: "Specially adapted classes for expecting mothers, children, seniors and schools — safe, gentle and tailored to each group's needs.",
         primaryCta: { href: "/book?service=prenatal", label: "Find Your Class" },
-        hub: SPECIALIZED_HUB,
+        hub,
         accent: "#6B2D8B",
       }} />
     </>

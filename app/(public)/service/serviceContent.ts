@@ -796,3 +796,28 @@ export const SCHOOL_YOGA: ServiceConfig = {
   siblingLinks: SPECIAL_SIBLINGS.filter((l) => l.href !== "/specialized-yoga/school-yoga"),
   accent: "#F7941D",
 };
+
+// Name-keyed map of every service page config. This is the canonical list the
+// admin "Page Content" editor and lib/pageContent.ts iterate over — the DB may
+// hold a per-service override row that is merged over these code defaults.
+export const SERVICE_CONFIGS = {
+  DROP_IN,
+  VIRTUAL_YOGA,
+  PRIVATE_YOGA,
+  YOGA_AT_HOME,
+  SOUND_SESSIONS,
+  SOUND_LEVEL_1,
+  SOUND_LEVEL_2,
+  WEIGHT_LOSS_BOOTCAMP,
+  CORPORATE_YOGA,
+  YOGA_TREKKING,
+  YOGA_THERAPY,
+  REIKI_HEALING,
+  DIET_CONSULTATION,
+  PRENATAL,
+  CHILDRENS_YOGA,
+  SENIOR_YOGA,
+  SCHOOL_YOGA,
+} satisfies Record<string, ServiceConfig>;
+
+export type ServiceConfigKey = keyof typeof SERVICE_CONFIGS;

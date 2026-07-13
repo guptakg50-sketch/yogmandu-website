@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PricingSection from "../PricingSection";
-import { COMMUTER_TIER } from "../pricingTiers";
+import { getTierSet, getSectionContent, getCurriculum } from "@/lib/pageContent";
+
+// Pricing card + policy/disclaimer copy are admin-editable (Page Content).
+export const revalidate = 60;
 import IntakeMonths from "../IntakeMonths";
 import TimingNotice from "@/components/TimingNotice";
 
@@ -37,54 +40,7 @@ const includes = [
   { icon: "🧘", label: "Same curriculum", sub: "Identical to our residential course" },
 ];
 
-// Course Content — identical to the Residential syllabus (ported from the
-// original Yogmandu curriculum), grouped into the four Yoga Alliance domains.
-const curriculum = [
-  {
-    title: "Techniques & Practice",
-    color: "#6B2D8B",
-    items: [
-      "Prayer & mantra chanting",
-      "Sukshma vyayama, warm-ups & sun salutation",
-      "Asanas, bandha & pranayama",
-      "Shatkarma & mudras",
-      "Yoga nidra, meditation, alignment & safety",
-    ],
-  },
-  {
-    title: "Teaching Methodology",
-    color: "#F7941D",
-    items: [
-      "Group dynamics & time management",
-      "Principles of demonstration",
-      "Verbal cueing & observation",
-      "Correcting techniques",
-      "Qualities of a good teacher",
-    ],
-  },
-  {
-    title: "Anatomy & Physiology",
-    color: "#8DC63F",
-    items: [
-      "Constituents of the human body",
-      "Bones, joints & muscles",
-      "Human body systems",
-      "Spiritual anatomy: chakras & nadis",
-      "Kundalini & pancha kosha",
-    ],
-  },
-  {
-    title: "Philosophy, Lifestyle & Ethics",
-    color: "#6B2D8B",
-    items: [
-      "Meaning & history of yoga",
-      "Patanjali Yoga Sutras",
-      "Forms of yoga",
-      "Karma, bhakti & mantra yoga",
-      "Jnana yoga",
-    ],
-  },
-];
+// Curriculum modules are admin-editable (defaults in curriculumContent.ts).
 
 const eligibility = [
   "Prior experience is good but not compulsory.",
@@ -149,7 +105,12 @@ const breadcrumbSchema = {
   ],
 };
 
-export default function CommuterPage() {
+export default async function CommuterPage() {
+  const [{ tiers: commuterTiers }, pleaseNote, { modules: curriculum }] = await Promise.all([
+    getTierSet("COMMUTER"),
+    getSectionContent("YTT_PLEASE_NOTE"),
+    getCurriculum("COMMUTER"),
+  ]);
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
@@ -184,7 +145,7 @@ export default function CommuterPage() {
       {/* Pricing */}
       <div id="pricing" />
       <PricingSection
-        tiers={[COMMUTER_TIER]}
+        tiers={commuterTiers}
         eyebrow="Non-Residential Format"
         title={<>Commuter <em style={{ color: "#6B2D8B" }}>program</em></>}
         subtitle="Tuition only — you arrange your own stay in Kathmandu. Same 28-day curriculum and RYT 200 certificate."
@@ -331,11 +292,9 @@ export default function CommuterPage() {
             </ul>
           </div>
           <div style={{ borderRadius: "0.9rem", background: "#FFFFFF", border: "1px solid rgba(107,45,139,0.14)", padding: "1.5rem 1.75rem" }}>
-            <p className="text-xs tracking-[0.2em] uppercase font-semibold mb-2" style={{ color: "#6B2D8B" }}>Please note</p>
+            <p className="text-xs tracking-[0.2em] uppercase font-semibold mb-2" style={{ color: "#6B2D8B" }}>{pleaseNote.title}</p>
             <p className="text-sm leading-relaxed" style={{ color: "#4A2E1A" }}>
-              If, for any reason, a participant is found unfit to complete the course, Yogmandu reserves the right to
-              discontinue their course without a refund. In some unavoidable situations, we may allow participants to
-              complete the course in the near future at no additional charge.
+              {pleaseNote.body}
             </p>
           </div>
         </div>

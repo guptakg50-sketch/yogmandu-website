@@ -121,3 +121,15 @@ export const SPECIALIZED_HUB: HubConfig = {
       "/specialized-yoga/school-yoga"),
   ],
 };
+
+// Name-keyed map of every hub — iterated by the admin "Page Content" editor
+// and lib/pageContent.ts (DB overrides merge over these code defaults).
+export const HUB_CONFIGS = {
+  YOGA_CLASSES:     YOGA_CLASSES_HUB,
+  SOUND_HEALING:    SOUND_HEALING_HUB,
+  RETREATS:         RETREATS_HUB,
+  THERAPY_WELLNESS: THERAPY_WELLNESS_HUB,
+  SPECIALIZED:      SPECIALIZED_HUB,
+} satisfies Record<string, HubConfig>;
+
+export type HubConfigKey = keyof typeof HUB_CONFIGS;

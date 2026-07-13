@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ServiceHub } from "../service/ServiceHub";
-import { RETREATS_HUB } from "../service/hubContent";
+import { getHubConfig } from "@/lib/pageContent";
+
+// Hub cards are admin-editable (Page Content → Cards & Pricing).
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: { absolute: "Yoga Retreat in Nepal — Kathmandu & Himalayas | Yogmandu" },
@@ -122,7 +125,8 @@ const retreatDay = [
   { time: "8:00 PM",  activity: "Evening meditation & silence" },
 ];
 
-export default function YogaRetreatNepalPage() {
+export default async function YogaRetreatNepalPage() {
+  const hub = await getHubConfig("RETREATS");
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(retreatServiceSchema) }} />
@@ -162,7 +166,7 @@ export default function YogaRetreatNepalPage() {
       </section>
 
       {/* Retreats & special programs — service hub (same 3D cards as Teacher Training), up top */}
-      <ServiceHub {...RETREATS_HUB} />
+      <ServiceHub {...hub} />
 
       {/* Why Nepal */}
       <section className="py-24 px-6" style={{ background: "#F9F5FF" }}>

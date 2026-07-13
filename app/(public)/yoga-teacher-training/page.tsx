@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PricingCard } from "./PricingSection";
-import { PROGRAM_TIERS } from "./pricingTiers";
+import { getTierSet, getSectionContent, getCurriculum } from "@/lib/pageContent";
+
+// Program cards, graduation section and cancellation table are admin-editable
+// (Page Content); re-render picks up saved overrides within a minute.
+export const revalidate = 60;
 import IntakeMonths from "./IntakeMonths";
 
 export const metadata: Metadata = {
@@ -137,54 +141,15 @@ const breadcrumbSchema = {
   ],
 };
 
-const curriculum = [
-  {
-    title: "Techniques & Practice",
-    color: "#6B2D8B",
-    items: [
-      "Prayer & mantra chanting",
-      "Sukshma vyayama & asanas",
-      "Pranayama, bandha & shatkarma",
-      "Mudras, yoga nidra & meditation",
-      "Alignment & safety guidelines",
-    ],
-  },
-  {
-    title: "Teaching Methodology",
-    color: "#F7941D",
-    items: [
-      "Group dynamics & time management",
-      "Demonstration principles",
-      "Verbal cueing & observation",
-      "Correction techniques",
-      "Teacher qualities & ethics",
-    ],
-  },
-  {
-    title: "Anatomy & Physiology",
-    color: "#8DC63F",
-    items: [
-      "Human body systems",
-      "Bones, joints & muscles",
-      "Spiritual anatomy: chakras & nadis",
-      "Kundalini & pancha kosha",
-      "Yoga therapy foundations",
-    ],
-  },
-  {
-    title: "Philosophy & Ethics",
-    color: "#6B2D8B",
-    items: [
-      "History of yoga",
-      "Patanjali Yoga Sutras",
-      "Karma, bhakti & jnana yoga",
-      "Mantra yoga & Sanskrit",
-      "Ashtanga — the eight limbs",
-    ],
-  },
-];
+// Curriculum modules are admin-editable (defaults in curriculumContent.ts).
 
-export default function YogaTeacherTrainingPage() {
+export default async function YogaTeacherTrainingPage() {
+  const [{ tiers: programTiers }, graduation, cancellation, { modules: curriculum }] = await Promise.all([
+    getTierSet("PROGRAM_CARDS"),
+    getSectionContent("YTT_GRADUATION"),
+    getSectionContent("YTT_CANCELLATION"),
+    getCurriculum("YTT_HUB"),
+  ]);
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
@@ -290,7 +255,7 @@ export default function YogaTeacherTrainingPage() {
             <div className="section-divider mt-6" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 md:gap-6 pt-8" style={{ perspective: "1500px" }}>
-            {PROGRAM_TIERS.map((tier) => <PricingCard key={tier.id} tier={tier} />)}
+            {programTiers.map((tier) => <PricingCard key={tier.id} tier={tier} />)}
           </div>
         </div>
       </section>
@@ -414,17 +379,17 @@ export default function YogaTeacherTrainingPage() {
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
           <div style={{ borderRadius: "1.25rem", overflow: "hidden", border: "1px solid rgba(107,45,139,0.14)",
             boxShadow: "0 18px 48px rgba(107,45,139,0.16)", maxWidth: 380, margin: "0 auto" }}>
-            <img src="/images/ytt/graduation.webp" alt="Yogmandu teacher training graduates holding their certificates, wearing marigold garlands at the graduation ceremony in Kathmandu"
+            <img src={graduation.image} alt={graduation.imageAlt}
               width={900} height={1200} loading="lazy" decoding="async"
               style={{ display: "block", width: "100%", height: "auto" }} />
           </div>
           <div>
-            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Graduation</h3>
+            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>{graduation.heading}</h3>
             <p className="text-sm leading-relaxed mb-4" style={{ color: "#4A2E1A" }}>
-              All graduates receive an internationally recognised Yoga Alliance RYT 200 certificate and can register as Registered Yoga Teachers.
+              {graduation.body}
             </p>
             <ul className="space-y-2 text-sm" style={{ color: "#4A2E1A" }}>
-              {["Certificate presentation ceremony","108 Sun Salutations (optional)","Traditional Fire Ceremony (Hawan)"].map(i => (
+              {graduation.bullets.map(i => (
                 <li key={i} className="flex items-start gap-2">
                   <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#8DC63F" }} />{i}
                 </li>
@@ -432,17 +397,12 @@ export default function YogaTeacherTrainingPage() {
             </ul>
           </div>
           <div>
-            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Cancellation Policy</h3>
+            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>{cancellation.heading}</h3>
             <div style={{ border: "1px solid rgba(42,18,8,0.08)", borderRadius: "0.75rem", overflow: "hidden" }}>
-              {[
-                { when: "Week 1 cancellation", refund: "50% refund" },
-                { when: "Week 2 cancellation", refund: "40% refund" },
-                { when: "Week 3 cancellation", refund: "25% refund" },
-                { when: "Week 4+ cancellation", refund: "No refund" },
-              ].map((r, i) => (
+              {cancellation.rows.map((r, i) => (
                 <div key={r.when} style={{
                   display: "flex", justifyContent: "space-between", padding: "0.75rem 1.25rem",
-                  borderBottom: i < 3 ? "1px solid rgba(42,18,8,0.06)" : "none",
+                  borderBottom: i < cancellation.rows.length - 1 ? "1px solid rgba(42,18,8,0.06)" : "none",
                   background: i % 2 === 0 ? "#FFFFFF" : "rgba(42,18,8,0.015)",
                 }}>
                   <span style={{ fontSize: "0.85rem", color: "#4A2E1A" }}>{r.when}</span>
@@ -451,7 +411,7 @@ export default function YogaTeacherTrainingPage() {
                 </div>
               ))}
             </div>
-            <p className="text-xs mt-3" style={{ color: "#9A7860" }}>USD 200 deposit is non-refundable but transferable within the same year.</p>
+            <p className="text-xs mt-3" style={{ color: "#9A7860" }}>{cancellation.note}</p>
           </div>
         </div>
       </section>

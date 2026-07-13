@@ -1,17 +1,17 @@
 import Link from "next/link";
+import { getSectionContent } from "@/lib/pageContent";
 
 /**
  * Site-wide notice that class/session times are not fixed and should be
  * confirmed on WhatsApp before visiting. Dropped onto every page that shows
  * times (class schedule, teacher-training, sound-healing sessions).
+ * Wording is admin-editable (Page Content → Timing notice).
  *
  * `variant`:
  *  - "banner" (default) — full callout card, for schedule/landing pages.
  *  - "inline" — slimmer, quieter note for use inside a content page.
  */
-const WHATSAPP = "https://wa.me/9779810263277";
-
-export default function TimingNotice({
+export default async function TimingNotice({
   variant = "banner",
   className = "",
 }: {
@@ -19,6 +19,7 @@ export default function TimingNotice({
   className?: string;
 }) {
   const inline = variant === "inline";
+  const notice = await getSectionContent("TIMING_NOTICE");
   return (
     <div
       className={className}
@@ -63,13 +64,10 @@ export default function TimingNotice({
           color: "#7A4A10",
         }}
       >
-        <strong style={{ color: "#8A4A00" }}>Please note:</strong> class and session
-        times are <strong>not fixed</strong> and may change with the season, teacher
-        availability and demand. Please confirm your preferred time with us on
-        WhatsApp before visiting.
+        <strong style={{ color: "#8A4A00" }}>{notice.lead}</strong> {notice.body}
       </p>
       <Link
-        href={WHATSAPP}
+        href={notice.ctaHref}
         target="_blank"
         rel="noopener noreferrer"
         className="cta-lift"
@@ -89,7 +87,7 @@ export default function TimingNotice({
           whiteSpace: "nowrap",
         }}
       >
-        <span aria-hidden="true">💬</span> Confirm on WhatsApp
+        <span aria-hidden="true">💬</span> {notice.ctaLabel}
       </Link>
     </div>
   );

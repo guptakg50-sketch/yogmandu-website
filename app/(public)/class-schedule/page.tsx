@@ -4,8 +4,8 @@ import ScheduleGrid from "./ScheduleGrid";
 import HeroDecor from "./HeroDecor";
 import TimingNotice from "@/components/TimingNotice";
 import { ServiceHub } from "../service/ServiceHub";
-import { YOGA_CLASSES_HUB } from "../service/hubContent";
 import { getActiveSessions, getInstructorMap } from "@/lib/publicData";
+import { getHubConfig, getSectionContent } from "@/lib/pageContent";
 
 export const revalidate = 60;
 
@@ -49,9 +49,11 @@ const levelColor = (level: string) => {
 };
 
 export default async function ClassSchedulePage() {
-  const [sessions, instructorMap] = await Promise.all([
+  const [sessions, instructorMap, hub, studio] = await Promise.all([
     getActiveSessions(),
     getInstructorMap(),
+    getHubConfig("YOGA_CLASSES"),
+    getSectionContent("INSIDE_STUDIO"),
   ]);
   return (
     <main style={{ background: "#FFFFFF", minHeight: "100vh" }}>
@@ -158,7 +160,7 @@ export default async function ClassSchedulePage() {
       </div>
 
       {/* ── Ways to practise — service hub (same 3D cards as Teacher Training), up top ── */}
-      <ServiceHub {...YOGA_CLASSES_HUB} />
+      <ServiceHub {...hub} />
 
       {/* ── Legend ── */}
       <div style={{ background: "#F9F5FF", padding: "1.25rem 2rem", borderBottom: "1px solid rgba(107,45,139,0.1)" }}>
@@ -193,36 +195,34 @@ export default async function ClassSchedulePage() {
           gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", alignItems: "center" }}>
           <div style={{ borderRadius: "1.25rem", overflow: "hidden", border: "1px solid rgba(107,45,139,0.14)",
             boxShadow: "0 18px 48px rgba(107,45,139,0.16)", maxWidth: 440, margin: "0 auto" }}>
-            <img src="/images/schedule/group-class.webp" alt="A morning group yoga class at the Yogmandu studio in Mid-Baneshwor, Kathmandu"
+            <img src={studio.image} alt={studio.imageAlt}
               width={900} height={1200} loading="lazy" decoding="async"
               style={{ display: "block", width: "100%", height: "auto" }} />
           </div>
           <div>
             <p style={{ fontSize: "0.85rem", letterSpacing: "0.3em", textTransform: "uppercase",
               color: "#6B2D8B", marginBottom: 14, fontWeight: 500 }}>
-              Inside the Studio
+              {studio.eyebrow}
             </p>
             <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(2rem,4vw,2.8rem)",
               fontWeight: 300, color: "#2A1208", lineHeight: 1.15, marginBottom: 18 }}>
-              Real classes, <em style={{ color: "#A65808" }}>every day</em>
+              {studio.title} <em style={{ color: "#A65808" }}>{studio.titleEm}</em>
             </h2>
             <p style={{ fontSize: "0.98rem", color: "#4A2E1A", lineHeight: 1.8, marginBottom: 28, maxWidth: 460 }}>
-              This is what a regular morning looks like at Yogmandu — a full room of students of all ages
-              and levels practising together in our Mid-Baneshwor studio. Whether it&apos;s your first class
-              or your five-hundredth, roll out a mat and join us.
+              {studio.body}
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
-              <Link href="/book" className="cta-lift" style={{
+              <Link href={studio.primaryHref} className="cta-lift" style={{
                 display: "inline-block", padding: "0.8rem 2rem", borderRadius: 999,
                 background: "#6B2D8B", color: "#fff", fontSize: "0.9rem", fontWeight: 500,
                 boxShadow: "0 6px 20px rgba(107,45,139,0.3)", textDecoration: "none" }}>
-                Book a Class
+                {studio.primaryLabel}
               </Link>
-              <a href="https://wa.me/9779810263277" target="_blank" rel="noopener noreferrer" className="cta-lift" style={{
+              <a href={studio.secondaryHref} target="_blank" rel="noopener noreferrer" className="cta-lift" style={{
                 display: "inline-block", padding: "0.8rem 2rem", borderRadius: 999,
                 border: "1.5px solid #6B2D8B", color: "#6B2D8B", fontSize: "0.9rem", fontWeight: 500,
                 textDecoration: "none" }}>
-                WhatsApp Us
+                {studio.secondaryLabel}
               </a>
             </div>
           </div>

@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import ServicePage from "../../service/ServicePage";
-import { REIKI_HEALING } from "../../service/serviceContent";
+import { getServicePageConfig } from "@/lib/pageContent";
+
+// Content is admin-editable (Page Content → Service Pages); re-render picks
+// up saved overrides within a minute.
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: { absolute: "Reiki Healing in Kathmandu — Energy Healing | Yogmandu" },
@@ -15,6 +19,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Page() {
-  return <ServicePage config={REIKI_HEALING} />;
+export default async function Page() {
+  return <ServicePage config={await getServicePageConfig("REIKI_HEALING")} />;
 }

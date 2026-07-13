@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import CategoryHub from "../service/CategoryHub";
-import { THERAPY_WELLNESS_HUB } from "../service/hubContent";
+import { getHubConfig } from "@/lib/pageContent";
+
+// Hub cards are admin-editable (Page Content → Cards & Pricing).
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: { absolute: "Yoga Therapy, Reiki & Diet Consultation in Kathmandu | Yogmandu" },
@@ -24,7 +27,8 @@ const breadcrumbSchema = {
   ],
 };
 
-export default function Page() {
+export default async function Page() {
+  const hub = await getHubConfig("THERAPY_WELLNESS");
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
@@ -34,7 +38,7 @@ export default function Page() {
         titleEm: "wellbeing",
         lead: "One-to-one therapeutic care in Kathmandu — yoga therapy for the body, Reiki for the energy, and personalised nutrition for the whole of you.",
         primaryCta: { href: "/book?service=therapy", label: "Book a Consultation" },
-        hub: THERAPY_WELLNESS_HUB,
+        hub,
         accent: "#6B2D8B",
       }} />
     </>

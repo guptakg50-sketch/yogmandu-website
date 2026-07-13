@@ -8,7 +8,7 @@ import LotusBackdrop from "@/components/LotusBackdropClient";
 
 export type ScheduleBlock = { label: string; rows: { time: string; activity: string }[] };
 export type Room = { name: string; single: string; double: string; amenities: string[] };
-export type CurriculumBlock = { title: string; icon: string; color: string; items: string[] };
+export type CurriculumBlock = { title: string; icon?: string; color: string; items: string[] };
 
 export type CourseConfig = {
   hours:        string;   // "500"
@@ -170,7 +170,7 @@ export default function CourseProgram({ config: c }: { config: CourseConfig }) {
                   background: `radial-gradient(circle, ${block.color}22 0%, transparent 70%)`, pointerEvents: "none",
                 }} />
                 <div className="flex items-center gap-3 mb-4 relative">
-                  <span style={{ fontSize: "1.3rem" }}>{block.icon}</span>
+                  {block.icon && <span style={{ fontSize: "1.3rem" }}>{block.icon}</span>}
                   <p className="text-xs tracking-[0.22em] uppercase font-semibold" style={{ color: block.color }}>{block.title}</p>
                 </div>
                 <ul className="space-y-2 relative">

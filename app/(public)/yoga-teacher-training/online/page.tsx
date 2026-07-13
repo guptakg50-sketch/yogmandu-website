@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PricingSection from "../PricingSection";
-import { ONLINE_TIER } from "../pricingTiers";
+import { getTierSet, getSectionContent, getCurriculum } from "@/lib/pageContent";
+
+// Pricing card + policy/disclaimer copy are admin-editable (Page Content).
+export const revalidate = 60;
 import IntakeMonths from "../IntakeMonths";
 import TimingNotice from "@/components/TimingNotice";
 
@@ -44,54 +47,7 @@ const howItWorks = [
   { n: "3", t: "Get certified", b: "Complete the practicum and assessment to earn your Yoga Alliance RYT 200 certificate." },
 ];
 
-// Course Content — same Yoga Alliance syllabus as our in-person formats,
-// delivered live online (ported from the original Yogmandu curriculum).
-const curriculum = [
-  {
-    title: "Techniques & Practice",
-    color: "#6B2D8B",
-    items: [
-      "Prayer & mantra chanting",
-      "Sukshma vyayama, warm-ups & sun salutation",
-      "Asanas, bandha & pranayama",
-      "Shatkarma & mudras",
-      "Yoga nidra, meditation, alignment & safety",
-    ],
-  },
-  {
-    title: "Teaching Methodology",
-    color: "#F7941D",
-    items: [
-      "Group dynamics & time management",
-      "Principles of demonstration",
-      "Verbal cueing & observation",
-      "Correction techniques",
-      "Qualities of a good teacher",
-    ],
-  },
-  {
-    title: "Anatomy & Physiology",
-    color: "#8DC63F",
-    items: [
-      "Constituents of the human body",
-      "Bones, joints & muscles",
-      "Human body systems",
-      "Spiritual anatomy: chakras & nadis",
-      "Kundalini & pancha kosha",
-    ],
-  },
-  {
-    title: "Philosophy, Lifestyle & Ethics",
-    color: "#6B2D8B",
-    items: [
-      "Meaning & history of yoga",
-      "Patanjali Yoga Sutras",
-      "Forms of yoga",
-      "Karma, bhakti & mantra yoga",
-      "Jnana yoga",
-    ],
-  },
-];
+// Curriculum modules are admin-editable (defaults in curriculumContent.ts).
 
 const eligibility = [
   "Prior experience is good but not compulsory.",
@@ -147,7 +103,12 @@ const breadcrumbSchema = {
   ],
 };
 
-export default function OnlinePage() {
+export default async function OnlinePage() {
+  const [{ tiers: onlineTiers }, pleaseNote, { modules: curriculum }] = await Promise.all([
+    getTierSet("ONLINE"),
+    getSectionContent("YTT_PLEASE_NOTE"),
+    getCurriculum("ONLINE"),
+  ]);
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
@@ -181,7 +142,7 @@ export default function OnlinePage() {
 
       {/* Pricing */}
       <PricingSection
-        tiers={[ONLINE_TIER]}
+        tiers={onlineTiers}
         eyebrow="Online Format"
         title={<>Online <em style={{ color: "#6B2D8B" }}>program</em></>}
         subtitle="Live real-time training from home — the same RYT 200 certificate at the most accessible price."
@@ -335,11 +296,9 @@ export default function OnlinePage() {
           </div>
         </div>
         <div className="max-w-5xl mx-auto mt-12" style={{ borderRadius: "0.9rem", background: "#FFFFFF", border: "1px solid rgba(107,45,139,0.14)", padding: "1.5rem 1.75rem" }}>
-          <p className="text-xs tracking-[0.2em] uppercase font-semibold mb-2" style={{ color: "#6B2D8B" }}>Please note</p>
+          <p className="text-xs tracking-[0.2em] uppercase font-semibold mb-2" style={{ color: "#6B2D8B" }}>{pleaseNote.title}</p>
           <p className="text-sm leading-relaxed" style={{ color: "#4A2E1A" }}>
-            If, for any reason, a participant is found unfit to complete the course, Yogmandu reserves the right to
-            discontinue their course without a refund. In some unavoidable situations, we may allow participants to
-            complete the course in the near future at no additional charge.
+            {pleaseNote.body}
           </p>
         </div>
       </section>

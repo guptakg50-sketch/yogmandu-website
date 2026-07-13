@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import CourseProgram from "../CourseProgram";
+import { getCurriculum } from "@/lib/pageContent";
+
+// Curriculum modules are admin-editable (defaults in curriculumContent.ts).
+export const revalidate = 60;
 import type { CourseConfig } from "../CourseProgram";
 
 export const metadata: Metadata = {
@@ -27,7 +31,7 @@ export const metadata: Metadata = {
   },
 };
 
-const config: CourseConfig = {
+const config: Omit<CourseConfig, "curriculum"> = {
   hours:       "300",
   eyebrow:     "Yoga Alliance RYS 300",
   heroTitleA:  "Deepen your practice &",
@@ -81,59 +85,6 @@ const config: CourseConfig = {
     "Practise advanced asanas with safety and precautions",
     "Learn advanced pranayama and how it builds energy and controls the mind",
     "Deepen your love for yoga and your commitment to teaching it",
-  ],
-  curriculum: [
-    {
-      title: "Philosophy", icon: "📜", color: "#6B2D8B",
-      items: [
-        "Advanced yoga philosophy & Patanjali's Yoga Sutras",
-        "Deep study of Ashtanga & Hatha traditions",
-        "Overview of Bhakti, Gyana, Karma, Mantra & Kundalini yoga",
-        "Lifestyle and ethics of a yoga teacher",
-        "Yogic philosophy from the classical scriptures",
-      ],
-    },
-    {
-      title: "Teaching Methodology", icon: "🎓", color: "#F7941D",
-      items: [
-        "Advanced principles of creating sequences",
-        "Sequences for intermediate, advanced & peak pose",
-        "Vinyasa flow sequencing",
-        "Teach and lead workshops; teach classes and receive feedback",
-        "Hands-on adjustments, verbal cues & effective assistance",
-        "Class setup, observation, assisting and correction",
-      ],
-    },
-    {
-      title: "Asana Practice", icon: "🧘", color: "#8DC63F",
-      items: [
-        "Workshops on advanced and special postures",
-        "Proper alignment to prevent injuries",
-        "Hatha, Ashtanga, Vinyasa, Power and Yin styles",
-        "Modifications, variations, applied anatomy & precautions",
-        "Individual support to improve advanced asanas",
-      ],
-    },
-    {
-      title: "Pranayama & Meditation", icon: "🌬", color: "#6B2D8B",
-      items: [
-        "Advanced pranayama and its link to yogic philosophy",
-        "Teaching methodology for pranayama class",
-        "Panchakosha and prana shakti",
-        "Yoga Nidra, mindfulness and mantra meditation",
-        "Chakra and Vipassana meditation",
-      ],
-    },
-    {
-      title: "Anatomy", icon: "🦴", color: "#F7941D",
-      items: [
-        "Musculoskeletal system and its relation to asana",
-        "Focus on the spine, its movement & health",
-        "Common areas of injury and their prevention",
-        "Contraindications under specific conditions",
-        "Spiritual anatomy: Nadis, Chakras and Koshas",
-      ],
-    },
   ],
   evaluation: [
     {
@@ -239,13 +190,14 @@ const breadcrumbSchema = {
   ],
 };
 
-export default function ThreeHundredHourPage() {
+export default async function ThreeHundredHourPage() {
+  const { modules: curriculum } = await getCurriculum("HOUR_300");
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
-      <CourseProgram config={config} />
+      <CourseProgram config={{ ...config, curriculum }} />
     </>
   );
 }

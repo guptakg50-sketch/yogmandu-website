@@ -131,3 +131,17 @@ export const ONLINE_TIER: Tier = {
   ctaLabel:  "Get Details",
   ctaHref:   "mailto:info@yogmandu.com",
 };
+
+// Name-keyed tier sets — iterated by the admin "Page Content" editor and
+// lib/pageContent.ts (DB overrides merge over these code defaults). Single-card
+// pages use a one-element array.
+export type TierSet = { tiers: Tier[] };
+
+export const TIER_SETS = {
+  PROGRAM_CARDS: { tiers: PROGRAM_TIERS },
+  COMMUTER:      { tiers: [COMMUTER_TIER] },
+  RESIDENTIAL:   { tiers: [RESIDENTIAL_TIER] },
+  ONLINE:        { tiers: [ONLINE_TIER] },
+} satisfies Record<string, TierSet>;
+
+export type TierSetKey = keyof typeof TIER_SETS;

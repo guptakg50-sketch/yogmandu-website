@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PricingSection from "../PricingSection";
-import { RESIDENTIAL_TIER } from "../pricingTiers";
+import { getTierSet, getSectionContent, getCurriculum } from "@/lib/pageContent";
+
+// Pricing card + policy/disclaimer copy are admin-editable (Page Content).
+export const revalidate = 60;
 import IntakeMonths from "../IntakeMonths";
 import TimingNotice from "@/components/TimingNotice";
 
@@ -69,52 +72,7 @@ const evaluation = [
   "Practicum",
 ];
 
-const curriculum = [
-  {
-    title: "Techniques & Practice",
-    color: "#6B2D8B",
-    items: [
-      "Prayer & mantra chanting",
-      "Sukshma vyayama & asanas",
-      "Pranayama, bandha & shatkarma",
-      "Mudras, yoga nidra & meditation",
-      "Alignment & safety guidelines",
-    ],
-  },
-  {
-    title: "Teaching Methodology",
-    color: "#F7941D",
-    items: [
-      "Group dynamics & time management",
-      "Demonstration principles",
-      "Verbal cueing & observation",
-      "Correction techniques",
-      "Teacher qualities & ethics",
-    ],
-  },
-  {
-    title: "Anatomy & Physiology",
-    color: "#8DC63F",
-    items: [
-      "Human body systems",
-      "Bones, joints & muscles",
-      "Spiritual anatomy: chakras & nadis",
-      "Kundalini & pancha kosha",
-      "Yoga therapy foundations",
-    ],
-  },
-  {
-    title: "Philosophy & Ethics",
-    color: "#6B2D8B",
-    items: [
-      "History of yoga",
-      "Patanjali Yoga Sutras",
-      "Karma, bhakti & jnana yoga",
-      "Mantra yoga & Sanskrit",
-      "Ashtanga — the eight limbs",
-    ],
-  },
-];
+// Curriculum modules are admin-editable (defaults in curriculumContent.ts).
 
 const faqs = [
   { q: "What does the Residential Full Board program include?", a: "The USD 1,400 residential program includes 25 nights of shared accommodation at the Yogmandu campus in Kathmandu, three organic vegetarian meals a day, unlimited herbal teas, a shatkarma kit, two Ayurvedic massages, and your training manual and notebook." },
@@ -143,7 +101,13 @@ const breadcrumbSchema = {
   ],
 };
 
-export default function ResidentialPage() {
+export default async function ResidentialPage() {
+  const [{ tiers: residentialTiers }, cancellation, pleaseNote, { modules: curriculum }] = await Promise.all([
+    getTierSet("RESIDENTIAL"),
+    getSectionContent("YTT_CANCELLATION"),
+    getSectionContent("YTT_PLEASE_NOTE"),
+    getCurriculum("RESIDENTIAL"),
+  ]);
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
@@ -177,7 +141,7 @@ export default function ResidentialPage() {
 
       {/* Pricing */}
       <PricingSection
-        tiers={[RESIDENTIAL_TIER]}
+        tiers={residentialTiers}
         eyebrow="Residential Format"
         title={<>Full Board <em style={{ color: "#6B2D8B" }}>program</em></>}
         subtitle="Everything included — tuition, accommodation, meals and the same RYT 200 certificate."
@@ -288,9 +252,7 @@ export default function ResidentialPage() {
               ))}
             </ul>
             <p className="text-xs mt-4 leading-relaxed" style={{ color: "#9A7860" }}>
-              If a participant is found unfit to complete the course, Yogmandu reserves the right to discontinue it
-              without a refund. In some unavoidable situations, we may allow completion in the near future at no
-              additional charge.
+              {pleaseNote.body}
             </p>
           </div>
           <div>
@@ -340,17 +302,12 @@ export default function ResidentialPage() {
             </ul>
           </div>
           <div>
-            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>Cancellation Policy</h3>
+            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>{cancellation.heading}</h3>
             <div style={{ border: "1px solid rgba(42,18,8,0.08)", borderRadius: "0.75rem", overflow: "hidden" }}>
-              {[
-                { when: "Week 1 cancellation", refund: "50% refund" },
-                { when: "Week 2 cancellation", refund: "40% refund" },
-                { when: "Week 3 cancellation", refund: "25% refund" },
-                { when: "Week 4+ cancellation", refund: "No refund" },
-              ].map((r, i) => (
+              {cancellation.rows.map((r, i) => (
                 <div key={r.when} style={{
                   display: "flex", justifyContent: "space-between", padding: "0.75rem 1.25rem",
-                  borderBottom: i < 3 ? "1px solid rgba(42,18,8,0.06)" : "none",
+                  borderBottom: i < cancellation.rows.length - 1 ? "1px solid rgba(42,18,8,0.06)" : "none",
                   background: i % 2 === 0 ? "#FFFFFF" : "rgba(42,18,8,0.015)",
                 }}>
                   <span style={{ fontSize: "0.85rem", color: "#4A2E1A" }}>{r.when}</span>
@@ -360,9 +317,7 @@ export default function ResidentialPage() {
               ))}
             </div>
             <p className="text-xs mt-3 leading-relaxed" style={{ color: "#9A7860" }}>
-              A USD 200 deposit reserves your place; the remaining USD 1,200 is due on arrival. If Yogmandu cancels
-              your reservation you are refunded in full, and in the event of illness or government restrictions you
-              may reschedule to a later course.
+              {cancellation.noteResidential}
             </p>
           </div>
         </div>

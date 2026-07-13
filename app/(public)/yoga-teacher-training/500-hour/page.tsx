@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import CourseProgram from "../CourseProgram";
+import { getCurriculum } from "@/lib/pageContent";
+
+// Curriculum modules are admin-editable (defaults in curriculumContent.ts).
+export const revalidate = 60;
 import type { CourseConfig } from "../CourseProgram";
 
 export const metadata: Metadata = {
@@ -27,7 +31,7 @@ export const metadata: Metadata = {
   },
 };
 
-const config: CourseConfig = {
+const config: Omit<CourseConfig, "curriculum"> = {
   hours:       "500",
   eyebrow:     "Yoga Alliance RYS 500",
   heroTitleA:  "Achieve the highest level of",
@@ -88,79 +92,6 @@ const config: CourseConfig = {
     "Learn advanced pranayama and how it builds energy and controls the mind",
     "Understand your body type and create a suitable practice for yourself",
     "Create a joyful, accepting environment that deepens your love for yoga",
-  ],
-  curriculum: [
-    {
-      title: "Philosophy", icon: "📜", color: "#6B2D8B",
-      items: [
-        "Wisdom of yoga: history, philosophy, and dhyan, mudra & bandha",
-        "Traditional vs modern yoga; deep study of Ashtanga & Hatha",
-        "Overview of Bhakti, Gyana, Karma, Mantra & Kundalini yoga",
-        "Satkarma — the six cleansing techniques of Hatha yoga",
-        "Classical yoga philosophy & Patanjali's Yoga Sutras",
-        "Lifestyle and ethics of a yoga teacher",
-        "Badhak Tattva (obstacles) & Sadhak Tattva (supporting elements)",
-        "Yogic philosophy from other scriptures",
-      ],
-    },
-    {
-      title: "Teaching Methodology", icon: "🎓", color: "#F7941D",
-      items: [
-        "Principles and guidelines of creating sequences",
-        "Sequences for beginner, intermediate & advanced levels",
-        "Sequences for peak pose and Vinyasa flow",
-        "Teach and lead workshops; teach classes and receive feedback",
-        "Teaching diverse levels, needs and age groups",
-        "Voice, language and instructional techniques",
-        "Demonstration, hands-on adjustments, verbal cues & assistance",
-        "Class setup, observation, assisting and correction",
-        "Conscious interaction, engagement and body language",
-      ],
-    },
-    {
-      title: "Asana Practice", icon: "🧘", color: "#8DC63F",
-      items: [
-        "Workshops on advanced and special postures",
-        "Learning new and advanced asanas",
-        "Proper alignment to prevent injuries",
-        "Asana practice twice a day for full immersion",
-        "Hatha, Ashtanga, Vinyasa, Power and Yin styles",
-        "Modifications, variations, applied anatomy & precautions",
-        "Individual support to improve advanced asanas",
-      ],
-    },
-    {
-      title: "Pranayama Practice", icon: "🌬", color: "#6B2D8B",
-      items: [
-        "Teaching various pranayama techniques",
-        "Extended time on individual techniques for depth",
-        "Advanced pranayama and its link to yogic philosophy",
-        "Teaching methodology for pranayama class",
-        "Daily advanced pranayama classes",
-        "Panchakosha and prana shakti",
-        "Importance & benefits of pranayama",
-      ],
-    },
-    {
-      title: "Meditation", icon: "🕉", color: "#F7941D",
-      items: [
-        "Yoga Nidra — meditative yogic sleep",
-        "Stages of mind & meditativeness",
-        "Seated guided meditation & mindfulness",
-        "Mantra and candle-gazing (Trataka) meditation",
-        "Chakra and Vipassana meditation",
-      ],
-    },
-    {
-      title: "Anatomy", icon: "🦴", color: "#8DC63F",
-      items: [
-        "Musculoskeletal system and its relation to asana",
-        "Focus on the spine and its movement & health",
-        "Common areas of injury and their prevention",
-        "Contraindications under specific conditions",
-        "Spiritual anatomy: Nadis, Chakras and Koshas",
-      ],
-    },
   ],
   evaluation: [
     {
@@ -312,13 +243,14 @@ const breadcrumbSchema = {
   ],
 };
 
-export default function FiveHundredHourPage() {
+export default async function FiveHundredHourPage() {
+  const { modules: curriculum } = await getCurriculum("HOUR_500");
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
-      <CourseProgram config={config} />
+      <CourseProgram config={{ ...config, curriculum }} />
     </>
   );
 }
