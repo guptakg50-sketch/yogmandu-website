@@ -190,10 +190,11 @@ export default async function ClassSchedulePage() {
       {/* ── Interactive schedule grid (client component) ── */}
       <ScheduleGrid sessions={sessions} instructorMap={instructorMap} />
 
-      {/* ── Yoga classes we offer — admin-editable graphic (Page Content) ── */}
-      <section style={{ background: "#FFFFFF", padding: "3.5rem 1.5rem 1rem" }}>
-        <div style={{ maxWidth: 1000, margin: "0 auto", borderRadius: "1.25rem", overflow: "hidden",
-          border: "1px solid rgba(107,45,139,0.14)", boxShadow: "0 18px 48px rgba(107,45,139,0.14)" }}>
+      {/* ── Yoga classes we offer — admin-editable graphic (Page Content) ──
+          The graphic's own background is near-white (#FEFCFB), so it sits
+          directly on the page with no card/border to blend seamlessly. */}
+      <section style={{ background: "#FEFCFB", padding: "3rem 1.5rem 2rem" }}>
+        <div style={{ maxWidth: 980, margin: "0 auto" }}>
           <img src={classesOffer.image} alt={classesOffer.imageAlt}
             width={1400} height={933} loading="lazy" decoding="async"
             style={{ display: "block", width: "100%", height: "auto" }} />
