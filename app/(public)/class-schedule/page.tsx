@@ -49,11 +49,12 @@ const levelColor = (level: string) => {
 };
 
 export default async function ClassSchedulePage() {
-  const [sessions, instructorMap, hub, studio] = await Promise.all([
+  const [sessions, instructorMap, hub, studio, classesOffer] = await Promise.all([
     getActiveSessions(),
     getInstructorMap(),
     getHubConfig("YOGA_CLASSES"),
     getSectionContent("INSIDE_STUDIO"),
+    getSectionContent("CLASSES_WE_OFFER"),
   ]);
   return (
     <main style={{ background: "#FFFFFF", minHeight: "100vh" }}>
@@ -188,6 +189,16 @@ export default async function ClassSchedulePage() {
 
       {/* ── Interactive schedule grid (client component) ── */}
       <ScheduleGrid sessions={sessions} instructorMap={instructorMap} />
+
+      {/* ── Yoga classes we offer — admin-editable graphic (Page Content) ── */}
+      <section style={{ background: "#FFFFFF", padding: "3.5rem 1.5rem 1rem" }}>
+        <div style={{ maxWidth: 1000, margin: "0 auto", borderRadius: "1.25rem", overflow: "hidden",
+          border: "1px solid rgba(107,45,139,0.14)", boxShadow: "0 18px 48px rgba(107,45,139,0.14)" }}>
+          <img src={classesOffer.image} alt={classesOffer.imageAlt}
+            width={1400} height={933} loading="lazy" decoding="async"
+            style={{ display: "block", width: "100%", height: "auto" }} />
+        </div>
+      </section>
 
       {/* ── Inside the studio ── */}
       <section style={{ background: "#F9F5FF", padding: "5rem 1.5rem" }}>

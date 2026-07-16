@@ -27,6 +27,16 @@ export const INSIDE_STUDIO_DEFAULT = {
   secondaryHref: "https://wa.me/9779810263277",
 };
 
+export const HOME_HERO_PHOTO_DEFAULT = {
+  image: "/images/home/hero-class.webp",
+  imageAlt: "A full morning group yoga class in lunge pose at the Yogmandu studio in Mid-Baneshwor, Kathmandu",
+};
+
+export const CLASSES_WE_OFFER_DEFAULT = {
+  image: "/images/schedule/classes-we-offer.webp",
+  imageAlt: "Yoga classes we offer at Yogmandu — Power Yoga for strength and stamina, Flexibility Yoga for mobility, Hatha Yoga for balance of body, breath and mind, Astanga Vinyasa dynamic flow, Asana & Meditation for mindfulness, and Pranayama & Suryanamaskar for breath control and energising sun salutations",
+};
+
 export const YTT_GRADUATION_DEFAULT = {
   heading: "Graduation",
   body: "All graduates receive an internationally recognised Yoga Alliance RYT 200 certificate and can register as Registered Yoga Teachers.",
@@ -76,6 +86,8 @@ export const TIMING_NOTICE_DEFAULT = {
 
 const SECTION_DEFAULTS = {
   INSIDE_STUDIO:    INSIDE_STUDIO_DEFAULT,
+  HOME_HERO_PHOTO:  HOME_HERO_PHOTO_DEFAULT,
+  CLASSES_WE_OFFER: CLASSES_WE_OFFER_DEFAULT,
   YTT_GRADUATION:   YTT_GRADUATION_DEFAULT,
   YTT_CANCELLATION: YTT_CANCELLATION_DEFAULT,
   YTT_PLEASE_NOTE:  YTT_PLEASE_NOTE_DEFAULT,
@@ -107,6 +119,22 @@ const SECTION_META: Record<SectionKey, { label: string; page: string; fields: Fi
       { name: "primaryHref", label: "Primary button link", type: "text" },
       { name: "secondaryLabel", label: "Secondary button label", type: "text" },
       { name: "secondaryHref", label: "Secondary button link", type: "text" },
+    ],
+  },
+  HOME_HERO_PHOTO: {
+    label: "Homepage hero photo",
+    page: "/ (homepage)",
+    fields: [
+      { name: "image", label: "Photo", type: "image" },
+      { name: "imageAlt", label: "Photo alt text (SEO)", type: "text" },
+    ],
+  },
+  CLASSES_WE_OFFER: {
+    label: "“Yoga Classes We Offer” graphic",
+    page: "/class-schedule",
+    fields: [
+      { name: "image", label: "Graphic", type: "image" },
+      { name: "imageAlt", label: "Graphic alt text (SEO)", type: "textarea" },
     ],
   },
   YTT_GRADUATION: {

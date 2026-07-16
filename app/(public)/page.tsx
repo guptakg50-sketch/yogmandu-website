@@ -7,6 +7,9 @@ import ProgramsSection from "@/components/ProgramsSectionClient";
 import WhySection from "@/components/WhySection";
 import PhotoCarousel from "@/components/PhotoCarousel";
 import { DeferUntilIdle, DeferUntilVisible } from "@/components/DeferredHeavy";
+import { getSectionContent } from "@/lib/pageContent";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: { absolute: "Yoga Classes & Teacher Training in Kathmandu | Yogmandu" },
@@ -56,7 +59,8 @@ const courseSchema = {
   ],
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const heroPhoto = await getSectionContent("HOME_HERO_PHOTO");
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
@@ -101,6 +105,16 @@ export default function HomePage() {
               <br />
               <em style={{ color: "#A65808" }}>hold your practice</em>
             </h1>
+
+            {/* Studio photo — admin-editable (Page Content → Homepage hero photo) */}
+            <div className="mb-8 max-w-md" style={{
+              borderRadius: "1.25rem", overflow: "hidden",
+              border: "1px solid rgba(247,148,29,0.25)",
+              boxShadow: "0 16px 40px rgba(107,45,139,0.15)" }}>
+              <img src={heroPhoto.image} alt={heroPhoto.imageAlt}
+                width={1200} height={903} fetchPriority="high" decoding="async"
+                style={{ display: "block", width: "100%", height: "auto" }} />
+            </div>
 
             <p className="text-base leading-relaxed mb-8 max-w-md" style={{ color: "#4A2E1A", fontWeight: 400 }}>
               Daily yoga classes in Mid-Baneshwor, Kathmandu — minutes from New Baneshwor &amp; the airport.
