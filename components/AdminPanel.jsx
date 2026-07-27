@@ -3075,90 +3075,232 @@ function PopupManager({ media = [], setMedia, toast }) {
   );
 }
 
+// ── Pricing ───────────────────────────────────────────────────────────────────
+// Every price on the website in one screen. The numbers themselves still belong
+// to the documents that render them (program cards, hub cards, service pages,
+// sessions, the sound-healing card), so editing here writes straight back to
+// the same records the pages read — this screen is a view over them, not a copy.
 function PricingManager({ toast }) {
-  const [loaded, setLoaded] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [l1Price, setL1Price] = useState("");
-  const [l1Note,  setL1Note]  = useState("");
-  const [l2Price, setL2Price] = useState("");
-  const [l2Note,  setL2Note]  = useState("");
+  const [loaded, setLoaded]   = useState(false);
+  const [saving, setSaving]   = useState(false);
+  const [error, setError]     = useState("");
+  const [query, setQuery]     = useState("");
+  const [docs, setDocs]       = useState([]);      // page-content docs (tiers | hub | service)
+  const [sessions, setSessions] = useState([]);    // class prices (NPR, per session)
+  const [sound, setSound]     = useState({ l1Price: "", l1Note: "", l2Price: "", l2Note: "" });
+  const [dirty, setDirty]     = useState({ docs: new Set(), sessions: false, sound: false });
+  const [showClasses, setShowClasses] = useState(false);
 
-  useEffect(() => {
-    fetch("/api/admin/pricing")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((res) => {
-        const sc = res?.data?.soundCert || {};
-        setL1Price(sc.level1?.price || "");
-        setL1Note(sc.level1?.note || "");
-        setL2Price(sc.level2?.price || "");
-        setL2Note(sc.level2?.note || "");
+  const load = () => {
+    setError("");
+    Promise.all([
+      fetchJson("/api/admin/page-content").catch(() => ({ items: [] })),
+      fetchJson("/api/admin/sessions").catch(() => ({ data: [] })),
+      fetchJson("/api/admin/pricing").catch(() => ({ data: {} })),
+    ])
+      .then(([content, sess, pricing]) => {
+        setDocs((content.items || []).filter((d) => ["tiers", "hub", "service"].includes(d.kind)));
+        setSessions(asArray(sess.data));
+        const sc = pricing?.data?.soundCert || {};
+        setSound({
+          l1Price: sc.level1?.price || "", l1Note: sc.level1?.note || "",
+          l2Price: sc.level2?.price || "", l2Note: sc.level2?.note || "",
+        });
+        setDirty({ docs: new Set(), sessions: false, sound: false });
       })
-      .catch(() => {})
+      .catch((e) => setError(e.message || "Could not load pricing"))
       .finally(() => setLoaded(true));
-  }, []);
+  };
+  useEffect(load, []);
 
-  async function persist() {
+  const markDoc = (key) => setDirty((d) => ({ ...d, docs: new Set(d.docs).add(key) }));
+
+  // One card inside a tiers/hub document.
+  const setTier = (docKey, i, patch) => {
+    setDocs((items) => items.map((d) => (d.key === docKey
+      ? { ...d, data: { ...d.data, tiers: (d.data.tiers || []).map((t, j) => (j === i ? { ...t, ...patch } : t)) } }
+      : d)));
+    markDoc(docKey);
+  };
+  // The headline price on a service page document.
+  const setService = (docKey, patch) => {
+    setDocs((items) => items.map((d) => (d.key === docKey ? { ...d, data: { ...d.data, ...patch } } : d)));
+    markDoc(docKey);
+  };
+  const setSessionPrice = (id, price) => {
+    setSessions((items) => items.map((s) => (s.id === id ? { ...s, price } : s)));
+    setDirty((d) => ({ ...d, sessions: true }));
+  };
+
+  const hasChanges = dirty.docs.size > 0 || dirty.sessions || dirty.sound;
+
+  async function saveAll() {
     setSaving(true);
-    const payload = {
-      soundCert: {
-        level1: { price: l1Price, note: l1Note },
-        level2: { price: l2Price, note: l2Note },
-      },
-    };
+    let saved = 0;
     try {
-      const res = await fetch("/api/admin/pricing", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) { toast("Pricing saved — live on next page load"); return; }
-      toast(data?.error || "Save failed");
-    } catch {
-      toast("Save failed — server error");
+      for (const key of dirty.docs) {
+        const doc = docs.find((d) => d.key === key);
+        if (!doc) continue;
+        await fetchJson("/api/admin/page-content", { method: "PUT", body: JSON.stringify({ key, data: doc.data }) });
+        saved += 1;
+      }
+      if (dirty.sessions) {
+        await fetchJson("/api/admin/sessions", { method: "PUT", body: JSON.stringify(sessions) });
+        saved += 1;
+      }
+      if (dirty.sound) {
+        await fetchJson("/api/admin/pricing", {
+          method: "PUT",
+          body: JSON.stringify({ soundCert: {
+            level1: { price: sound.l1Price, note: sound.l1Note },
+            level2: { price: sound.l2Price, note: sound.l2Note },
+          } }),
+        });
+        saved += 1;
+      }
+      setDirty({ docs: new Set(), sessions: false, sound: false });
+      toast(saved ? "Pricing saved — live on the site within a few minutes" : "Nothing to save");
+    } catch (e) {
+      toast(e.message || "Save failed");
     } finally {
       setSaving(false);
     }
   }
 
   if (!loaded) {
-    return <div className="space-y-4">{Array.from({ length: 2 }, (_, i) => <div key={i} className="h-24 animate-pulse rounded-xl bg-stone-200" />)}</div>;
+    return <div className="space-y-4">{Array.from({ length: 4 }, (_, i) => <div key={i} className="h-24 animate-pulse rounded-xl bg-stone-200" />)}</div>;
   }
+  if (error) {
+    return <EmptyState icon={AlertTriangle} title="Couldn't load pricing" text={error} action={<Button onClick={load}><RefreshCw size={16} /> Retry</Button>} />;
+  }
+
+  const q = query.trim().toLowerCase();
+  const matches = (...text) => !q || text.filter(Boolean).join(" ").toLowerCase().includes(q);
+
+  const tierDocs    = docs.filter((d) => d.kind === "tiers");
+  const hubDocs     = docs.filter((d) => d.kind === "hub");
+  const serviceDocs = docs.filter((d) => d.kind === "service" && (d.data.price || d.data.priceNote));
+  const otherSvc    = docs.filter((d) => d.kind === "service" && !d.data.price && !d.data.priceNote);
+  const visibleSessions = sessions.filter((s) => matches(s.name));
+
+  const priceCount =
+    tierDocs.reduce((n, d) => n + (d.data.tiers || []).length, 0) +
+    hubDocs.reduce((n, d) => n + (d.data.tiers || []).length, 0) +
+    docs.filter((d) => d.kind === "service").length + sessions.length + 2;
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-stone-900">Sound Healing Certification Pricing</h2>
-          <p className="text-sm text-stone-500">Rates shown on the two certification cards (/sound-healing-therapy). Leave a price blank to show &ldquo;Price on request&rdquo;.</p>
+          <h2 className="text-lg font-semibold text-stone-900">Pricing</h2>
+          <p className="text-sm text-stone-500">Every price on the website — {priceCount} in total. Change one here and the page that shows it updates; nothing is duplicated.</p>
         </div>
-        <Button onClick={persist} disabled={saving}><Save size={16} /> {saving ? "Saving…" : "Save & Publish"}</Button>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="space-y-4 rounded-xl border border-stone-200 bg-stone-50 p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Level I · Foundational</p>
-          <Field label="Price" hint="e.g. USD 150 / NPR 18,000">
-            <TextInput value={l1Price} placeholder="USD 150 / NPR 18,000" onChange={(e) => setL1Price(e.target.value)} />
-          </Field>
-          <Field label="Note under price (optional)" hint="e.g. 20 hours · certificate included">
-            <TextInput value={l1Note} placeholder="20 hours · certificate included" onChange={(e) => setL1Note(e.target.value)} />
-          </Field>
-        </div>
-
-        <div className="space-y-4 rounded-xl border border-stone-200 bg-stone-50 p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-purple-700">Level II · Advanced</p>
-          <Field label="Price" hint="e.g. USD 300 / NPR 36,000">
-            <TextInput value={l2Price} placeholder="USD 300 / NPR 36,000" onChange={(e) => setL2Price(e.target.value)} />
-          </Field>
-          <Field label="Note under price (optional)">
-            <TextInput value={l2Note} placeholder="Extended program · certificate included" onChange={(e) => setL2Note(e.target.value)} />
-          </Field>
+        <div className="flex items-center gap-2">
+          {hasChanges && <Badge className="bg-amber-100 text-amber-700">Unsaved changes</Badge>}
+          <Button onClick={saveAll} disabled={saving || !hasChanges}><Save size={16} /> {saving ? "Saving…" : "Save & Publish"}</Button>
         </div>
       </div>
+
+      <div className="relative">
+        <Search className="absolute left-3 top-2.5 text-stone-400" size={16} />
+        <TextInput className="pl-9" placeholder="Search by program, service or class name" value={query} onChange={(e) => setQuery(e.target.value)} />
+      </div>
+
+      {/* Teacher-training and hub cards share the same card shape. */}
+      {[...tierDocs, ...hubDocs].map((doc) => {
+        const rows = (doc.data.tiers || []).map((t, i) => ({ t, i })).filter(({ t }) => matches(t.title, t.category, t.price));
+        if (rows.length === 0) return null;
+        return (
+          <PricingGroup key={doc.key} title={doc.label} page={doc.page}>
+            {rows.map(({ t, i }) => (
+              <div key={t.id || i} className="grid gap-3 border-t border-stone-100 p-4 md:grid-cols-[minmax(0,1.2fr)_repeat(3,minmax(0,1fr))] md:items-center">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-stone-900">{t.title || `Card ${i + 1}`}</p>
+                  {t.category && <p className="truncate text-xs text-stone-400">{t.category}</p>}
+                </div>
+                <Field label="Price"><TextInput value={t.price || ""} placeholder="USD 600" onChange={(e) => setTier(doc.key, i, { price: e.target.value })} /></Field>
+                <Field label="Sub-line"><TextInput value={t.priceSub || ""} placeholder="NPR rates for Nepali citizens" onChange={(e) => setTier(doc.key, i, { priceSub: e.target.value })} /></Field>
+                <Field label="Note"><TextInput value={t.priceNote || ""} placeholder="28-day program" onChange={(e) => setTier(doc.key, i, { priceNote: e.target.value })} /></Field>
+              </div>
+            ))}
+          </PricingGroup>
+        );
+      })}
+
+      {/* Individual service pages. */}
+      <PricingGroup title="Service pages" page="one headline price per service page">
+        {[...serviceDocs, ...otherSvc]
+          .filter((d) => matches(d.label, d.page, d.data.price))
+          .map((doc) => (
+            <div key={doc.key} className="grid gap-3 border-t border-stone-100 p-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1.4fr)] md:items-center">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-stone-900">{doc.label}</p>
+                <p className="truncate text-xs text-stone-400">{doc.page}</p>
+              </div>
+              <Field label="Price" hint={doc.data.price ? "" : "blank = hidden"}>
+                <TextInput value={doc.data.price || ""} placeholder="From NPR 600" onChange={(e) => setService(doc.key, { price: e.target.value })} />
+              </Field>
+              <Field label="Note under the price">
+                <TextInput value={doc.data.priceNote || ""} placeholder="Per class · packages available" onChange={(e) => setService(doc.key, { priceNote: e.target.value })} />
+              </Field>
+            </div>
+          ))}
+      </PricingGroup>
+
+      {/* Sound healing certification — the two cards this tab used to hold. */}
+      <PricingGroup title="Sound Healing certification" page="/sound-healing-therapy">
+        <div className="grid gap-4 border-t border-stone-100 p-4 md:grid-cols-2">
+          <div className="space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Level I · Foundational</p>
+            <Field label="Price" hint="blank shows “Price on request”"><TextInput value={sound.l1Price} placeholder="USD 150 / NPR 18,000" onChange={(e) => { setSound({ ...sound, l1Price: e.target.value }); setDirty((d) => ({ ...d, sound: true })); }} /></Field>
+            <Field label="Note under price"><TextInput value={sound.l1Note} placeholder="20 hours · certificate included" onChange={(e) => { setSound({ ...sound, l1Note: e.target.value }); setDirty((d) => ({ ...d, sound: true })); }} /></Field>
+          </div>
+          <div className="space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-purple-700">Level II · Advanced</p>
+            <Field label="Price"><TextInput value={sound.l2Price} placeholder="USD 300 / NPR 36,000" onChange={(e) => { setSound({ ...sound, l2Price: e.target.value }); setDirty((d) => ({ ...d, sound: true })); }} /></Field>
+            <Field label="Note under price"><TextInput value={sound.l2Note} placeholder="Extended program · certificate included" onChange={(e) => { setSound({ ...sound, l2Note: e.target.value }); setDirty((d) => ({ ...d, sound: true })); }} /></Field>
+          </div>
+        </div>
+      </PricingGroup>
+
+      {/* Per-class prices. Collapsed by default — there are a lot of them. */}
+      <PricingGroup
+        title={`Class prices (${sessions.length})`}
+        page="Sessions · the NPR amount on each class"
+        action={<Button variant="secondary" onClick={() => setShowClasses((v) => !v)}>{showClasses ? "Hide" : "Show"}</Button>}
+      >
+        {(showClasses || q) && (
+          <div className="grid gap-3 border-t border-stone-100 p-4 md:grid-cols-2 xl:grid-cols-3">
+            {visibleSessions.map((s) => (
+              <label key={s.id} className="flex items-center gap-3">
+                <span className="min-w-0 flex-1 truncate text-sm text-stone-700" title={s.name}>{s.name}</span>
+                <span className="text-xs text-stone-400">NPR</span>
+                <TextInput type="number" className="w-28" value={s.price ?? 0} onChange={(e) => setSessionPrice(s.id, Number(e.target.value))} />
+              </label>
+            ))}
+            {visibleSessions.length === 0 && <p className="text-sm text-stone-400">No classes match that search.</p>}
+          </div>
+        )}
+      </PricingGroup>
     </div>
   );
 }
+
+function PricingGroup({ title, page, action, children }) {
+  return (
+    <section className="overflow-hidden rounded-xl border border-stone-200 bg-white">
+      <div className="flex items-center justify-between gap-3 bg-stone-50 px-4 py-3">
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-stone-800">{title}</p>
+          <p className="truncate text-xs text-stone-500">{page}</p>
+        </div>
+        {action}
+      </div>
+      {children}
+    </section>
+  );
+}
+
 
 const REVIEW_COLORS = [
   { value: "#F7941D", label: "Orange" },
