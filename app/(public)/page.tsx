@@ -7,9 +7,11 @@ import ProgramsSection from "@/components/ProgramsSectionClient";
 import WhySection from "@/components/WhySection";
 import PhotoCarousel from "@/components/PhotoCarousel";
 import { DeferUntilIdle, DeferUntilVisible } from "@/components/DeferredHeavy";
+import CardIcon from "@/components/CardIcon";
+import SectionImage from "@/components/SectionImage";
 import { getSectionContent } from "@/lib/pageContent";
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: { absolute: "Yoga Classes & Teacher Training in Kathmandu | Yogmandu" },
@@ -60,7 +62,10 @@ const courseSchema = {
 };
 
 export default async function HomePage() {
-  const heroPhoto = await getSectionContent("HOME_HERO_PHOTO");
+  const [heroPhoto, quickLinks] = await Promise.all([
+    getSectionContent("HOME_HERO_PHOTO"),
+    getSectionContent("HOME_QUICK_LINKS"),
+  ]);
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
@@ -124,9 +129,9 @@ export default async function HomePage() {
             {/* ── 3 main focuses ── */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
               {[
-                { href: "/class-schedule",        icon: "🗓", label: "Class Schedule",    color: "#6B2D8B", bg: "rgba(107,45,139,0.07)", border: "rgba(107,45,139,0.2)" },
-                { href: "/yoga-teacher-training",  icon: "🧘", label: "Teacher Training", color: "#2A1208", bg: "rgba(247,148,29,0.07)", border: "rgba(247,148,29,0.2)" },
-                { href: "/sound-healing-therapy",  icon: "🎵", label: "Sound Healing",    color: "#2A1208", bg: "rgba(141,198,63,0.07)", border: "rgba(141,198,63,0.25)" },
+                { href: "/class-schedule",        icon: "calendar", label: "Class Schedule",    color: "#6B2D8B", bg: "rgba(107,45,139,0.07)", border: "rgba(107,45,139,0.2)" },
+                { href: "/yoga-teacher-training",  icon: "lotus",    label: "Teacher Training", color: "#2A1208", bg: "rgba(247,148,29,0.07)", border: "rgba(247,148,29,0.2)" },
+                { href: "/sound-healing-therapy",  icon: "bowl",     label: "Sound Healing",    color: "#2A1208", bg: "rgba(141,198,63,0.07)", border: "rgba(141,198,63,0.25)" },
               ].map(item => (
                 <Link
                   key={item.href}
@@ -140,7 +145,7 @@ export default async function HomePage() {
                     fontSize: "0.9rem", transition: "all 0.25s",
                   }}
                 >
-                  <span style={{ fontSize: "1.1rem" }}>{item.icon}</span>
+                  <CardIcon name={item.icon} size={18} />
                   {item.label}
                 </Link>
               ))}
@@ -215,58 +220,7 @@ export default async function HomePage() {
           maxWidth: 1200, margin: "0 auto", padding: "0 1.5rem",
           display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.5rem",
         }}>
-          {[
-            // accent = decorative (top bar, border, bg tint) — kept bright/brand
-            // textAccent = used for CTA text + dynamic UI text — meets WCAG AA on white
-            {
-              href: "/class-schedule",
-              accent: "#6B2D8B", textAccent: "#6B2D8B",
-              icon: "🗓",
-              title: "Class Schedule",
-              desc: "Browse our weekly yoga timetable — morning flows, evening restorative sessions, pranayama and more.",
-              cta: "View Schedule",
-            },
-            {
-              href: "/yoga-teacher-training",
-              accent: "#F7941D", textAccent: "#A65808",
-              icon: "🧘",
-              title: "Yoga Teacher Training",
-              desc: "Yoga Alliance RYS 200, 300 & 500 certified programs in the heart of Kathmandu, Nepal.",
-              cta: "View Programs",
-            },
-            {
-              href: "/book?service=sound",
-              accent: "#8DC63F", textAccent: "#4A6418",
-              icon: "🎵",
-              title: "Sound Healing",
-              desc: "Authentic Tibetan singing bowl therapy — individual sessions, group healing and full certification courses.",
-              cta: "Book a Session",
-            },
-            {
-              href: "/services",
-              accent: "#6B2D8B", textAccent: "#6B2D8B",
-              icon: "✨",
-              title: "All Services",
-              desc: "Retreats, corporate yoga, weight-loss bootcamp, therapy, diet consultation, Reiki, prenatal & more — the full range.",
-              cta: "Explore Services",
-            },
-            {
-              href: "/about",
-              accent: "#F7941D", textAccent: "#A65808",
-              icon: "🌅",
-              title: "Our Story",
-              desc: "Founded in 2018 by the teams of experts in the yoga and wellness industry. Led by Yogi Arjun Rakhal (ERYT 500, YACEP) and Dr. Chintamani Gautam (PhD Yogic Science, ERYT 500). Nepal's first Yoga Alliance registered school.",
-              cta: "Meet the Team",
-            },
-            {
-              href: "/gallery",
-              accent: "#8DC63F", textAccent: "#4A6418",
-              icon: "📷",
-              title: "Studio & Students",
-              desc: "Photos from classes, sound baths, retreats, and 200hr graduates from 50+ countries — see what awaits you in Kathmandu.",
-              cta: "View Gallery",
-            },
-          ].map(item => (
+          {quickLinks.cards.map(item => (
             <div
               key={item.href}
               className="service-card card-link"
@@ -289,7 +243,7 @@ export default async function HomePage() {
               {/* Whole-card link — the CTA below stays clickable above it */}
               <Link href={item.href} aria-label={item.title}
                 style={{ position: "absolute", inset: 0, zIndex: 1, borderRadius: "1.25rem" }} />
-              <span style={{ fontSize: "2rem", display: "block", marginBottom: 12 }}>{item.icon}</span>
+              <CardIcon name={item.icon} size={32} style={{ color: item.accent, marginBottom: 12 }} />
               <h2 style={{
                 fontFamily: "Cormorant Garamond, serif",
                 fontSize: "1.4rem", fontWeight: 400,
@@ -324,6 +278,9 @@ export default async function HomePage() {
       </section>
 
       {/* ── PROGRAMS — 3D interactive section, lazy when in view ── */}
+      <div style={{ background: "#FFFFFF", padding: "2rem 1.5rem 0" }}>
+        <SectionImage slot="home-programs" />
+      </div>
       <DeferUntilVisible fallback={<div style={{ minHeight: 600 }} />}>
         <ProgramsSection />
       </DeferUntilVisible>

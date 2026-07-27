@@ -4,7 +4,7 @@ import PricingSection from "../PricingSection";
 import { getTierSet, getSectionContent, getCurriculum } from "@/lib/pageContent";
 
 // Pricing card + policy/disclaimer copy are admin-editable (Page Content).
-export const revalidate = 60;
+export const revalidate = 300;
 import IntakeMonths from "../IntakeMonths";
 import TimingNotice from "@/components/TimingNotice";
 

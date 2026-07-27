@@ -4,7 +4,7 @@ import { ServiceHub } from "../service/ServiceHub";
 import { getHubConfig } from "@/lib/pageContent";
 
 // Hub cards are admin-editable (Page Content → Cards & Pricing).
-export const revalidate = 60;
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: { absolute: "Yoga Retreat in Nepal — Kathmandu & Himalayas | Yogmandu" },
@@ -166,7 +166,7 @@ export default async function YogaRetreatNepalPage() {
       </section>
 
       {/* Retreats & special programs — service hub (same 3D cards as Teacher Training), up top */}
-      <ServiceHub {...hub} />
+      <ServiceHub {...hub} imageSlot="hub-RETREATS" />
 
       {/* Why Nepal */}
       <section className="py-24 px-6" style={{ background: "#F9F5FF" }}>

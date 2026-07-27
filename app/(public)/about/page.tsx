@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import AboutContent from "./AboutContent";
-import { getInstructors, instructorSlug } from "@/lib/publicData";
+import { getInstructors, instructorSlug, isInstructorVisible } from "@/lib/publicData";
 
 // Brand palette + initials are derived here since the admin record doesn't store them.
 const TEAM_PALETTE = ["#6B2D8B", "#F7941D", "#8DC63F"];
@@ -13,7 +13,7 @@ function initialsOf(name: string): string {
 }
 
 // Revalidate so admin edits to instructors appear without a redeploy (matches blog/schedule).
-export const revalidate = 60;
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: { absolute: "About Yogmandu — Yoga School in Kathmandu, Nepal" },
@@ -88,7 +88,7 @@ export default async function AboutPage() {
   // team when Supabase is unconfigured/empty/unreachable (getInstructors → null).
   const instructors = await getInstructors().catch(() => null);
   const team = (instructors ?? [])
-    .filter((i) => (i.status ?? "Active") === "Active")
+    .filter(isInstructorVisible)
     .map((i, idx) => ({
       name:           i.name,
       slug:           instructorSlug(i.name),

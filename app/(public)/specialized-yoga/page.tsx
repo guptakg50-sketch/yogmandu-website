@@ -3,7 +3,7 @@ import CategoryHub from "../service/CategoryHub";
 import { getHubConfig } from "@/lib/pageContent";
 
 // Hub cards are admin-editable (Page Content → Cards & Pricing).
-export const revalidate = 60;
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: { absolute: "Prenatal, Kids, Senior & School Yoga in Kathmandu | Yogmandu" },
@@ -33,6 +33,7 @@ export default async function Page() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <CategoryHub config={{
+        imageSlot: "hub-SPECIALIZED",
         eyebrow: "For Specific Groups",
         titleA: "Yoga for",
         titleEm: "every stage of life",

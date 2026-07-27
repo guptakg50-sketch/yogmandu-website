@@ -7,7 +7,7 @@ import { ServiceHub } from "../service/ServiceHub";
 import { getActiveSessions, getInstructorMap } from "@/lib/publicData";
 import { getHubConfig, getSectionContent } from "@/lib/pageContent";
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: { absolute: "Yoga Classes in Baneshwor, Kathmandu | Yogmandu" },
@@ -161,7 +161,7 @@ export default async function ClassSchedulePage() {
       </div>
 
       {/* ── Ways to practise — service hub (same 3D cards as Teacher Training), up top ── */}
-      <ServiceHub {...hub} />
+      <ServiceHub {...hub} imageSlot="hub-YOGA_CLASSES" />
 
       {/* ── Legend ── */}
       <div style={{ background: "#F9F5FF", padding: "1.25rem 2rem", borderBottom: "1px solid rgba(107,45,139,0.1)" }}>

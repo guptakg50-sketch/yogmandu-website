@@ -12,6 +12,15 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  // ISR/SSG cache store. Without this the incremental cache is "dummy", which
+  // means EVERY request full-renders the page (and re-queries Supabase) —
+  // the cause of the 1102 "Worker exceeded resource limits" crashes.
+  "kv_namespaces": [
+    {
+      "binding": "NEXT_INC_CACHE_KV",
+      "id": "f511506f2b1342b6b01cca3e9d09ec04"
+    }
+  ],
   // Persist Worker logs so runtime errors (e.g. the 1102 resource-limit crash)
   // are actually inspectable via `wrangler tail` and the dashboard Logs tab.
   "observability": {

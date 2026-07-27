@@ -4,13 +4,14 @@ import { notFound } from "next/navigation";
 import {
   getInstructors,
   getInstructorBySlug,
+  isInstructorVisible,
   instructorSlug,
   styleToAccent,
 } from "@/lib/publicData";
 
 // Re-fetch from Supabase at most once a minute so admin edits to a teacher
 // appear without a redeploy. New slugs are rendered on first request.
-export const revalidate = 60;
+export const revalidate = 300;
 export const dynamicParams = true;
 
 type Params = Promise<{ slug: string }>;
@@ -25,7 +26,7 @@ function initialsOf(name: string): string {
 
 export async function generateStaticParams() {
   const list = await getInstructors().catch(() => null);
-  return (list ?? []).map((i) => ({ slug: instructorSlug(i.name) }));
+  return (list ?? []).filter(isInstructorVisible).map((i) => ({ slug: instructorSlug(i.name) }));
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
@@ -56,7 +57,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default async function TeacherPage({ params }: { params: Params }) {
   const { slug } = await params;
   const t = await getInstructorBySlug(slug).catch(() => null);
-  if (!t) notFound();
+  // Hidden teachers 404 rather than keeping a live page nobody links to.
+  if (!t || !isInstructorVisible(t)) notFound();
 
   const specialties = Array.isArray(t.specialties) ? t.specialties : [];
   const accent      = styleToAccent(specialties);

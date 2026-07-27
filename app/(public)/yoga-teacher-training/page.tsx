@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PricingCard } from "./PricingSection";
+import SectionImage from "@/components/SectionImage";
 import { getTierSet, getSectionContent, getCurriculum } from "@/lib/pageContent";
 
 // Program cards, graduation section and cancellation table are admin-editable
 // (Page Content); re-render picks up saved overrides within a minute.
-export const revalidate = 60;
+export const revalidate = 300;
 import IntakeMonths from "./IntakeMonths";
 
 export const metadata: Metadata = {
@@ -254,6 +255,7 @@ export default async function YogaTeacherTrainingPage() {
             </p>
             <div className="section-divider mt-6" />
           </div>
+          <SectionImage slot="ytt-programs" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 md:gap-6 pt-8" style={{ perspective: "1500px" }}>
             {programTiers.map((tier) => <PricingCard key={tier.id} tier={tier} />)}
           </div>
@@ -270,6 +272,7 @@ export default async function YogaTeacherTrainingPage() {
           <p className="text-sm mb-10" style={{ color: "#7A5840" }}>
             Tap a month to reserve your place — each cohort is limited to 12 students.
           </p>
+          <SectionImage slot="ytt-dates" />
           <IntakeMonths />
           <p className="text-sm mt-6" style={{ color: "#7A5840" }}>Secure your place with a USD 200 deposit · Full balance due on arrival</p>
         </div>
@@ -285,6 +288,7 @@ export default async function YogaTeacherTrainingPage() {
             </h2>
             <div className="section-divider mt-6" />
           </div>
+          <SectionImage slot="ytt-curriculum" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {curriculum.map(block => (
               <div key={block.title} className="lift-3d rounded-2xl p-8 relative overflow-hidden"

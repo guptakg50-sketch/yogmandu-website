@@ -5,7 +5,7 @@ import { ServiceHub } from "../service/ServiceHub";
 import { getHubConfig, getSectionContent } from "@/lib/pageContent";
 
 // Hub cards + "In Session" photos are admin-editable (Page Content).
-export const revalidate = 60;
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: { absolute: "Sound Healing Kathmandu — Tibetan Singing Bowls | Yogmandu" },
@@ -191,7 +191,7 @@ export default async function SoundHealingPage() {
       </section>
 
       {/* Sound healing offerings — service hub (same 3D cards as Teacher Training), up top */}
-      <ServiceHub {...hub} />
+      <ServiceHub {...hub} imageSlot="hub-SOUND_HEALING" />
 
       {/* How it works */}
       <section className="py-24 px-6" style={{ background: "#F9F5FF" }}>

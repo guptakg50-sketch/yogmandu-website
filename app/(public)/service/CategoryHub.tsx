@@ -17,6 +17,8 @@ export type CategoryHubConfig = {
   primaryCta: { href: string; label: string };
   hub:       HubConfig;
   accent:    string;
+  /** Optional admin-managed image band under the hub heading. */
+  imageSlot?: string;
 };
 
 export default function CategoryHub({ config: c }: { config: CategoryHubConfig }) {
@@ -52,7 +54,7 @@ export default function CategoryHub({ config: c }: { config: CategoryHubConfig }
       </section>
 
       {/* The 3D card hub grid */}
-      <ServiceHub {...c.hub} />
+      <ServiceHub {...c.hub} imageSlot={c.imageSlot} />
 
       {/* Closing CTA */}
       <section className="py-20 px-6" style={{ background: "#F9F5FF" }}>

@@ -3,7 +3,7 @@ import GalleryGrid from "./GalleryGrid";
 import { getGalleryItems } from "@/lib/publicData";
 import { resolveGalleryPhotos, toAbsoluteSrc } from "./galleryData";
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",

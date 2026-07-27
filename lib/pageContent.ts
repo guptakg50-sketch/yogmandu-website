@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabaseAdmin";
 import { SERVICE_CONFIGS, type ServiceConfig, type ServiceConfigKey } from "@/app/(public)/service/serviceContent";
 import { HUB_CONFIGS, type HubConfig, type HubConfigKey } from "@/app/(public)/service/hubContent";
@@ -34,7 +35,77 @@ export const HOME_HERO_PHOTO_DEFAULT = {
 
 export const CLASSES_WE_OFFER_DEFAULT = {
   image: "/images/schedule/classes-we-offer.webp",
-  imageAlt: "Yoga classes we offer at Yogmandu — Power Yoga for strength and stamina, Flexibility Yoga for mobility, Hatha Yoga for balance of body, breath and mind, Astanga Vinyasa dynamic flow, Asana & Meditation for mindfulness, and Pranayama & Suryanamaskar for breath control and energising sun salutations",
+  imageAlt: "Yoga classes we offer at Yogmandu — Power Yoga for strength and stamina, Flexibility Yoga for mobility, Hatha Yoga for balance of body, breath and mind, Vinyasa Flow for dynamic strength and discipline, Asana & Meditation for mindfulness, and Pranayama & Suryanamaskar for breath control and energising sun salutations",
+};
+
+// Optional image bands. Every section built as "small eyebrow line + heading"
+// has one of these slots directly under the heading; leaving the image blank
+// hides the band entirely, so the client can add a picture to any of them
+// without a code change. Images keep their own aspect ratio and scale down on
+// small screens, so any size can be uploaded.
+export const SECTION_IMAGES_DEFAULT = {
+  slots: [
+    { id: "home-programs",    label: "Homepage — Our Programs",              image: "", alt: "" },
+    { id: "ytt-programs",     label: "Teacher Training — All pathways",      image: "", alt: "" },
+    { id: "ytt-curriculum",   label: "Teacher Training — Curriculum",        image: "", alt: "" },
+    { id: "ytt-dates",        label: "Teacher Training — Intake months",     image: "", alt: "" },
+    { id: "hub-YOGA_CLASSES", label: "Class Schedule — Ways to practise",    image: "", alt: "" },
+    { id: "hub-SOUND_HEALING", label: "Sound Healing — hub cards",           image: "", alt: "" },
+    { id: "hub-RETREATS",     label: "Retreats — hub cards",                 image: "", alt: "" },
+    { id: "hub-THERAPY_WELLNESS", label: "Therapy & Wellness — hub cards",   image: "", alt: "" },
+    { id: "hub-SPECIALIZED",  label: "Specific Groups — hub cards",          image: "", alt: "" },
+    { id: "about-team",       label: "About — Meet the team",                image: "", alt: "" },
+  ],
+};
+
+// The six quick-link cards under the homepage hero. `icon` is an icon name from
+// components/CardIcon (an emoji still works — it renders as-is).
+export const HOME_QUICK_LINKS_DEFAULT = {
+  cards: [
+    {
+      href: "/class-schedule", accent: "#6B2D8B", textAccent: "#6B2D8B", icon: "calendar",
+      title: "Class Schedule",
+      desc: "Browse our weekly yoga timetable — morning flows, evening restorative sessions, pranayama and more.",
+      cta: "View Schedule",
+    },
+    {
+      href: "/yoga-teacher-training", accent: "#F7941D", textAccent: "#A65808", icon: "lotus",
+      title: "Yoga Teacher Training",
+      desc: "Yoga Alliance RYS 200, 300 & 500 certified programs in the heart of Kathmandu, Nepal.",
+      cta: "View Programs",
+    },
+    {
+      href: "/book?service=sound", accent: "#8DC63F", textAccent: "#4A6418", icon: "bowl",
+      title: "Sound Healing",
+      desc: "Authentic Tibetan singing bowl therapy — individual sessions, group healing and full certification courses.",
+      cta: "Book a Session",
+    },
+    {
+      href: "/services", accent: "#6B2D8B", textAccent: "#6B2D8B", icon: "sparkle",
+      title: "All Services",
+      desc: "Retreats, corporate yoga, weight-loss bootcamp, therapy, diet consultation, Reiki, prenatal & more — the full range.",
+      cta: "Explore Services",
+    },
+    {
+      href: "/about", accent: "#F7941D", textAccent: "#A65808", icon: "sunrise",
+      title: "Our Story",
+      desc: "Founded in 2018 by the teams of experts in the yoga and wellness industry. Led by Yogi Arjun Rakhal (ERYT 500, YACEP) and Dr. Chintamani Gautam (PhD Yogic Science, ERYT 500). Nepal's first Yoga Alliance registered school.",
+      cta: "Meet the Team",
+    },
+    {
+      href: "/gallery", accent: "#8DC63F", textAccent: "#4A6418", icon: "camera",
+      title: "Studio & Students",
+      desc: "Photos from classes, sound baths, retreats, and 200hr graduates from 50+ countries — see what awaits you in Kathmandu.",
+      cta: "View Gallery",
+    },
+  ],
+};
+
+// The category list behind the "Type" dropdown on every session. Stored here so
+// the client can add or remove categories without a code change; sessions keep
+// whatever type string they were saved with.
+export const SESSION_TYPES_DEFAULT = {
+  types: ["Class", "Workshop", "Retreat", "Drop-in", "Online"],
 };
 
 export const YTT_GRADUATION_DEFAULT = {
@@ -88,6 +159,9 @@ const SECTION_DEFAULTS = {
   INSIDE_STUDIO:    INSIDE_STUDIO_DEFAULT,
   HOME_HERO_PHOTO:  HOME_HERO_PHOTO_DEFAULT,
   CLASSES_WE_OFFER: CLASSES_WE_OFFER_DEFAULT,
+  HOME_QUICK_LINKS: HOME_QUICK_LINKS_DEFAULT,
+  SECTION_IMAGES:   SECTION_IMAGES_DEFAULT,
+  SESSION_TYPES:    SESSION_TYPES_DEFAULT,
   YTT_GRADUATION:   YTT_GRADUATION_DEFAULT,
   YTT_CANCELLATION: YTT_CANCELLATION_DEFAULT,
   YTT_PLEASE_NOTE:  YTT_PLEASE_NOTE_DEFAULT,
@@ -102,7 +176,7 @@ export type SectionKey = keyof typeof SECTION_DEFAULTS;
 // Field schemas let the admin render a form for each bespoke section without
 // hardcoding shapes client-side. types: text | textarea | image | lines |
 // pairs (when/refund rows) | photos (src+alt list).
-type FieldDef = { name: string; label: string; type: "text" | "textarea" | "image" | "lines" | "pairs" | "photos" };
+type FieldDef = { name: string; label: string; type: "text" | "textarea" | "image" | "lines" | "pairs" | "photos" | "cards" | "slots" };
 
 const SECTION_META: Record<SectionKey, { label: string; page: string; fields: FieldDef[] }> = {
   INSIDE_STUDIO: {
@@ -135,6 +209,27 @@ const SECTION_META: Record<SectionKey, { label: string; page: string; fields: Fi
     fields: [
       { name: "image", label: "Graphic", type: "image" },
       { name: "imageAlt", label: "Graphic alt text (SEO)", type: "textarea" },
+    ],
+  },
+  SECTION_IMAGES: {
+    label: "Section images (optional picture under a heading)",
+    page: "every “eyebrow + heading” section across the site",
+    fields: [
+      { name: "slots", label: "Image slots", type: "slots" },
+    ],
+  },
+  HOME_QUICK_LINKS: {
+    label: "Homepage quick-link cards (icons + text)",
+    page: "/ (homepage)",
+    fields: [
+      { name: "cards", label: "Cards", type: "cards" },
+    ],
+  },
+  SESSION_TYPES: {
+    label: "Session type list (Class, Workshop, …)",
+    page: "Admin → Sessions (the Type dropdown & filter)",
+    fields: [
+      { name: "types", label: "Session types (one per line)", type: "lines" },
     ],
   },
   YTT_GRADUATION: {
@@ -294,6 +389,29 @@ export async function getContent<T extends object>(key: string, fallback: T): Pr
 
 export async function getSectionContent<K extends SectionKey>(key: K): Promise<(typeof SECTION_DEFAULTS)[K]> {
   return getContent(`section:${key}`, SECTION_DEFAULTS[key]);
+}
+
+export type SectionImageSlot = { id: string; label: string; image: string; alt: string };
+
+/**
+ * All section image slots. Wrapped in React `cache` so a page rendering several
+ * <SectionImage> bands still makes a single database read per request.
+ */
+export const getSectionImages = cache(async (): Promise<SectionImageSlot[]> => {
+  const { slots } = await getSectionContent("SECTION_IMAGES");
+  return Array.isArray(slots) ? (slots as SectionImageSlot[]) : [];
+});
+
+/** One slot by id, or null when the client hasn't set a picture for it. */
+export async function getSectionImage(id: string): Promise<SectionImageSlot | null> {
+  const slot = (await getSectionImages()).find((s) => s.id === id);
+  return slot?.image ? slot : null;
+}
+
+/** Session categories, admin-editable. Falls back to the built-in list. */
+export async function getSessionTypes(): Promise<string[]> {
+  const { types } = await getSectionContent("SESSION_TYPES");
+  return Array.isArray(types) && types.length ? types : SESSION_TYPES_DEFAULT.types;
 }
 
 export async function getServicePageConfig(key: ServiceConfigKey): Promise<ServiceConfig> {

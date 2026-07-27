@@ -6,7 +6,7 @@ import { getBlogBySlug, getPublishedBlogs } from "@/lib/publicData";
 // Re-fetch from Supabase at most once a minute so edits made in the admin
 // Blog Manager appear on the live site without a rebuild/redeploy. New slugs
 // not returned by generateStaticParams are rendered on first request.
-export const revalidate = 60;
+export const revalidate = 300;
 export const dynamicParams = true;
 
 const CATEGORY_COLORS: Record<string, string> = {

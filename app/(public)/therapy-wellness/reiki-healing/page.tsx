@@ -4,7 +4,7 @@ import { getServicePageConfig } from "@/lib/pageContent";
 
 // Content is admin-editable (Page Content → Service Pages); re-render picks
 // up saved overrides within a minute.
-export const revalidate = 60;
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: { absolute: "Reiki Healing in Kathmandu — Energy Healing | Yogmandu" },

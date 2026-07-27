@@ -12,6 +12,8 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
+  ChevronDown,
   Clock,
   Copy,
   Download,
@@ -19,6 +21,8 @@ import {
   Eye,
   FileText,
   Globe2,
+  GripVertical,
+  EyeOff,
   Image,
   LayoutDashboard,
   Link,
@@ -38,6 +42,7 @@ import {
   Users,
   X,
 } from "lucide-react";
+import { CARD_ICONS, CARD_ICON_NAMES } from "@/components/CardIcon";
 import {
   sessionInstructorName,
   sessionSpotsLabel,
@@ -646,6 +651,7 @@ function makeInitialState() {
 
   return {
     seoPages: pages,
+    sessionTypes: SESSION_TYPES,
     instructors: initialInstructors,
     sessions: initialSessions,
     media: initialSessions.slice(0, 4).map((session) => ({ id: uid("media"), url: session.image, caption: session.name, usedBy: session.id })),
@@ -766,13 +772,18 @@ async function fetchJson(path, options) {
 }
 
 async function loadRemoteCms() {
-  const [blogs, sessions, media, gallery, instructors] = await Promise.all([
+  const [blogs, sessions, media, gallery, instructors, content] = await Promise.all([
     fetchJson("/api/admin/blogs"),
     fetchJson("/api/admin/sessions"),
     fetchJson("/api/admin/media"),
     fetchJson("/api/admin/gallery").catch(()     => ({ data: [], configured: false })),
     fetchJson("/api/admin/instructors").catch(() => ({ data: [], configured: false })),
+    fetchJson("/api/admin/page-content").catch(() => ({ items: [] })),
   ]);
+
+  // Session categories are editable content (Page Content → section:SESSION_TYPES),
+  // so the dropdown and filters always reflect whatever the client has saved.
+  const savedTypes = (content.items || []).find((d) => d.key === "section:SESSION_TYPES")?.data?.types;
 
   return {
     configured: blogs.configured || sessions.configured || media.configured || gallery.configured || instructors.configured,
@@ -781,6 +792,7 @@ async function loadRemoteCms() {
     media: media.data || [],
     gallery: gallery.data || [],
     instructors: instructors.data || [],
+    sessionTypes: Array.isArray(savedTypes) && savedTypes.length ? savedTypes : SESSION_TYPES,
   };
 }
 
@@ -1405,9 +1417,10 @@ function GalleryEditor({ items, onChange }) {
   );
 }
 
-function SessionsManager({ sessions, setSessions, instructors, setInstructors, media, setMedia, toast }) {
+function SessionsManager({ sessions, setSessions, instructors, setInstructors, media, setMedia, sessionTypes = SESSION_TYPES, setSessionTypes, toast }) {
   const [view, setView] = useState("Table");
   const [tab, setTab] = useState("Sessions");
+  const [editingTypes, setEditingTypes] = useState(false);
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useReducer((state, patch) => ({ ...state, ...patch }), { type: "All", instructor: "All", level: "All", status: "All", day: "All" });
   const [editing, setEditing] = useState(null);
@@ -1415,9 +1428,28 @@ function SessionsManager({ sessions, setSessions, instructors, setInstructors, m
     const instructor = instructors.find((item) => item.id === session.instructorId)?.name || "";
     return (filters.type === "All" || session.type === filters.type) && (filters.instructor === "All" || session.instructorId === filters.instructor) && (filters.level === "All" || session.level === filters.level) && (filters.status === "All" || session.status === filters.status) && (filters.day === "All" || session.days.includes(filters.day)) && `${session.name} ${instructor} ${session.tags.join(" ")}`.toLowerCase().includes(query.toLowerCase());
   };
-  // Organise by day of week (Sunday → Saturday), then by start time, so the list
-  // order is stable and predictable — renaming a class never makes it jump.
-  const filtered = sessions.filter(matchesFilters).sort(compareBySchedule);
+  // Website order first (display_order / priority), falling back to day of week
+  // then start time. Sessions that have never been re-ordered all share the same
+  // priority, so the list still reads Sunday → Saturday out of the box.
+  const filtered = sessions.filter(matchesFilters).sort(compareByWebsiteOrder);
+
+  // Re-ordering only makes sense against the full, unfiltered list — otherwise
+  // "move up" would jump over rows the admin cannot see.
+  const filtersActive = query.trim() !== "" || Object.values(filters).some((v) => v !== "All");
+
+  // Move one session up/down and renumber every session's priority to match the
+  // new visual order. priority → display_order in the API, which is what the
+  // public schedule sorts by, so the admin list and the website always agree.
+  const moveSession = (id, direction) => {
+    const ordered = [...sessions].sort(compareByWebsiteOrder);
+    const from = ordered.findIndex((s) => s.id === id);
+    const to = from + direction;
+    if (from < 0 || to < 0 || to >= ordered.length) return;
+    [ordered[from], ordered[to]] = [ordered[to], ordered[from]];
+    const rank = new Map(ordered.map((s, i) => [s.id, i + 1]));
+    setSessions((items) => items.map((s) => ({ ...s, priority: rank.get(s.id) ?? s.priority })));
+    toast("Order updated");
+  };
 
   // After editing, if the current search/filters would hide the saved session,
   // clear them so the user never "loses" the class they were just editing.
@@ -1431,41 +1463,119 @@ function SessionsManager({ sessions, setSessions, instructors, setInstructors, m
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex gap-2">{["Sessions", "Weekly Schedule", "Instructors"].map((item) => <Button key={item} variant={tab === item ? "primary" : "secondary"} onClick={() => setTab(item)}>{item}</Button>)}</div>
-        {tab === "Sessions" && <Button onClick={() => setEditing(newSession(instructors[0]?.id))}><Plus size={16} /> Add New Session</Button>}
+        {tab === "Sessions" && (
+          <div className="flex gap-2">
+            <Button variant="secondary" onClick={() => setEditingTypes(true)}><Tag size={16} /> Manage types</Button>
+            <Button onClick={() => setEditing(newSession(instructors[0]?.id, sessionTypes[0]))}><Plus size={16} /> Add New Session</Button>
+          </div>
+        )}
       </div>
 
       {tab === "Sessions" && (
         <>
           <div className="grid gap-3 rounded-xl border border-stone-200 bg-white p-4 md:grid-cols-3 xl:grid-cols-7">
             <div className="relative md:col-span-2"><Search className="absolute left-3 top-2.5 text-stone-400" size={16} /><TextInput placeholder="Search sessions, instructors, or tags" value={query} onChange={(e) => setQuery(e.target.value)} className="pl-9" /></div>
-            <Select value={filters.type} onChange={(e) => setFilters({ type: e.target.value })}>{["All", ...SESSION_TYPES].map((item) => <option key={item}>{item}</option>)}</Select>
+            <Select value={filters.type} onChange={(e) => setFilters({ type: e.target.value })}>{["All", ...sessionTypes].map((item) => <option key={item}>{item}</option>)}</Select>
             <Select value={filters.instructor} onChange={(e) => setFilters({ instructor: e.target.value })}><option>All</option>{instructors.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</Select>
             <Select value={filters.level} onChange={(e) => setFilters({ level: e.target.value })}>{["All", ...LEVELS].map((item) => <option key={item}>{item}</option>)}</Select>
             <Select value={filters.status} onChange={(e) => setFilters({ status: e.target.value })}>{["All", ...SESSION_STATUSES].map((item) => <option key={item}>{item}</option>)}</Select>
             <Select value={filters.day} onChange={(e) => setFilters({ day: e.target.value })}>{["All", ...DAYS].map((item) => <option key={item}>{item}</option>)}</Select>
           </div>
           <div className="flex justify-end gap-2"><Button variant={view === "Table" ? "primary" : "secondary"} onClick={() => setView("Table")}><ListFilter size={16} /> Table</Button><Button variant={view === "Grid" ? "primary" : "secondary"} onClick={() => setView("Grid")}><Image size={16} /> Grid</Button></div>
-          {view === "Table" ? <SessionsTable sessions={filtered} instructors={instructors} onEdit={setEditing} setSessions={setSessions} toast={toast} /> : <SessionsGrid sessions={filtered} instructors={instructors} onEdit={setEditing} />}
+          {view === "Table"
+            ? <SessionsTable sessions={filtered} instructors={instructors} onEdit={setEditing} setSessions={setSessions} toast={toast} onMove={moveSession} canReorder={!filtersActive} />
+            : <SessionsGrid sessions={filtered} instructors={instructors} onEdit={setEditing} />}
         </>
       )}
 
       {tab === "Weekly Schedule" && <WeeklySchedule sessions={sessions} instructors={instructors} onEdit={setEditing} />}
       {tab === "Instructors" && <InstructorsManager instructors={instructors} setInstructors={setInstructors} sessions={sessions} toast={toast} />}
-      {editing && <SessionEditor session={editing} sessions={sessions} setSessions={setSessions} instructors={instructors} media={media} setMedia={setMedia} onClose={() => setEditing(null)} onSaved={revealSaved} toast={toast} />}
+      {editing && <SessionEditor session={editing} sessions={sessions} setSessions={setSessions} instructors={instructors} media={media} setMedia={setMedia} sessionTypes={sessionTypes} onClose={() => setEditing(null)} onSaved={revealSaved} toast={toast} />}
+      {editingTypes && <SessionTypesEditor types={sessionTypes} sessions={sessions} onSave={setSessionTypes} onClose={() => setEditingTypes(false)} toast={toast} />}
     </div>
   );
 }
 
-function newSession(instructorId) {
-  return { id: uid("session"), name: "New Yoga Session", shortDescription: "", fullDescription: "", type: "Class", styles: [], level: "All Levels", language: "Both", recurring: true, days: ["Mon"], date: "", startDate: new Date().toISOString().slice(0, 10), endDate: "", startTime: "07:00", endTime: "08:00", duration: 60, instructorId, location: "In-studio", room: "Main Hall", meetingLink: "", capacity: 15, enrolled: 0, waitlist: true, waitlistCount: 0, pricingType: "Fixed Price", price: 800, trial: false, image: "", gallery: [], video: "", status: "Active", homepage: false, featured: false, tags: [], priority: 10, notes: "", equipment: "", prerequisites: "", views: 0 };
+// Add / rename / remove the categories behind the session "Type" dropdown.
+// Saved to Page Content (section:SESSION_TYPES) so the list survives redeploys
+// and every admin screen picks it up straight away.
+function SessionTypesEditor({ types, sessions, onSave, onClose, toast }) {
+  const [draft, setDraft] = useState(types);
+  const [adding, setAdding] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const usageCount = (type) => sessions.filter((s) => s.type === type).length;
+
+  const add = () => {
+    const value = adding.trim();
+    if (!value) return;
+    if (draft.some((t) => t.toLowerCase() === value.toLowerCase())) { toast("That type already exists"); return; }
+    setDraft([...draft, value]);
+    setAdding("");
+  };
+
+  const remove = (type) => {
+    const used = usageCount(type);
+    if (used > 0 && !confirm(`${used} session${used === 1 ? "" : "s"} still use "${type}". They keep the label but it won't be selectable any more. Remove it?`)) return;
+    setDraft(draft.filter((t) => t !== type));
+  };
+
+  const save = async () => {
+    const cleaned = draft.map((t) => t.trim()).filter(Boolean);
+    if (cleaned.length === 0) { toast("Keep at least one type"); return; }
+    setBusy(true);
+    try {
+      await fetchJson("/api/admin/page-content", { method: "PUT", body: JSON.stringify({ key: "section:SESSION_TYPES", data: { types: cleaned } }) });
+      onSave(cleaned);
+      toast("Session types saved");
+      onClose();
+    } catch (e) {
+      toast(e.message || "Could not save the types");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Modal title="Session types" onClose={onClose}>
+      <div className="space-y-4">
+        <p className="text-sm text-stone-500">These are the options in the Type dropdown on every session. Changes apply everywhere as soon as you save.</p>
+        <div className="space-y-2">
+          {draft.map((type, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <TextInput value={type} onChange={(e) => setDraft(draft.map((t, j) => (j === i ? e.target.value : t)))} />
+              <span className="w-24 flex-shrink-0 text-xs text-stone-400">{usageCount(type)} in use</span>
+              <Button variant="ghost" className="text-red-600 hover:bg-red-50" title="Remove type" aria-label={`Remove ${type}`} onClick={() => remove(type)}><Trash2 size={16} /></Button>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <TextInput value={adding} placeholder="Add a new type, e.g. Masterclass" onChange={(e) => setAdding(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); add(); } }} />
+          <Button variant="secondary" onClick={add}><Plus size={15} /> Add</Button>
+        </div>
+        <div className="flex justify-end gap-2 border-t border-stone-200 pt-4">
+          <Button variant="secondary" onClick={onClose} disabled={busy}>Cancel</Button>
+          <Button onClick={save} disabled={busy}><Save size={16} /> {busy ? "Saving…" : "Save types"}</Button>
+        </div>
+      </div>
+    </Modal>
+  );
 }
 
-function SessionsTable({ sessions, instructors, onEdit, setSessions, toast }) {
+function newSession(instructorId, defaultType = "Class") {
+  return { id: uid("session"), name: "New Yoga Session", shortDescription: "", fullDescription: "", type: defaultType, styles: [], level: "All Levels", language: "Both", recurring: true, days: ["Mon"], date: "", startDate: new Date().toISOString().slice(0, 10), endDate: "", startTime: "07:00", endTime: "08:00", duration: 60, instructorId, location: "In-studio", room: "Main Hall", meetingLink: "", capacity: 15, enrolled: 0, waitlist: true, waitlistCount: 0, pricingType: "Fixed Price", price: 800, trial: false, image: "", gallery: [], video: "", status: "Active", homepage: false, featured: false, tags: [], priority: 10, notes: "", equipment: "", prerequisites: "", views: 0 };
+}
+
+function SessionsTable({ sessions, instructors, onEdit, setSessions, toast, onMove, canReorder }) {
   return (
-    <section className="overflow-hidden rounded-xl border border-stone-200 bg-white">
-      <table className="w-full text-left text-sm">
-        <thead className="bg-stone-50 text-xs uppercase text-stone-500"><tr>{["Session Name", "Type", "Instructor", "Schedule", "Duration", "Level", "Capacity", "Price", "Status", "Actions"].map((item) => <th key={item} className="p-3">{item}</th>)}</tr></thead>
-        <tbody className="divide-y divide-stone-100">{sessions.map((session) => <tr key={session.id} className="hover:bg-stone-50"><td className="p-3 font-medium text-stone-900">{session.name}</td><td className="p-3"><Badge className={typeColor(session.type)}>{session.type}</Badge></td><td className="p-3 text-emerald-700">{sessionInstructorName(session, instructors)}</td><td className="p-3 text-stone-600">{sessionScheduleLabel(session)}</td><td className="p-3 text-stone-600">{session.duration} min</td><td className="p-3"><Badge className="bg-stone-100 text-stone-700">{session.level}</Badge></td><td className="p-3 text-stone-600">{sessionSpotsLabel(session)}</td><td className="p-3 text-stone-600">{toMoney(session.price)}</td><td className="p-3"><Badge className={session.status === "Active" ? "bg-emerald-100 text-emerald-700" : session.status === "Cancelled" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}>{session.status}</Badge></td><td className="p-3"><div className="flex gap-1"><Button variant="ghost" onClick={() => onEdit(session)}><Edit3 size={16} /></Button><Button variant="ghost" onClick={() => { setSessions((items) => [{ ...session, id: uid("session"), name: `${session.name} Copy`, status: "Paused" }, ...items]); toast("Session duplicated"); }}><Copy size={16} /></Button><Button variant="ghost" onClick={() => setSessions((items) => items.map((item) => item.id === session.id ? { ...item, status: "Archived" } : item))}><Archive size={16} /></Button><Button variant="ghost" onClick={() => { if (confirm("Delete this session?")) setSessions((items) => items.filter((item) => item.id !== session.id)); }}><Trash2 size={16} /></Button></div></td></tr>)}</tbody>
+    // overflow-x-auto (not overflow-hidden): with 11 columns the Actions cell used
+    // to be clipped off the right edge on laptops and phones, which is why the
+    // delete button looked missing. The table now scrolls sideways instead.
+    <section className="overflow-x-auto rounded-xl border border-stone-200 bg-white">
+      {!canReorder && <p className="border-b border-stone-100 bg-amber-50 px-3 py-2 text-xs text-amber-700">Clear the search and filters above to re-order sessions.</p>}
+      <table className="w-full min-w-[64rem] text-left text-sm">
+        <thead className="bg-stone-50 text-xs uppercase text-stone-500"><tr>{["Order", "Session Name", "Type", "Instructor", "Schedule", "Duration", "Level", "Capacity", "Price", "Status", "Actions"].map((item) => <th key={item} className="p-3">{item}</th>)}</tr></thead>
+        <tbody className="divide-y divide-stone-100">{sessions.map((session, i) => <tr key={session.id} className="hover:bg-stone-50"><td className="p-3"><div className="flex gap-1"><Button variant="ghost" className="h-8 w-8 p-0" title="Move up" aria-label="Move up" disabled={!canReorder || i === 0} onClick={() => onMove(session.id, -1)}><ChevronUp size={16} /></Button><Button variant="ghost" className="h-8 w-8 p-0" title="Move down" aria-label="Move down" disabled={!canReorder || i === sessions.length - 1} onClick={() => onMove(session.id, 1)}><ChevronDown size={16} /></Button></div></td><td className="p-3 font-medium text-stone-900">{session.name}</td><td className="p-3"><Badge className={typeColor(session.type)}>{session.type}</Badge></td><td className="p-3 text-emerald-700">{sessionInstructorName(session, instructors)}</td><td className="p-3 text-stone-600">{sessionScheduleLabel(session)}</td><td className="p-3 text-stone-600">{session.duration} min</td><td className="p-3"><Badge className="bg-stone-100 text-stone-700">{session.level}</Badge></td><td className="p-3 text-stone-600">{sessionSpotsLabel(session)}</td><td className="p-3 text-stone-600">{toMoney(session.price)}</td><td className="p-3"><Badge className={session.status === "Active" ? "bg-emerald-100 text-emerald-700" : session.status === "Cancelled" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}>{session.status}</Badge></td><td className="p-3"><div className="flex flex-nowrap gap-1"><Button variant="ghost" title="Edit" aria-label="Edit session" onClick={() => onEdit(session)}><Edit3 size={16} /></Button><Button variant="ghost" title="Duplicate" aria-label="Duplicate session" onClick={() => { setSessions((items) => [{ ...session, id: uid("session"), name: `${session.name} Copy`, status: "Paused" }, ...items]); toast("Session duplicated"); }}><Copy size={16} /></Button><Button variant="ghost" title="Archive (hides it from the website)" aria-label="Archive session" onClick={() => setSessions((items) => items.map((item) => item.id === session.id ? { ...item, status: "Archived" } : item))}><Archive size={16} /></Button><Button variant="ghost" className="text-red-600 hover:bg-red-50" title="Delete permanently" aria-label="Delete session" onClick={() => { if (confirm(`Permanently delete "${session.name}"? This cannot be undone.`)) { setSessions((items) => items.filter((item) => item.id !== session.id)); toast("Session deleted"); } }}><Trash2 size={16} /></Button></div></td></tr>)}</tbody>
       </table>
     </section>
   );
@@ -1482,6 +1592,15 @@ function sessionDayRank(session) {
   const ranks = (session.days || []).map((d) => DAY_RANK[d]).filter((n) => n != null);
   return ranks.length ? Math.min(...ranks) : 99; // undated/one-off classes sort last
 }
+// The order the website uses: display_order (stored as `priority`) first, with
+// the schedule as the tie-breaker so un-ordered sessions still read Sun→Sat.
+function compareByWebsiteOrder(a, b) {
+  const pa = typeof a.priority === "number" ? a.priority : 999;
+  const pb = typeof b.priority === "number" ? b.priority : 999;
+  if (pa !== pb) return pa - pb;
+  return compareBySchedule(a, b);
+}
+
 // Order sessions by their earliest weekday (Sun→Sat), then start time, then name.
 function compareBySchedule(a, b) {
   const dr = sessionDayRank(a) - sessionDayRank(b);
@@ -1525,7 +1644,7 @@ function sessionTimeConflicts(draft, sessions) {
   return out;
 }
 
-function SessionEditor({ session, sessions, setSessions, instructors, media, setMedia, onClose, onSaved, toast }) {
+function SessionEditor({ session, sessions, setSessions, instructors, media, setMedia, sessionTypes = SESSION_TYPES, onClose, onSaved, toast }) {
   const [draft, setDraft] = useState(session);
   const [tab, setTab] = useState("Basic");
   const exists = sessions.some((item) => item.id === session.id);
@@ -1555,7 +1674,7 @@ function SessionEditor({ session, sessions, setSessions, instructors, media, set
         <div className="flex gap-2">{["Basic", "Schedule", "Media", "SEO", "Notes"].map((item) => <Button key={item} variant={tab === item ? "primary" : "secondary"} onClick={() => setTab(item)}>{item}</Button>)}</div>
         <Button onClick={save}><Save size={16} /> Save Session</Button>
       </div>
-      {tab === "Basic" && <div className="grid gap-4 md:grid-cols-2"><Field label="Session Name" hint={`${draft.name.length}/80`}><TextInput maxLength={80} value={draft.name} onChange={(e) => update("name", e.target.value)} /></Field><Field label="Type"><Select value={draft.type} onChange={(e) => update("type", e.target.value)}>{SESSION_TYPES.map((item) => <option key={item}>{item}</option>)}</Select></Field><Field label="Short Description" hint={`${draft.shortDescription.length}/200`} className="md:col-span-2"><TextArea maxLength={200} value={draft.shortDescription} onChange={(e) => update("shortDescription", e.target.value)} /></Field><Field label="Full Description" className="md:col-span-2"><TextArea rows={6} value={draft.fullDescription} onChange={(e) => update("fullDescription", e.target.value)} /></Field><Field label="Difficulty"><Select value={draft.level} onChange={(e) => update("level", e.target.value)}>{LEVELS.map((item) => <option key={item}>{item}</option>)}</Select></Field><Field label="Language"><Select value={draft.language} onChange={(e) => update("language", e.target.value)}>{["English", "Nepali", "Both"].map((item) => <option key={item}>{item}</option>)}</Select></Field><TagChooser label="Styles" options={STYLES} value={draft.styles} onChange={(value) => update("styles", value)} /><TagInput value={draft.tags} onChange={(value) => update("tags", value)} /></div>}
+      {tab === "Basic" && <div className="grid gap-4 md:grid-cols-2"><Field label="Session Name" hint={`${draft.name.length}/80`}><TextInput maxLength={80} value={draft.name} onChange={(e) => update("name", e.target.value)} /></Field><Field label="Type"><Select value={draft.type} onChange={(e) => update("type", e.target.value)}>{(sessionTypes.includes(draft.type) ? sessionTypes : [draft.type, ...sessionTypes]).map((item) => <option key={item}>{item}</option>)}</Select></Field><Field label="Short Description" hint={`${draft.shortDescription.length}/200`} className="md:col-span-2"><TextArea maxLength={200} value={draft.shortDescription} onChange={(e) => update("shortDescription", e.target.value)} /></Field><Field label="Full Description" className="md:col-span-2"><TextArea rows={6} value={draft.fullDescription} onChange={(e) => update("fullDescription", e.target.value)} /></Field><Field label="Difficulty"><Select value={draft.level} onChange={(e) => update("level", e.target.value)}>{LEVELS.map((item) => <option key={item}>{item}</option>)}</Select></Field><Field label="Language"><Select value={draft.language} onChange={(e) => update("language", e.target.value)}>{["English", "Nepali", "Both"].map((item) => <option key={item}>{item}</option>)}</Select></Field><TagChooser label="Styles" options={STYLES} value={draft.styles} onChange={(value) => update("styles", value)} /><TagInput value={draft.tags} onChange={(value) => update("tags", value)} /></div>}
       {tab === "Schedule" && <div className="grid gap-4 md:grid-cols-2"><Toggle label="Recurring session" checked={draft.recurring} onChange={(checked) => update("recurring", checked)} />{draft.recurring ? <TagChooser label="Days of week" options={DAYS} value={draft.days} onChange={(value) => update("days", value)} /> : <Field label="Specific date"><TextInput type="date" value={draft.date} onChange={(e) => update("date", e.target.value)} /></Field>}<Field label="Start time"><TextInput type="time" value={draft.startTime} onChange={(e) => update("startTime", e.target.value)} /></Field><Field label="End time"><TextInput type="time" value={draft.endTime} onChange={(e) => update("endTime", e.target.value)} /></Field><Field label="Start date"><TextInput type="date" value={draft.startDate} onChange={(e) => update("startDate", e.target.value)} /></Field><Field label="Optional end date"><TextInput type="date" value={draft.endDate} onChange={(e) => update("endDate", e.target.value)} /></Field><div className="rounded-xl bg-stone-100 p-4 text-sm text-stone-600">Duration: {calculateDuration(draft.startTime, draft.endTime, draft.duration)} min<br />Time zone: Nepal Time, UTC+5:45</div><Field label="Instructor"><Select value={draft.instructorId} onChange={(e) => update("instructorId", e.target.value)}>{instructors.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</Select></Field><Field label="Location"><Select value={draft.location} onChange={(e) => update("location", e.target.value)}>{["In-studio", "Online", "Both"].map((item) => <option key={item}>{item}</option>)}</Select></Field>{draft.location !== "Online" && <Field label="Room"><TextInput value={draft.room} onChange={(e) => update("room", e.target.value)} /></Field>}{draft.location !== "In-studio" && <Field label="Meeting link"><TextInput value={draft.meetingLink} onChange={(e) => update("meetingLink", e.target.value)} /></Field>}<Field label="Max Capacity"><TextInput type="number" value={draft.capacity} onChange={(e) => update("capacity", Number(e.target.value))} /></Field><Field label="Current Enrollment"><TextInput readOnly value={draft.enrolled} /></Field><Toggle label="Allow waitlist when full" checked={draft.waitlist} onChange={(checked) => update("waitlist", checked)} /><Field label="Pricing type"><Select value={draft.pricingType} onChange={(e) => update("pricingType", e.target.value)}>{["Free", "Fixed Price", "Drop-in + Package"].map((item) => <option key={item}>{item}</option>)}</Select></Field><Field label="NPR Amount"><TextInput type="number" value={draft.price} onChange={(e) => update("price", Number(e.target.value))} /></Field><Toggle label="Trial class available" checked={draft.trial} onChange={(checked) => update("trial", checked)} /><Field label="Status"><Select value={draft.status} onChange={(e) => update("status", e.target.value)}>{SESSION_STATUSES.map((item) => <option key={item}>{item}</option>)}</Select></Field><Toggle label="Show on homepage" checked={draft.homepage} onChange={(checked) => update("homepage", checked)} /><Toggle label="Featured session" checked={draft.featured} onChange={(checked) => update("featured", checked)} /><Field label="Display order"><TextInput type="number" value={draft.priority} onChange={(e) => update("priority", Number(e.target.value))} /></Field></div>}
       {tab === "Media" && <div className="space-y-4"><Field label="Featured Image"><TextInput value={draft.image} onChange={(e) => update("image", e.target.value)} /></Field><input type="file" accept="image/*" onChange={(e) => uploadFile(e, (url, item) => { update("image", url); setMedia([item || { id: uid("media"), url, caption: draft.name, usedBy: draft.id }, ...media]); }, { caption: draft.name, usedBy: draft.id })} className="text-sm" />{draft.image && <img src={draft.image} alt="" className="h-64 w-full rounded-xl object-cover" />}<GalleryEditor items={draft.gallery} onChange={(gallery) => update("gallery", gallery)} /><Field label="Promo video URL"><TextInput value={draft.video} onChange={(e) => update("video", e.target.value)} /></Field></div>}
       {tab === "SEO" && <SeoEditorFields value={sessionSeoDraft(draft)} onChange={(next) => setDraft({ ...draft, ...next })} allPages={sessions.map(sessionSeoDraft)} />}
@@ -1600,16 +1719,233 @@ function WeeklySchedule({ sessions, instructors, onEdit }) {
   );
 }
 
+// A teacher shows on the public site only while their status is "Active" — the
+// About page filters on exactly that, so "Hidden" takes them off the website
+// without deleting anything.
+const instructorVisible = (inst) => (inst.status ?? "Active") === "Active";
+
+// Saved order: explicit displayOrder first, then name so a teacher without one
+// never jumps around between loads.
+function compareInstructors(a, b) {
+  const oa = typeof a.displayOrder === "number" ? a.displayOrder : 9999;
+  const ob = typeof b.displayOrder === "number" ? b.displayOrder : 9999;
+  if (oa !== ob) return oa - ob;
+  return (a.name || "").localeCompare(b.name || "");
+}
+
 function InstructorsManager({ instructors, setInstructors, sessions, toast }) {
   const [editing, setEditing] = useState(null);
+  const [view, setView] = useState("List");
+  const [busy, setBusy] = useState(false);
+  const [dragId, setDragId] = useState(null);
+  const [dragOrder, setDragOrder] = useState(null);
+
+  const ordered = [...instructors].sort(compareInstructors);
+  const list = dragOrder ?? ordered;
+
+  // Teachers persist one row at a time (never a full-replace PUT), so saving a
+  // new order means POSTing just the rows whose position actually changed.
+  const persistOrder = async (next) => {
+    const numbered = next.map((inst, i) => ({ ...inst, displayOrder: i }));
+    const changed = numbered.filter((inst, i) => ordered[i]?.id !== inst.id || ordered[i]?.displayOrder !== inst.displayOrder);
+    setInstructors(numbered);
+    if (changed.length === 0) return;
+    setBusy(true);
+    try {
+      for (const inst of changed) {
+        const res = await fetch("/api/admin/instructors", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(inst) });
+        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Could not save the new order");
+      }
+      toast("Order saved");
+    } catch (e) {
+      toast(e.message || "Could not save the new order");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const move = (id, direction) => {
+    const from = ordered.findIndex((i) => i.id === id);
+    const to = from + direction;
+    if (from < 0 || to < 0 || to >= ordered.length) return;
+    const next = [...ordered];
+    [next[from], next[to]] = [next[to], next[from]];
+    persistOrder(next);
+  };
+
+  const toggleVisible = async (inst) => {
+    const next = { ...inst, status: instructorVisible(inst) ? "Hidden" : "Active" };
+    setBusy(true);
+    try {
+      const res = await fetch("/api/admin/instructors", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(next) });
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Update failed");
+      setInstructors(instructors.map((i) => (i.id === inst.id ? next : i)));
+      toast(instructorVisible(next) ? `${next.name || "Teacher"} is now shown on the website` : `${next.name || "Teacher"} is hidden from the website`);
+    } catch (e) {
+      toast(e.message || "Update failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const removeInstructor = async (inst) => {
+    if (!confirm(`Permanently delete ${inst.name || "this teacher"}? This cannot be undone — use "hide" instead if you only want them off the website.`)) return;
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/admin/instructors?id=${encodeURIComponent(inst.id)}`, { method: "DELETE" });
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Delete failed");
+      setInstructors(instructors.filter((i) => i.id !== inst.id));
+      toast("Teacher deleted");
+    } catch (e) {
+      toast(e.message || "Delete failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // Drag to any position. Pointer events (not HTML5 drag-and-drop) so the same
+  // code works with a mouse and with a finger on a phone; the handle captures
+  // the pointer and elementFromPoint tells us which card we are hovering.
+  const startDrag = (e, id) => {
+    e.preventDefault();
+    setDragId(id);
+    setDragOrder(ordered);
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  };
+  const dragOver = (e) => {
+    if (!dragId || !dragOrder) return;
+    const el = document.elementFromPoint(e.clientX, e.clientY)?.closest("[data-inst-id]");
+    const overId = el?.getAttribute("data-inst-id");
+    if (!overId || overId === dragId) return;
+    const from = dragOrder.findIndex((i) => i.id === dragId);
+    const to = dragOrder.findIndex((i) => i.id === overId);
+    if (from < 0 || to < 0) return;
+    const next = [...dragOrder];
+    next.splice(to, 0, next.splice(from, 1)[0]);
+    setDragOrder(next);
+  };
+  const endDrag = () => {
+    if (dragId && dragOrder) persistOrder(dragOrder);
+    setDragId(null);
+    setDragOrder(null);
+  };
+
+  const newInstructor = () => ({ id: uid("inst"), name: "", photo: "", bio: "", specialties: [], certifications: "", years: 1, social: { instagram: "", facebook: "", website: "" }, status: "Active" });
+
   return (
     <div className="space-y-4">
-      <div className="flex justify-end"><Button onClick={() => setEditing({ id: uid("inst"), name: "", photo: "", bio: "", specialties: [], certifications: "", years: 1, social: { instagram: "", facebook: "", website: "" }, status: "Active" })}><Plus size={16} /> Add Instructor</Button></div>
-      <section className="overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <table className="w-full text-left text-sm"><thead className="bg-stone-50 text-xs uppercase text-stone-500"><tr>{["Name", "Photo", "Specialties", "Active Sessions", "Status", "Actions"].map((item) => <th key={item} className="p-3">{item}</th>)}</tr></thead><tbody className="divide-y divide-stone-100">{instructors.map((inst) => <tr key={inst.id}><td className="p-3 font-medium">{inst.name}</td><td className="p-3">{inst.photo && <img src={inst.photo} alt="" className="h-12 w-12 rounded-full object-cover" />}</td><td className="p-3"><div className="flex flex-wrap gap-1">{inst.specialties.map((item) => <Badge key={item} className="bg-emerald-100 text-emerald-700">{item}</Badge>)}</div></td><td className="p-3">{sessions.filter((session) => session.instructorId === inst.id && session.status === "Active").length}</td><td className="p-3"><Badge className="bg-stone-100 text-stone-700">{inst.status}</Badge></td><td className="p-3"><Button variant="ghost" onClick={() => setEditing(inst)}><Edit3 size={16} /></Button></td></tr>)}</tbody></table>
-      </section>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex gap-2">
+          <Button variant={view === "List" ? "primary" : "secondary"} onClick={() => setView("List")}><ListFilter size={16} /> List</Button>
+          <Button variant={view === "Grid" ? "primary" : "secondary"} onClick={() => setView("Grid")}><Image size={16} /> Drag to re-order</Button>
+        </div>
+        <Button onClick={() => setEditing(newInstructor())}><Plus size={16} /> Add Instructor</Button>
+      </div>
+
+      {view === "List" ? (
+        <section className="overflow-x-auto rounded-xl border border-stone-200 bg-white">
+          <table className="w-full min-w-[52rem] text-left text-sm">
+            <thead className="bg-stone-50 text-xs uppercase text-stone-500">
+              <tr>{["Order", "Name", "Photo", "Specialties", "Active Sessions", "Show on web", "Actions"].map((item) => <th key={item} className="p-3">{item}</th>)}</tr>
+            </thead>
+            <tbody className="divide-y divide-stone-100">
+              {list.map((inst, i) => (
+                <tr key={inst.id} className={classNames("hover:bg-stone-50", !instructorVisible(inst) && "opacity-60")}>
+                  <td className="p-3">
+                    <div className="flex gap-1">
+                      <Button variant="ghost" className="h-8 w-8 p-0" title="Move up" aria-label="Move up" disabled={busy || i === 0} onClick={() => move(inst.id, -1)}><ChevronUp size={16} /></Button>
+                      <Button variant="ghost" className="h-8 w-8 p-0" title="Move down" aria-label="Move down" disabled={busy || i === list.length - 1} onClick={() => move(inst.id, 1)}><ChevronDown size={16} /></Button>
+                    </div>
+                  </td>
+                  <td className="p-3 font-medium">{inst.name}</td>
+                  <td className="p-3">{inst.photo && <img src={inst.photo} alt="" className="h-12 w-12 rounded-full object-cover" />}</td>
+                  <td className="p-3"><div className="flex flex-wrap gap-1">{(inst.specialties || []).map((item) => <Badge key={item} className="bg-emerald-100 text-emerald-700">{item}</Badge>)}</div></td>
+                  <td className="p-3">{sessions.filter((session) => session.instructorId === inst.id && session.status === "Active").length}</td>
+                  <td className="p-3"><VisibilityToggle inst={inst} busy={busy} onToggle={() => toggleVisible(inst)} /></td>
+                  <td className="p-3">
+                    <div className="flex flex-nowrap gap-1">
+                      <Button variant="ghost" title="Edit" aria-label="Edit teacher" onClick={() => setEditing(inst)}><Edit3 size={16} /></Button>
+                      <Button variant="ghost" className="text-red-600 hover:bg-red-50" title="Delete permanently" aria-label="Delete teacher" disabled={busy} onClick={() => removeInstructor(inst)}><Trash2 size={16} /></Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      ) : (
+        <>
+          <p className="text-sm text-stone-500">Press and hold the <GripVertical size={14} className="inline" /> handle on a card, then drag it to any position — on a phone too. The order here is the order teachers appear on the website.</p>
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            {list.map((inst, i) => (
+              <article
+                key={inst.id}
+                data-inst-id={inst.id}
+                className={classNames(
+                  "rounded-xl border bg-white p-3 transition",
+                  dragId === inst.id ? "border-emerald-500 shadow-lg ring-2 ring-emerald-200" : "border-stone-200",
+                  !instructorVisible(inst) && "opacity-60",
+                )}
+              >
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-stone-400">#{i + 1}</span>
+                  <button
+                    type="button"
+                    title="Drag to move"
+                    aria-label={`Drag ${inst.name || "teacher"} to a new position`}
+                    onPointerDown={(e) => startDrag(e, inst.id)}
+                    onPointerMove={dragOver}
+                    onPointerUp={endDrag}
+                    onPointerCancel={endDrag}
+                    className="cursor-grab touch-none rounded p-1 text-stone-400 hover:bg-stone-100 active:cursor-grabbing"
+                  >
+                    <GripVertical size={16} />
+                  </button>
+                </div>
+                {inst.photo
+                  ? <img src={inst.photo} alt="" className="mb-2 h-24 w-full rounded-lg object-cover" draggable={false} />
+                  : <div className="mb-2 flex h-24 w-full items-center justify-center rounded-lg bg-stone-100 text-xs text-stone-400">No photo</div>}
+                <p className="truncate text-sm font-medium text-stone-900">{inst.name || "Untitled"}</p>
+                <p className="truncate text-xs text-stone-500">{inst.role || (inst.specialties || []).join(", ") || "—"}</p>
+                <div className="mt-2 flex items-center justify-between gap-1">
+                  <VisibilityToggle inst={inst} busy={busy} onToggle={() => toggleVisible(inst)} compact />
+                  <div className="flex">
+                    <Button variant="ghost" className="h-8 w-8 p-0" title="Move up" aria-label="Move up" disabled={busy || i === 0} onClick={() => move(inst.id, -1)}><ChevronUp size={15} /></Button>
+                    <Button variant="ghost" className="h-8 w-8 p-0" title="Move down" aria-label="Move down" disabled={busy || i === list.length - 1} onClick={() => move(inst.id, 1)}><ChevronDown size={15} /></Button>
+                    <Button variant="ghost" className="h-8 w-8 p-0" title="Edit" aria-label="Edit teacher" onClick={() => setEditing(inst)}><Edit3 size={15} /></Button>
+                    <Button variant="ghost" className="h-8 w-8 p-0 text-red-600 hover:bg-red-50" title="Delete permanently" aria-label="Delete teacher" disabled={busy} onClick={() => removeInstructor(inst)}><Trash2 size={15} /></Button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </>
+      )}
+
+      {list.length === 0 && <p className="rounded-xl border border-dashed border-stone-300 p-6 text-center text-sm text-stone-500">No teachers yet — use “Add Instructor”.</p>}
       {editing && <InstructorEditor instructor={editing} instructors={instructors} setInstructors={setInstructors} onClose={() => setEditing(null)} toast={toast} />}
     </div>
+  );
+}
+
+// Show/hide on the website. Deliberately reads as a switch rather than a status
+// dropdown — hiding is the safe alternative to deleting a teacher.
+function VisibilityToggle({ inst, busy, onToggle, compact = false }) {
+  const on = instructorVisible(inst);
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      disabled={busy}
+      title={on ? "Shown on the website — click to hide" : "Hidden from the website — click to show"}
+      className={classNames(
+        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold transition disabled:opacity-50",
+        on ? "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100" : "border-stone-200 bg-stone-100 text-stone-500 hover:bg-stone-200",
+      )}
+    >
+      {on ? <Eye size={13} /> : <EyeOff size={13} />}
+      {compact ? (on ? "Shown" : "Hidden") : (on ? "Shown on web" : "Hidden")}
+    </button>
   );
 }
 
@@ -1646,7 +1982,7 @@ function InstructorEditor({ instructor, instructors, setInstructors, onClose, to
       onClose();
     } catch (e) { toast(e.message || "Delete failed"); } finally { setBusy(false); }
   };
-  return <Modal title="Instructor" onClose={onClose}><div className="grid gap-4"><Field label="Full name"><TextInput value={draft.name} onChange={(e) => update("name", e.target.value)} /></Field><Field label="Role / Title" hint="shown under the name on the About page"><TextInput value={draft.role || ""} placeholder="e.g. Senior Yoga Teacher & Trainer" onChange={(e) => update("role", e.target.value)} /></Field><Field label="Photos" hint="Add one or more photos of this teacher. The first is the cover; multiple photos crossfade on the About page."><div className="flex flex-wrap gap-2">{photos.map((url, i) => <div key={url + i} className="relative h-28 w-20 overflow-hidden rounded-lg border border-stone-200"><img src={url} alt="" className="h-full w-full object-cover" />{i === 0 && <span className="absolute left-1 top-1 rounded bg-emerald-600 px-1 text-[9px] font-semibold uppercase text-white">Cover</span>}<button type="button" onClick={() => setPhotos(photos.filter((_, j) => j !== i))} className="absolute right-1 top-1 rounded-full bg-stone-900/75 px-1.5 text-xs text-white">✕</button><div className="absolute bottom-1 left-1 flex gap-1"><button type="button" disabled={i === 0} onClick={() => movePhoto(i, -1)} className="rounded bg-stone-900/75 px-1 text-xs text-white disabled:opacity-30">↑</button><button type="button" disabled={i === photos.length - 1} onClick={() => movePhoto(i, 1)} className="rounded bg-stone-900/75 px-1 text-xs text-white disabled:opacity-30">↓</button></div></div>)}{photos.length === 0 && <p className="text-sm text-stone-400">No photos yet — upload below.</p>}</div></Field><div className="flex flex-wrap items-center gap-3"><label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700"><Upload size={15} /> Upload photo<input type="file" accept="image/*" className="hidden" onChange={(e) => uploadFile(e, (url) => setPhotos([...photos, url]))} /></label><div className="flex flex-1 gap-2"><TextInput value={urlInput} placeholder="…or paste an image URL" onChange={(e) => setUrlInput(e.target.value)} /><Button variant="secondary" onClick={() => { const u = urlInput.trim(); if (u) { setPhotos([...photos, u]); setUrlInput(""); } }}>Add</Button></div></div><Field label="Short bio"><TextArea value={draft.bio} onChange={(e) => update("bio", e.target.value)} /></Field><TagChooser label="Specialties" options={STYLES} value={draft.specialties} onChange={(value) => update("specialties", value)} /><Field label="Certifications"><TextArea value={draft.certifications} onChange={(e) => update("certifications", e.target.value)} /></Field><Field label="Years of experience"><TextInput type="number" value={draft.years} onChange={(e) => update("years", Number(e.target.value))} /></Field><div className="grid gap-3 md:grid-cols-3"><Field label="Instagram"><TextInput value={draft.social.instagram} onChange={(e) => update("social", { ...draft.social, instagram: e.target.value })} /></Field><Field label="Facebook"><TextInput value={draft.social.facebook} onChange={(e) => update("social", { ...draft.social, facebook: e.target.value })} /></Field><Field label="Website"><TextInput value={draft.social.website} onChange={(e) => update("social", { ...draft.social, website: e.target.value })} /></Field></div><Field label="Status"><Select value={draft.status} onChange={(e) => update("status", e.target.value)}>{["Active", "On Leave", "Archived"].map((item) => <option key={item}>{item}</option>)}</Select></Field><div className="flex justify-end gap-2">{exists && <Button variant="danger" onClick={apiDelete} disabled={busy}><Trash2 size={16} /> Delete</Button>}{exists && <Button variant="secondary" onClick={() => apiSave({ ...draft, status: "Archived" }, "Instructor archived", () => setInstructors(instructors.map((item) => item.id === draft.id ? { ...draft, status: "Archived" } : item)))} disabled={busy}>Archive</Button>}<Button onClick={() => apiSave(draft, "Instructor saved", () => setInstructors(exists ? instructors.map((item) => item.id === draft.id ? draft : item) : [draft, ...instructors]))} disabled={busy}><Save size={16} /> {busy ? "Saving…" : "Save"}</Button></div></div></Modal>;
+  return <Modal title="Instructor" onClose={onClose}><div className="grid gap-4"><Field label="Full name"><TextInput value={draft.name} onChange={(e) => update("name", e.target.value)} /></Field><Field label="Role / Title" hint="shown under the name on the About page"><TextInput value={draft.role || ""} placeholder="e.g. Senior Yoga Teacher & Trainer" onChange={(e) => update("role", e.target.value)} /></Field><Field label="Photos" hint="Add one or more photos of this teacher. The first is the cover; multiple photos crossfade on the About page."><div className="flex flex-wrap gap-2">{photos.map((url, i) => <div key={url + i} className="relative h-28 w-20 overflow-hidden rounded-lg border border-stone-200"><img src={url} alt="" className="h-full w-full object-cover" />{i === 0 && <span className="absolute left-1 top-1 rounded bg-emerald-600 px-1 text-[9px] font-semibold uppercase text-white">Cover</span>}<button type="button" onClick={() => setPhotos(photos.filter((_, j) => j !== i))} className="absolute right-1 top-1 rounded-full bg-stone-900/75 px-1.5 text-xs text-white">✕</button><div className="absolute bottom-1 left-1 flex gap-1"><button type="button" disabled={i === 0} onClick={() => movePhoto(i, -1)} className="rounded bg-stone-900/75 px-1 text-xs text-white disabled:opacity-30">↑</button><button type="button" disabled={i === photos.length - 1} onClick={() => movePhoto(i, 1)} className="rounded bg-stone-900/75 px-1 text-xs text-white disabled:opacity-30">↓</button></div></div>)}{photos.length === 0 && <p className="text-sm text-stone-400">No photos yet — upload below.</p>}</div></Field><div className="flex flex-wrap items-center gap-3"><label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700"><Upload size={15} /> Upload photo<input type="file" accept="image/*" className="hidden" onChange={(e) => uploadFile(e, (url) => setPhotos([...photos, url]))} /></label><div className="flex flex-1 gap-2"><TextInput value={urlInput} placeholder="…or paste an image URL" onChange={(e) => setUrlInput(e.target.value)} /><Button variant="secondary" onClick={() => { const u = urlInput.trim(); if (u) { setPhotos([...photos, u]); setUrlInput(""); } }}>Add</Button></div></div><Field label="Short bio"><TextArea value={draft.bio} onChange={(e) => update("bio", e.target.value)} /></Field><TagChooser label="Specialties" options={STYLES} value={draft.specialties} onChange={(value) => update("specialties", value)} /><Field label="Certifications"><TextArea value={draft.certifications} onChange={(e) => update("certifications", e.target.value)} /></Field><Field label="Years of experience"><TextInput type="number" value={draft.years} onChange={(e) => update("years", Number(e.target.value))} /></Field><div className="grid gap-3 md:grid-cols-3"><Field label="Instagram"><TextInput value={draft.social.instagram} onChange={(e) => update("social", { ...draft.social, instagram: e.target.value })} /></Field><Field label="Facebook"><TextInput value={draft.social.facebook} onChange={(e) => update("social", { ...draft.social, facebook: e.target.value })} /></Field><Field label="Website"><TextInput value={draft.social.website} onChange={(e) => update("social", { ...draft.social, website: e.target.value })} /></Field></div><Field label="Status" hint="only “Active” shows on the website"><Select value={draft.status} onChange={(e) => update("status", e.target.value)}>{["Active", "Hidden", "On Leave", "Archived"].map((item) => <option key={item}>{item}</option>)}</Select></Field><div className="flex justify-end gap-2">{exists && <Button variant="danger" onClick={apiDelete} disabled={busy}><Trash2 size={16} /> Delete</Button>}{exists && <Button variant="secondary" onClick={() => apiSave({ ...draft, status: "Archived" }, "Instructor archived", () => setInstructors(instructors.map((item) => item.id === draft.id ? { ...draft, status: "Archived" } : item)))} disabled={busy}>Archive</Button>}<Button onClick={() => apiSave(draft, "Instructor saved", () => setInstructors(exists ? instructors.map((item) => item.id === draft.id ? draft : item) : [draft, ...instructors]))} disabled={busy}><Save size={16} /> {busy ? "Saving…" : "Save"}</Button></div></div></Modal>;
 }
 
 function MediaLibrary({ media, setMedia, blogs, sessions, toast }) {
@@ -1792,7 +2128,7 @@ function GalleryManager({ items, setItems, toast }) {
   );
 }
 
-function SettingsPage({ settings, setSettings, instructors, setInstructors, sessions, toast }) {
+function SettingsPage({ settings, setSettings, instructors, setInstructors, sessions, sessionTypes = SESSION_TYPES, toast }) {
   const [xml, setXml] = useState("");
   const update = (key, value) => setSettings({ ...settings, [key]: value });
   return (
@@ -1801,7 +2137,7 @@ function SettingsPage({ settings, setSettings, instructors, setInstructors, sess
       <SettingsCard title="SEO Defaults"><Field label="Default OG image"><TextInput value={settings.defaultOgImage} onChange={(e) => update("defaultOgImage", e.target.value)} /></Field><Field label="Twitter handle"><TextInput value={settings.twitterHandle} onChange={(e) => update("twitterHandle", e.target.value)} /></Field><Field label="Google Analytics ID"><TextInput value={settings.analyticsId} onChange={(e) => update("analyticsId", e.target.value)} /></Field><Field label="Search Console verification tag"><TextInput value={settings.searchConsoleTag} onChange={(e) => update("searchConsoleTag", e.target.value)} /></Field><Field label="Facebook Pixel ID"><TextInput value={settings.pixelId} onChange={(e) => update("pixelId", e.target.value)} /></Field></SettingsCard>
       <SettingsCard title="Pricing & Packages"><TextArea rows={6} value={settings.packages.join("\n")} onChange={(e) => update("packages", e.target.value.split("\n"))} /></SettingsCard>
       <SettingsCard title="Booking / Enquiry Settings"><Field label="Contact form fields"><TextArea value={settings.bookingFields} onChange={(e) => update("bookingFields", e.target.value)} /></Field><Field label="Auto-reply email template"><TextArea value={settings.autoReply} onChange={(e) => update("autoReply", e.target.value)} /></Field></SettingsCard>
-      <SettingsCard title="Session Categories"><TagChooser label="Session styles" options={STYLES} value={STYLES} onChange={() => {}} /><div className="grid grid-cols-3 gap-2">{SESSION_TYPES.map((type, index) => <label key={type} className="text-sm text-stone-600">{type}<input type="color" defaultValue={COLORS[index]} className="mt-1 h-9 w-full rounded" /></label>)}</div></SettingsCard>
+      <SettingsCard title="Session Categories"><TagChooser label="Session styles" options={STYLES} value={STYLES} onChange={() => {}} /><div className="grid grid-cols-3 gap-2">{sessionTypes.map((type, index) => <label key={type} className="text-sm text-stone-600">{type}<input type="color" defaultValue={COLORS[index]} className="mt-1 h-9 w-full rounded" /></label>)}</div></SettingsCard>
       <SettingsCard title="Sitemap Settings"><Button onClick={() => { const output = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${["/", "/about", "/sessions", "/blog", ...sessions.map((s) => `/sessions/${slugify(s.name)}`)].map((path) => `  <url><loc>${settings.siteUrl}${path}</loc></url>`).join("\n")}\n</urlset>`; setXml(output); toast("Sitemap regenerated"); }}><RefreshCw size={16} /> Regenerate Sitemap</Button>{xml && <TextArea rows={10} value={xml} readOnly className="mt-3 font-mono" />}</SettingsCard>
       <SettingsCard title="Instructor Management"><InstructorsManager instructors={instructors} setInstructors={setInstructors} sessions={sessions} toast={toast} /></SettingsCard>
     </div>
@@ -2260,6 +2596,7 @@ function AdminWorkspace({ onLogout }) {
           media: remote.media.length ? remote.media : current.media,
           gallery: remote.gallery,
           instructors: remote.instructors.length ? remote.instructors : current.instructors,
+          sessionTypes: remote.sessionTypes,
         }));
         setSyncStatus("Connected to Supabase");
       })
@@ -2322,7 +2659,7 @@ function AdminWorkspace({ onLogout }) {
           {active === "seo"        && <SeoManager pages={state.seoPages} setPages={setPart("seoPages")} toast={notify} />}
           {active === "sitemap"    && <SitemapManager toast={notify} />}
           {active === "blog" && <BlogManager blogs={state.blogs} setBlogs={setPart("blogs")} media={state.media} setMedia={setPart("media")} toast={notify} />}
-          {active === "sessions" && <SessionsManager sessions={state.sessions} setSessions={setPart("sessions")} instructors={state.instructors} setInstructors={setPart("instructors")} media={state.media} setMedia={setPart("media")} toast={notify} />}
+          {active === "sessions" && <SessionsManager sessions={state.sessions} setSessions={setPart("sessions")} instructors={state.instructors} setInstructors={setPart("instructors")} media={state.media} setMedia={setPart("media")} sessionTypes={state.sessionTypes} setSessionTypes={setPart("sessionTypes")} toast={notify} />}
           {active === "instructors" && <InstructorsManager instructors={state.instructors} setInstructors={setPart("instructors")} sessions={state.sessions} toast={notify} />}
           {active === "media" && <MediaLibrary media={state.media} setMedia={setPart("media")} blogs={state.blogs} sessions={state.sessions} toast={notify} />}
           {active === "gallery" && <GalleryManager items={state.gallery} setItems={setPart("gallery")} toast={notify} />}
@@ -2330,7 +2667,7 @@ function AdminWorkspace({ onLogout }) {
           {active === "pricing" && <PricingManager toast={notify} />}
           {active === "testimonials" && <TestimonialsManager toast={notify} />}
           {active === "services" && <ServicesManager toast={notify} />}
-          {active === "settings" && <SettingsPage settings={state.settings} setSettings={setPart("settings")} instructors={state.instructors} setInstructors={setPart("instructors")} sessions={state.sessions} toast={notify} />}
+          {active === "settings" && <SettingsPage settings={state.settings} setSettings={setPart("settings")} instructors={state.instructors} setInstructors={setPart("instructors")} sessions={state.sessions} sessionTypes={state.sessionTypes} toast={notify} />}
         </main>
       </div>
       {toast && <div className="fixed bottom-5 right-5 z-50 rounded-xl bg-stone-950 px-4 py-3 text-sm font-medium text-white shadow-xl">{toast} <Check className="ml-2 inline text-emerald-400" size={16} /></div>}
@@ -3316,11 +3653,147 @@ function ImageField({ value, onChange, toast }) {
 }
 
 // Form for the bespoke sections — the field list comes from the server registry.
+// Icon set shared with the website, so the admin preview always matches what
+// the page renders and neither list can drift.
+const CARD_ICON_PATHS = CARD_ICONS;
+const CARD_ICON_CHOICES = CARD_ICON_NAMES;
+
+// One image slot per "eyebrow + heading" section. Leaving a slot empty keeps
+// that section exactly as it is today, so nothing appears until a picture is
+// actually chosen. Any image size is fine — the site scales it down to fit.
+function SectionImageSlotFields({ slots, onChange, toast }) {
+  const setSlot = (i, patch) => onChange(slots.map((s, j) => (j === i ? { ...s, ...patch } : s)));
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-stone-500">Add a picture under any section heading. Leave one blank to show nothing there.</p>
+      {slots.map((s, i) => (
+        <div key={s.id || i} className="rounded-xl border border-stone-200 bg-white p-4">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">{s.label || s.id}</p>
+            {s.image
+              ? <Badge className="bg-emerald-100 text-emerald-700">Image set</Badge>
+              : <Badge className="bg-stone-100 text-stone-500">Empty</Badge>}
+          </div>
+          <div className="grid gap-3">
+            <Field label="Image"><ImageField value={s.image} onChange={(v) => setSlot(i, { image: v })} toast={toast} /></Field>
+            <Field label="Description for search engines & screen readers"><TextInput value={s.alt || ""} placeholder="e.g. Students practising in the Yogmandu studio" onChange={(e) => setSlot(i, { alt: e.target.value })} /></Field>
+            {s.image && <div><Button variant="ghost" className="text-red-600 hover:bg-red-50" onClick={() => setSlot(i, { image: "", alt: "" })}><Trash2 size={15} /> Remove image</Button></div>}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// A card's icon is either one of the built-in line icons or a picture the
+// client uploads. The stored value is the icon name in the first case and the
+// image URL in the second — isCardIconImage decides which editor to show.
+const isCardIconImage = (v) => Boolean(v) && (v.startsWith("/") || v.startsWith("http") || v.startsWith("data:"));
+
+function CardIconField({ value, onChange, toast }) {
+  const [mode, setMode] = useState(isCardIconImage(value) ? "image" : "icon");
+
+  const choose = (next) => {
+    setMode(next);
+    // Swap the stored value so the card never keeps an image URL while the
+    // icon picker is showing (or vice versa).
+    if (next === "icon" && isCardIconImage(value)) onChange(CARD_ICON_CHOICES[0]);
+    if (next === "image" && !isCardIconImage(value)) onChange("");
+  };
+
+  return (
+    <Field label="Icon" hint="shown at the top of the card">
+      <div className="space-y-2">
+        <div className="flex gap-2">
+          <Button variant={mode === "icon" ? "primary" : "secondary"} onClick={() => choose("icon")}>Built-in icon</Button>
+          <Button variant={mode === "image" ? "primary" : "secondary"} onClick={() => choose("image")}><Upload size={15} /> Own image</Button>
+        </div>
+        {mode === "icon" ? (
+          <div className="flex items-center gap-3">
+            <Select value={value || ""} onChange={(e) => onChange(e.target.value)}>
+              {!CARD_ICON_CHOICES.includes(value) && <option value={value || ""}>{value || "(none)"}</option>}
+              {CARD_ICON_CHOICES.map((n) => <option key={n} value={n}>{n}</option>)}
+            </Select>
+            <AdminCardIconPreview name={value} />
+          </div>
+        ) : (
+          <>
+            <ImageField value={value} onChange={onChange} toast={toast} />
+            <p className="text-xs text-stone-400">A square picture works best — it is shown at about 32&nbsp;pixels, so a simple logo or symbol reads better than a photo.</p>
+          </>
+        )}
+      </div>
+    </Field>
+  );
+}
+
+// Small live preview of the chosen built-in icon, drawn from the same paths the
+// website uses so the admin and the page can't drift apart.
+function AdminCardIconPreview({ name }) {
+  const path = CARD_ICON_PATHS[name];
+  if (!path) return <span className="text-xs text-stone-400">no preview</span>;
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6B2D8B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
+      <path d={path} />
+    </svg>
+  );
+}
+
+// Editor for the homepage quick-link cards: icon, wording, link and colours.
+function QuickLinkCardFields({ cards, onChange, toast }) {
+  const setCard = (i, patch) => onChange(cards.map((c, j) => (j === i ? { ...c, ...patch } : c)));
+  const move = (i, dir) => {
+    const j = i + dir;
+    if (j < 0 || j >= cards.length) return;
+    const next = [...cards];
+    [next[i], next[j]] = [next[j], next[i]];
+    onChange(next);
+  };
+  return (
+    <div className="space-y-4">
+      {cards.map((c, i) => (
+        <div key={i} className="rounded-xl border border-stone-200 bg-white p-4">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">{c.title || `Card ${i + 1}`}</p>
+            <div className="flex gap-1">
+              <Button variant="ghost" onClick={() => move(i, -1)} disabled={i === 0}><ChevronUp size={15} /></Button>
+              <Button variant="ghost" onClick={() => move(i, 1)} disabled={i === cards.length - 1}><ChevronDown size={15} /></Button>
+              <Button variant="ghost" className="text-red-600 hover:bg-red-50" onClick={() => { if (window.confirm(`Remove the "${c.title || "untitled"}" card?`)) onChange(cards.filter((_, j) => j !== i)); }}><Trash2 size={15} /></Button>
+            </div>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            <CardIconField value={c.icon} onChange={(icon) => setCard(i, { icon })} toast={toast} />
+            <Field label="Title"><TextInput value={c.title || ""} onChange={(e) => setCard(i, { title: e.target.value })} /></Field>
+            <Field label="Button text"><TextInput value={c.cta || ""} onChange={(e) => setCard(i, { cta: e.target.value })} /></Field>
+            <Field label="Link" hint="e.g. /class-schedule"><TextInput value={c.href || ""} onChange={(e) => setCard(i, { href: e.target.value })} /></Field>
+            <Field label="Accent colour" hint="hex, e.g. #6B2D8B">
+              <div className="flex items-center gap-2">
+                <span className="inline-block h-6 w-6 flex-shrink-0 rounded-full border border-stone-300" style={{ background: c.accent || "#6B2D8B" }} />
+                <TextInput value={c.accent || ""} onChange={(e) => setCard(i, { accent: e.target.value })} />
+              </div>
+            </Field>
+            <Field label="Link-text colour" hint="darker shade, for readability">
+              <div className="flex items-center gap-2">
+                <span className="inline-block h-6 w-6 flex-shrink-0 rounded-full border border-stone-300" style={{ background: c.textAccent || "#6B2D8B" }} />
+                <TextInput value={c.textAccent || ""} onChange={(e) => setCard(i, { textAccent: e.target.value })} />
+              </div>
+            </Field>
+          </div>
+          <div className="mt-3"><Field label="Description"><TextArea rows={3} value={c.desc || ""} onChange={(e) => setCard(i, { desc: e.target.value })} /></Field></div>
+        </div>
+      ))}
+      <Button variant="secondary" onClick={() => onChange([...cards, { href: "/", accent: "#6B2D8B", textAccent: "#6B2D8B", icon: "sparkle", title: "", desc: "", cta: "Learn more" }])}><Plus size={15} /> Add card</Button>
+    </div>
+  );
+}
+
 function SectionFields({ fields, draft, setDraft, toast }) {
   const set = (name, value) => setDraft({ ...draft, [name]: value });
   return (
     <div className="grid gap-4">
       {fields.map((f) => {
+        if (f.type === "cards") return <QuickLinkCardFields key={f.name} cards={draft[f.name] || []} onChange={(v) => set(f.name, v)} toast={toast} />;
+        if (f.type === "slots") return <SectionImageSlotFields key={f.name} slots={draft[f.name] || []} onChange={(v) => set(f.name, v)} toast={toast} />;
         if (f.type === "textarea") return <Field key={f.name} label={f.label}><TextArea rows={4} value={draft[f.name] || ""} onChange={(e) => set(f.name, e.target.value)} /></Field>;
         if (f.type === "image") return <Field key={f.name} label={f.label}><ImageField value={draft[f.name]} onChange={(v) => set(f.name, v)} toast={toast} /></Field>;
         if (f.type === "lines") return <Field key={f.name} label={f.label}><LinesArea value={draft[f.name]} onChange={(v) => set(f.name, v)} /></Field>;

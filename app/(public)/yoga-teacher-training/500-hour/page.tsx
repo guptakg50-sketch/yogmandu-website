@@ -3,7 +3,7 @@ import CourseProgram from "../CourseProgram";
 import { getCurriculum } from "@/lib/pageContent";
 
 // Curriculum modules are admin-editable (defaults in curriculumContent.ts).
-export const revalidate = 60;
+export const revalidate = 300;
 import type { CourseConfig } from "../CourseProgram";
 
 export const metadata: Metadata = {

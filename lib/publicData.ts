@@ -41,6 +41,16 @@ export async function getInstructors(): Promise<DBInstructor[] | null> {
   }
 }
 
+/**
+ * A teacher appears on the public site only while their status is "Active".
+ * The admin's "Show on web" switch flips between "Active" and "Hidden", so this
+ * is the single place that decides visibility (About cards, teacher pages and
+ * the sitemap all go through it).
+ */
+export function isInstructorVisible(i: DBInstructor): boolean {
+  return (i.status ?? "Active") === "Active";
+}
+
 // Stable URL slug for a teacher, derived from their display name.
 // Used by both the /teachers/[slug] route and the About-page card links so
 // the two always agree. e.g. "Dr. Chintamani Gautam" → "dr-chintamani-gautam".
@@ -108,6 +118,9 @@ export interface DBSession {
   featured: boolean;
   homepage: boolean;
   priority: number;
+  /** Cover image and extra photos uploaded on the session's Media tab. */
+  image?: string;
+  gallery?: { id?: string; url: string; caption?: string }[];
 }
 
 export async function getActiveSessions(): Promise<DBSession[] | null> {
