@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withShareText } from "@/lib/seo";
 import Link from "next/link";
 import Testimonials from "@/components/Testimonials";
 import SingingBowl from "@/components/SingingBowlClient";
@@ -13,7 +14,7 @@ import { getSectionContent } from "@/lib/pageContent";
 
 export const revalidate = 300;
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: { absolute: "Yoga Classes & Teacher Training in Kathmandu | Yogmandu" },
   description:
     "Daily yoga classes in Baneshwor, Kathmandu — near New Baneshwor. Beginner-friendly classes, sound healing & Yoga Alliance teacher training. Book today.",
@@ -39,6 +40,12 @@ export const metadata: Metadata = {
     images: ["/opengraph-image.png"],
   },
 };
+
+// Share-preview text (WhatsApp/Facebook/Google) is admin-editable —
+// Page Content → Share previews. Falls back to the object above.
+export async function generateMetadata(): Promise<Metadata> {
+  return withShareText("/", pageMetadata);
+}
 
 const courseSchema = {
   "@context": "https://schema.org",

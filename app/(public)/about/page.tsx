@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withShareText } from "@/lib/seo";
 import AboutContent from "./AboutContent";
 import { getInstructors, instructorSlug, isInstructorVisible } from "@/lib/publicData";
 
@@ -15,7 +16,7 @@ function initialsOf(name: string): string {
 // Revalidate so admin edits to instructors appear without a redeploy (matches blog/schedule).
 export const revalidate = 300;
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: { absolute: "About Yogmandu — Yoga School in Kathmandu, Nepal" },
   description:
     "Founded 2018 and led by Dr. Chintamani Gautam (PhD Yogic Science, E-RYT 500), Yogmandu is a Yoga Alliance registered yoga school in Kathmandu, Nepal.",
@@ -27,15 +28,21 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://yogmandu.com/about" },
   openGraph: {
     title: "About Yogmandu | Nepal's First Yoga Alliance Registered School",
-    description: "Founded 2018 by Dr. Chintamani Gautam. ERYT 500, PhD Yogic Science. 3,000+ teachers from 50+ countries. Kathmandu, Nepal.",
+    description: "Founded 2018 by Yogi Arjuna Rakhal and Dr. Chintamani Gautam. ERYT 500, PhD Yogic Science. 3,000+ teachers from 50+ countries. Kathmandu, Nepal.",
     url: "https://yogmandu.com/about",
     images: ["/opengraph-image.png"],
   },
   twitter: {
     title: "About Yogmandu | Nepal's First Yoga Alliance Registered School",
-    description: "Founded 2018 by Dr. Chintamani Gautam. ERYT 500, PhD Yogic Science. 3,000+ teachers from 50+ countries.",
+    description: "Founded 2018 by Yogi Arjuna Rakhal and Dr. Chintamani Gautam. ERYT 500, PhD Yogic Science. 3,000+ teachers from 50+ countries.",
   },
 };
+
+// Share-preview text (WhatsApp/Facebook/Google) is admin-editable —
+// Page Content → Share previews. Falls back to the object above.
+export async function generateMetadata(): Promise<Metadata> {
+  return withShareText("/about", pageMetadata);
+}
 
 const founderSchema = {
   "@context": "https://schema.org",

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withShareText } from "@/lib/seo";
 import Link from "next/link";
 import PricingSection from "../PricingSection";
 import { getTierSet, getSectionContent, getCurriculum } from "@/lib/pageContent";
@@ -8,7 +9,7 @@ export const revalidate = 300;
 import IntakeMonths from "../IntakeMonths";
 import TimingNotice from "@/components/TimingNotice";
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: { absolute: "Residential Full Board 200hr Yoga Teacher Training — Nepal | Yogmandu" },
   description:
     "Live-in Residential Full Board 200-hour Yoga Teacher Training in Kathmandu, Nepal. Yoga Alliance RYT 200 with accommodation and all organic meals included (USD 1,400).",
@@ -31,6 +32,12 @@ export const metadata: Metadata = {
     description: "Live-in RYT 200 training in Kathmandu — accommodation + all organic meals included.",
   },
 };
+
+// Share-preview text (WhatsApp/Facebook/Google) is admin-editable —
+// Page Content → Share previews. Falls back to the object above.
+export async function generateMetadata(): Promise<Metadata> {
+  return withShareText("/yoga-teacher-training/residential", pageMetadata);
+}
 
 const includes = [
   { icon: "🛏", label: "Shared accommodation", sub: "25 nights at the Yogmandu campus" },

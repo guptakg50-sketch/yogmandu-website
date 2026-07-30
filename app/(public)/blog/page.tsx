@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withShareText } from "@/lib/seo";
 import Link from "next/link";
 import { getPublishedBlogs } from "@/lib/publicData";
 import type { DBBlog } from "@/lib/publicData";
@@ -30,7 +31,7 @@ const breadcrumbSchema = {
   ],
 };
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: { absolute: "Yoga Blog — Philosophy, Breathwork & Sound Healing | Yogmandu" },
   description:
     "Articles on yoga philosophy, pranayama, Tibetan sound healing and teacher training from Dr. Chintamani Gautam and the Yogmandu team in Kathmandu, Nepal.",
@@ -46,6 +47,12 @@ export const metadata: Metadata = {
     images: ["/opengraph-image.png"],
   },
 };
+
+// Share-preview text (WhatsApp/Facebook/Google) is admin-editable —
+// Page Content → Share previews. Falls back to the object above.
+export async function generateMetadata(): Promise<Metadata> {
+  return withShareText("/blog", pageMetadata);
+}
 
 const CATEGORY_COLORS: Record<string, string> = {
   "Teacher Training": "#6B2D8B",

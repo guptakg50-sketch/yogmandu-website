@@ -31,6 +31,7 @@ const DEFAULT_CONFIG = {
     { href: "/contact", label: "Contact" },
     { href: "/privacy", label: "Privacy" },
     { href: "/terms",   label: "Terms" },
+    { href: "/accessibility", label: "Accessibility" },
   ],
   contact: [
     { icon: "📍", text: "Mid-Baneshwor-31, Kathmandu, Nepal" },
@@ -273,6 +274,46 @@ export default function Footer() {
               );
             })}
           </ul>
+        </div>
+      </div>
+
+      {/* ── Accessibility ──
+          Rendered structurally rather than from the footer link config, so it
+          can't be dropped by an older saved Site Layout that predates it. */}
+      <div style={{ borderTop: "1px solid rgba(42,18,8,0.08)", padding: "1.5rem 2rem" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", flexWrap: "wrap",
+          alignItems: "center", justifyContent: "space-between", gap: 14 }}>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 12, maxWidth: 640 }}>
+            {/* Universal access symbol */}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6B2D8B"
+              strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"
+              aria-hidden="true" style={{ flexShrink: 0, marginTop: 2 }}>
+              <circle cx="12" cy="4" r="1.6" />
+              <path d="M5 8.5h14M12 8.5v5M12 13.5l-3 6.5M12 13.5l3 6.5" />
+            </svg>
+            <div>
+              <h4 style={{ fontSize: "0.95rem", letterSpacing: "0.26em", textTransform: "uppercase",
+                color: "#6B2D8B", margin: "0 0 6px", fontWeight: 500 }}>
+                Accessibility
+              </h4>
+              <p style={{ fontSize: "0.88rem", color: "#5C3D2E", lineHeight: 1.65, margin: 0 }}>
+                We want this site and our studio to work for everyone. If something is hard to use,
+                tell us and we&rsquo;ll fix it — and help you book in the meantime.
+              </p>
+            </div>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+            <Link href="/accessibility"
+              style={{ fontSize: "0.85rem", fontWeight: 500, color: "#6B2D8B", textDecoration: "none",
+                padding: "0.5rem 1.1rem", borderRadius: 999, border: "1.5px solid rgba(107,45,139,0.35)" }}>
+              Accessibility statement
+            </Link>
+            <a href="mailto:info@yogmandu.com?subject=Website%20accessibility"
+              style={{ fontSize: "0.85rem", fontWeight: 500, color: "#A65808", textDecoration: "none",
+                padding: "0.5rem 1.1rem", borderRadius: 999, border: "1.5px solid rgba(166,88,8,0.35)" }}>
+              Report a problem
+            </a>
+          </div>
         </div>
       </div>
 

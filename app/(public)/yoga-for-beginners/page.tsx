@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import { withShareText } from "@/lib/seo";
 import Link from "next/link";
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: { absolute: "Yoga for Beginners in Baneshwor, Kathmandu | Yogmandu" },
   description:
     "New to yoga? Start with beginner-friendly classes at Yogmandu in Baneshwor, Kathmandu — near New Baneshwor. Gentle Hatha & breathwork. No experience needed.",
@@ -30,6 +31,12 @@ export const metadata: Metadata = {
     description: "Gentle, beginner-friendly yoga in Kathmandu. No experience or flexibility needed.",
   },
 };
+
+// Share-preview text (WhatsApp/Facebook/Google) is admin-editable —
+// Page Content → Share previews. Falls back to the object above.
+export async function generateMetadata(): Promise<Metadata> {
+  return withShareText("/yoga-for-beginners", pageMetadata);
+}
 
 // Single source of truth: the visible FAQ section below and the FAQPage
 // structured data are both generated from this array, so they can never drift

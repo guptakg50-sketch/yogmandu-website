@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withShareText } from "@/lib/seo";
 import SingingBowl from "@/components/SingingBowlClient";
 import StatsOrbs from "@/components/StatsOrbs";
 import { ServiceHub } from "../service/ServiceHub";
@@ -7,7 +8,7 @@ import { getHubConfig, getSectionContent } from "@/lib/pageContent";
 // Hub cards + "In Session" photos are admin-editable (Page Content).
 export const revalidate = 300;
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: { absolute: "Sound Healing Kathmandu — Tibetan Singing Bowls | Yogmandu" },
   description:
     "Tibetan singing bowl sound healing in Baneshwor, Kathmandu — near New Baneshwor. Individual & group sessions plus Level I & II certification. Book today.",
@@ -34,6 +35,12 @@ export const metadata: Metadata = {
     description: "Authentic Tibetan singing bowl sessions in Kathmandu. Individual USD 20 · Group USD 10/person · Level I & II certification.",
   },
 };
+
+// Share-preview text (WhatsApp/Facebook/Google) is admin-editable —
+// Page Content → Share previews. Falls back to the object above.
+export async function generateMetadata(): Promise<Metadata> {
+  return withShareText("/sound-healing-therapy", pageMetadata);
+}
 
 const serviceSchema = {
   "@context": "https://schema.org",

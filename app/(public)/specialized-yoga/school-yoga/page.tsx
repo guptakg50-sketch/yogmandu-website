@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withShareText } from "@/lib/seo";
 import ServicePage from "../../service/ServicePage";
 import { getServicePageConfig } from "@/lib/pageContent";
 
@@ -6,7 +7,7 @@ import { getServicePageConfig } from "@/lib/pageContent";
 // up saved overrides within a minute.
 export const revalidate = 300;
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: { absolute: "School Yoga Programs in Kathmandu | Yogmandu" },
   description:
     "Yoga programs for schools in Kathmandu — building focus, wellbeing and resilience for students and staff. Age-appropriate, curriculum-friendly, on-site.",
@@ -18,6 +19,12 @@ export const metadata: Metadata = {
     images: ["/opengraph-image.png"],
   },
 };
+
+// Share-preview text (WhatsApp/Facebook/Google) is admin-editable —
+// Page Content → Share previews. Falls back to the object above.
+export async function generateMetadata(): Promise<Metadata> {
+  return withShareText("/specialized-yoga/school-yoga", pageMetadata);
+}
 
 export default async function Page() {
   return <ServicePage config={await getServicePageConfig("SCHOOL_YOGA")} />;

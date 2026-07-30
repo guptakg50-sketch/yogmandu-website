@@ -1121,64 +1121,135 @@ function MiniTable({ title, columns, rows, action }) {
   );
 }
 
-function SeoManager({ pages, setPages, toast }) {
-  const [selectedId, setSelectedId] = useState(pages[0]?.id);
-  const selected = pages.find((page) => page.id === selectedId) || pages[0];
-  const [draft, setDraft] = useState(selected);
-  useEffect(() => setDraft(selected), [selectedId, selected]);
-  if (!selected) return null;
+// ── Share previews / SEO ──────────────────────────────────────────────────────
+// The title and blurb that WhatsApp, Facebook, LinkedIn and Google show when a
+// link to the site is shared. This screen previously kept its edits in the
+// browser only — nothing was ever sent to the server — so changes appeared to
+// save and then vanished. It now reads and writes the same Page Content record
+// the pages themselves render from.
+function SeoManager({ toast }) {
+  const [pages, setPages]     = useState(null);
+  const [error, setError]     = useState("");
+  const [query, setQuery]     = useState("");
+  const [selected, setSelected] = useState(null);
+  const [saving, setSaving]   = useState(false);
+  const [dirty, setDirty]     = useState(false);
 
-  function copyTags() {
-    const snippet = `<title>${draft.seoTitle}</title>
-<meta name="description" content="${draft.metaDescription}" />
-<link rel="canonical" href="${draft.canonical}" />
-<meta name="robots" content="${draft.robotsIndex}, ${draft.robotsFollow}" />
-<meta property="og:title" content="${draft.ogTitle}" />
-<meta property="og:description" content="${draft.ogDescription}" />
-<meta property="og:image" content="${draft.ogImage}" />
-<script type="application/ld+json">${draft.schemaJson}</script>`;
-    navigator.clipboard.writeText(snippet);
-    toast("Meta tags copied");
+  const load = () => {
+    setError("");
+    fetchJson("/api/admin/page-content")
+      .then((res) => {
+        const doc = (res.items || []).find((d) => d.key === "section:SHARE_PREVIEWS");
+        const list = doc?.data?.pages || [];
+        setPages(list);
+        setSelected((cur) => cur ?? list[0]?.path ?? null);
+        setDirty(false);
+      })
+      .catch((e) => { setPages([]); setError(e.message || "Could not load share previews"); });
+  };
+  useEffect(load, []);
+
+  const setPage = (path, patch) => {
+    setPages((list) => list.map((p) => (p.path === path ? { ...p, ...patch } : p)));
+    setDirty(true);
+  };
+
+  async function save() {
+    setSaving(true);
+    try {
+      await fetchJson("/api/admin/page-content", { method: "PUT", body: JSON.stringify({ key: "section:SHARE_PREVIEWS", data: { pages } }) });
+      toast("Share text saved — new shares show it within a few minutes");
+      setDirty(false);
+    } catch (e) {
+      toast(e.message || "Save failed");
+    } finally {
+      setSaving(false);
+    }
   }
 
+  if (pages === null) {
+    return <div className="space-y-4">{Array.from({ length: 3 }, (_, i) => <div key={i} className="h-24 animate-pulse rounded-xl bg-stone-200" />)}</div>;
+  }
+  if (error) {
+    return <EmptyState icon={AlertTriangle} title="Couldn't load share previews" text={error} action={<Button onClick={load}><RefreshCw size={16} /> Retry</Button>} />;
+  }
+
+  const q = query.trim().toLowerCase();
+  const visible = pages.filter((p) => !q || `${p.path} ${p.label} ${p.title}`.toLowerCase().includes(q));
+  const current = pages.find((p) => p.path === selected) || visible[0];
+
   return (
-    <div className="grid gap-5 lg:grid-cols-[260px_1fr]">
-      <aside className="rounded-xl border border-stone-200 bg-white p-3">
-        <Button className="mb-3 w-full" onClick={() => {
-          const page = makeSeo("/new-page", "New Page | Yogmandu", "Describe this Yogmandu page.");
-          setPages([...pages, page]);
-          setSelectedId(page.id);
-        }}><Plus size={16} /> Add Page</Button>
-        <div className="space-y-1">
-          {pages.map((page) => <button key={page.id} onClick={() => setSelectedId(page.id)} className={classNames("flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm", selectedId === page.id ? "bg-emerald-50 text-emerald-800" : "text-stone-600 hover:bg-stone-50")}><span>{page.pageName}</span><Badge className={scoreColor(scoreSeo(page, pages))}>{scoreSeo(page, pages)}</Badge></button>)}
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold text-stone-900">Share previews</h2>
+          <p className="text-sm text-stone-500">What people see when a link to a page is pasted into WhatsApp, Facebook or Google — {pages.length} pages.</p>
         </div>
-        <div className="mt-4 rounded-lg bg-stone-50 p-3">
-          <p className="text-xs font-semibold uppercase text-stone-500">Bulk robots</p>
-          <Button variant="secondary" className="mt-2 w-full" onClick={() => { setPages(pages.map((page) => ({ ...page, robotsIndex: "index", robotsFollow: "follow" }))); toast("Robots applied to all pages"); }}>Apply index, follow</Button>
+        <div className="flex items-center gap-2">
+          {dirty && <Badge className="bg-amber-100 text-amber-700">Unsaved changes</Badge>}
+          <Button onClick={save} disabled={saving || !dirty}><Save size={16} /> {saving ? "Saving…" : "Save & Publish"}</Button>
         </div>
-      </aside>
-      <main className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white p-4">
-          <div>
-            <h2 className="text-xl font-semibold text-stone-900">{draft.pageName}</h2>
-            <p className="text-sm text-stone-500">{draft.route}</p>
+      </div>
+
+      <div className="grid gap-5 lg:grid-cols-[280px_1fr]">
+        <div className="space-y-2">
+          <div className="relative">
+            <Search className="absolute left-3 top-2.5 text-stone-400" size={16} />
+            <TextInput className="pl-9" placeholder="Find a page" value={query} onChange={(e) => setQuery(e.target.value)} />
           </div>
-          <div className="flex gap-2">
-            <Button variant="secondary" onClick={copyTags}><Copy size={16} /> Copy Meta Tags</Button>
-            <Button variant="secondary" onClick={() => setDraft(selected)}>Discard</Button>
-            <Button onClick={() => { setPages(pages.map((page) => page.id === draft.id ? { ...draft, updatedAt: new Date().toISOString().slice(0, 10) } : page)); toast("SEO page saved"); }}><Save size={16} /> Save</Button>
+          <div className="max-h-[28rem] space-y-1 overflow-y-auto rounded-xl border border-stone-200 bg-white p-2">
+            {visible.map((p) => (
+              <button
+                key={p.path}
+                type="button"
+                onClick={() => setSelected(p.path)}
+                className={classNames(
+                  "w-full truncate rounded-lg px-3 py-2 text-left text-sm transition",
+                  current?.path === p.path ? "bg-emerald-50 font-medium text-emerald-800" : "text-stone-600 hover:bg-stone-50",
+                )}
+              >
+                {p.label || p.path}
+              </button>
+            ))}
+            {visible.length === 0 && <p className="p-3 text-sm text-stone-400">No pages match.</p>}
           </div>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          <Field label="Page name"><TextInput value={draft.pageName} onChange={(e) => setDraft({ ...draft, pageName: e.target.value })} /></Field>
-          <Field label="Route"><TextInput value={draft.route} onChange={(e) => setDraft({ ...draft, route: e.target.value })} /></Field>
-          <Field label="Last updated"><TextInput value={draft.updatedAt} onChange={(e) => setDraft({ ...draft, updatedAt: e.target.value })} /></Field>
-        </div>
-        <SeoEditorFields value={draft} onChange={setDraft} allPages={pages} />
-      </main>
+
+        {current && (
+          <div className="space-y-4 rounded-xl border border-stone-200 bg-white p-5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">{current.path}</p>
+
+            <Field label="Share title" hint={`${(current.title || "").length} characters · about 60 shows`}>
+              <TextInput value={current.title || ""} onChange={(e) => setPage(current.path, { title: e.target.value })} />
+            </Field>
+            <Field label="Share text" hint={`${(current.description || "").length} characters · about 150 shows`}>
+              <TextArea rows={3} value={current.description || ""} onChange={(e) => setPage(current.path, { description: e.target.value })} />
+            </Field>
+            <Field label="Preview image" hint="leave blank to use the site-wide default">
+              <ImageField value={current.image} onChange={(v) => setPage(current.path, { image: v })} toast={toast} />
+            </Field>
+
+            {/* Roughly how the link will look once shared. */}
+            <div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-stone-500">Preview</p>
+              <div className="max-w-md overflow-hidden rounded-lg border border-stone-200">
+                <div className="flex h-24 items-center justify-center bg-stone-100 text-xs text-stone-400">
+                  {current.image ? <img src={current.image} alt="" className="h-full w-full object-cover" /> : "default share image"}
+                </div>
+                <div className="space-y-1 bg-white p-3">
+                  <p className="line-clamp-2 text-sm font-semibold text-stone-900">{current.title || "(no title)"}</p>
+                  <p className="line-clamp-3 text-xs text-stone-500">{current.description || "(no description)"}</p>
+                  <p className="text-xs text-stone-400">yogmandu.com</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
+
 
 function BlogManager({ blogs, setBlogs, media, setMedia, toast }) {
   const [query, setQuery] = useState("");
@@ -2656,7 +2727,7 @@ function AdminWorkspace({ onLogout }) {
           {active === "bookings"   && <BookingsManager toast={notify} />}
           {active === "siteLayout" && <SiteLayoutManager toast={notify} />}
           {active === "pageContent" && <PageContentManager toast={notify} />}
-          {active === "seo"        && <SeoManager pages={state.seoPages} setPages={setPart("seoPages")} toast={notify} />}
+          {active === "seo"        && <SeoManager toast={notify} />}
           {active === "sitemap"    && <SitemapManager toast={notify} />}
           {active === "blog" && <BlogManager blogs={state.blogs} setBlogs={setPart("blogs")} media={state.media} setMedia={setPart("media")} toast={notify} />}
           {active === "sessions" && <SessionsManager sessions={state.sessions} setSessions={setPart("sessions")} instructors={state.instructors} setInstructors={setPart("instructors")} media={state.media} setMedia={setPart("media")} sessionTypes={state.sessionTypes} setSessionTypes={setPart("sessionTypes")} toast={notify} />}

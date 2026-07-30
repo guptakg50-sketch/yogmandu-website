@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { withShareText } from "@/lib/seo";
 import CategoryHub from "../service/CategoryHub";
 import { getHubConfig } from "@/lib/pageContent";
 
 // Hub cards are admin-editable (Page Content → Cards & Pricing).
 export const revalidate = 300;
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: { absolute: "Yoga Therapy, Reiki & Diet Consultation in Kathmandu | Yogmandu" },
   description:
     "One-to-one therapy and wellness at Yogmandu, Kathmandu — yoga therapy, Reiki energy healing and personalised Ayurvedic diet consultation.",
@@ -17,6 +18,12 @@ export const metadata: Metadata = {
     images: ["/opengraph-image.png"],
   },
 };
+
+// Share-preview text (WhatsApp/Facebook/Google) is admin-editable —
+// Page Content → Share previews. Falls back to the object above.
+export async function generateMetadata(): Promise<Metadata> {
+  return withShareText("/therapy-wellness", pageMetadata);
+}
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",

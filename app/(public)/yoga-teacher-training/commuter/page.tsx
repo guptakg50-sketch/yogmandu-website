@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withShareText } from "@/lib/seo";
 import Link from "next/link";
 import PricingSection from "../PricingSection";
 import { getTierSet, getSectionContent, getCurriculum } from "@/lib/pageContent";
@@ -8,7 +9,7 @@ export const revalidate = 300;
 import IntakeMonths from "../IntakeMonths";
 import TimingNotice from "@/components/TimingNotice";
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: { absolute: "Commuter (Non-Residential) 200hr Yoga Teacher Training — Nepal | Yogmandu" },
   description:
     "Non-residential Commuter 200-hour Yoga Teacher Training in Kathmandu, Nepal. Train by day and stay in your own accommodation. Yoga Alliance RYT 200 from USD 600.",
@@ -30,6 +31,12 @@ export const metadata: Metadata = {
     description: "Train by day, stay in your own accommodation. Yoga Alliance RYT 200 from USD 600.",
   },
 };
+
+// Share-preview text (WhatsApp/Facebook/Google) is admin-editable —
+// Page Content → Share previews. Falls back to the object above.
+export async function generateMetadata(): Promise<Metadata> {
+  return withShareText("/yoga-teacher-training/commuter", pageMetadata);
+}
 
 const includes = [
   { icon: "📜", label: "Yoga Alliance RYT 200", sub: "Internationally recognised certificate" },

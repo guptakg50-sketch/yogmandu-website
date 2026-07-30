@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withShareText } from "@/lib/seo";
 import Link from "next/link";
 import PricingSection from "../PricingSection";
 import { getTierSet, getSectionContent, getCurriculum } from "@/lib/pageContent";
@@ -8,7 +9,7 @@ export const revalidate = 300;
 import IntakeMonths from "../IntakeMonths";
 import TimingNotice from "@/components/TimingNotice";
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: { absolute: "Online 200hr Yoga Teacher Training — Live Virtual | Yogmandu" },
   description:
     "Live Online 200-hour Yoga Teacher Training with Yogmandu. Earn your Yoga Alliance RYT 200 from anywhere with real-time classes (USD 500) — same certification as our in-person course.",
@@ -31,6 +32,12 @@ export const metadata: Metadata = {
     description: "Earn your Yoga Alliance RYT 200 online with live real-time classes. USD 500.",
   },
 };
+
+// Share-preview text (WhatsApp/Facebook/Google) is admin-editable —
+// Page Content → Share previews. Falls back to the object above.
+export async function generateMetadata(): Promise<Metadata> {
+  return withShareText("/yoga-teacher-training/online", pageMetadata);
+}
 
 const includes = [
   { icon: "💻", label: "Live online sessions", sub: "Real-time on Zoom — not pre-recorded" },

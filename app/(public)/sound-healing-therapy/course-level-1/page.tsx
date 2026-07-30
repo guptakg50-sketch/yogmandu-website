@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withShareText } from "@/lib/seo";
 import ServicePage from "../../service/ServicePage";
 import { getServicePageConfig } from "@/lib/pageContent";
 
@@ -6,7 +7,7 @@ import { getServicePageConfig } from "@/lib/pageContent";
 // up saved overrides within a minute.
 export const revalidate = 300;
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: { absolute: "Sound Healing Course Level I (Foundational) in Nepal | Yogmandu" },
   description:
     "Level I foundational sound healing certification in Kathmandu, Nepal — 20 hours of Tibetan singing bowl history, technique and session basics. Certificate awarded.",
@@ -18,6 +19,12 @@ export const metadata: Metadata = {
     images: ["/opengraph-image.png"],
   },
 };
+
+// Share-preview text (WhatsApp/Facebook/Google) is admin-editable —
+// Page Content → Share previews. Falls back to the object above.
+export async function generateMetadata(): Promise<Metadata> {
+  return withShareText("/sound-healing-therapy/course-level-1", pageMetadata);
+}
 
 export default async function Page() {
   return <ServicePage config={await getServicePageConfig("SOUND_LEVEL_1")} />;

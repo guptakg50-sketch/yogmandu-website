@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withShareText } from "@/lib/seo";
 import Link from "next/link";
 import { ServiceHub } from "../service/ServiceHub";
 import { getHubConfig } from "@/lib/pageContent";
@@ -6,7 +7,7 @@ import { getHubConfig } from "@/lib/pageContent";
 // Hub cards are admin-editable (Page Content → Cards & Pricing).
 export const revalidate = 300;
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: { absolute: "Yoga Retreat in Nepal — Kathmandu & Himalayas | Yogmandu" },
   description:
     "Join a yoga retreat in Nepal with Yogmandu — daily yoga & meditation, Tibetan sound healing, mountain air and Himalayan tradition in Kathmandu. Tailored dates.",
@@ -34,6 +35,12 @@ export const metadata: Metadata = {
     description: "Daily yoga, meditation & Tibetan sound healing amid the Himalayas. Tailored retreats in Nepal.",
   },
 };
+
+// Share-preview text (WhatsApp/Facebook/Google) is admin-editable —
+// Page Content → Share previews. Falls back to the object above.
+export async function generateMetadata(): Promise<Metadata> {
+  return withShareText("/yoga-retreat-nepal", pageMetadata);
+}
 
 // Single source of truth: the visible FAQ section below and the FAQPage
 // structured data are both generated from this array, so they can never drift

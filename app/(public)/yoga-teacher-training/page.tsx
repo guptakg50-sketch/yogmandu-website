@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withShareText } from "@/lib/seo";
 import Link from "next/link";
 import { PricingCard } from "./PricingSection";
 import SectionImage from "@/components/SectionImage";
@@ -9,7 +10,7 @@ import { getTierSet, getSectionContent, getCurriculum } from "@/lib/pageContent"
 export const revalidate = 300;
 import IntakeMonths from "./IntakeMonths";
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: { absolute: "Yoga Teacher Training in Nepal — RYS 200 | Yogmandu" },
   description:
     "Yoga Alliance RYS 200 teacher training in Kathmandu, Nepal. Residential & non-residential 2026 batches — Hatha, Ashtanga, anatomy, philosophy & practice.",
@@ -36,6 +37,12 @@ export const metadata: Metadata = {
     description: "Yoga Alliance RYS 200 certified. Residential USD 1,400 · Non-residential USD 600. 2026 batches in Kathmandu.",
   },
 };
+
+// Share-preview text (WhatsApp/Facebook/Google) is admin-editable —
+// Page Content → Share previews. Falls back to the object above.
+export async function generateMetadata(): Promise<Metadata> {
+  return withShareText("/yoga-teacher-training", pageMetadata);
+}
 
 const courseSchema = {
   "@context": "https://schema.org",

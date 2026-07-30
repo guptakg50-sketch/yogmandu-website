@@ -42,6 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/gallery/all`,                   lastModified: mtime("app/(public)/gallery/all/page.tsx"),           changeFrequency: "monthly", priority: 0.6,  images: galleryImages },
     { url: `${base}/blog`,                          lastModified: mtime("app/(public)/blog/page.tsx"),                  changeFrequency: "weekly",  priority: 0.7 },
     { url: `${base}/privacy`,                       lastModified: mtime("app/(public)/privacy/page.tsx"),               changeFrequency: "yearly",  priority: 0.3 },
+    { url: `${base}/accessibility`,                 lastModified: mtime("app/(public)/accessibility/page.tsx"),         changeFrequency: "yearly",  priority: 0.35 },
     { url: `${base}/terms`,                         lastModified: mtime("app/(public)/terms/page.tsx"),                 changeFrequency: "yearly",  priority: 0.3 },
 
     // ── Service category hubs & individual service pages ──

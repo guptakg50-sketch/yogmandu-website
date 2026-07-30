@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withShareText } from "@/lib/seo";
 import { getGalleryItems } from "@/lib/publicData";
 import { resolveGalleryPhotos, toAbsoluteSrc } from "../galleryData";
 import GalleryAllGrid from "./GalleryAllGrid";
@@ -15,7 +16,7 @@ const breadcrumbSchema = {
   ],
 };
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: "All Photos | Yogmandu Gallery — Yoga & Sound Healing Nepal",
   description:
     "Every moment from Yogmandu Kathmandu — yoga classes, Tibetan singing bowl sessions, teacher training graduates, and the spirit of Nepal. Browse all 50 photos.",
@@ -27,6 +28,12 @@ export const metadata: Metadata = {
     url: "https://yogmandu.com/gallery/all",
   },
 };
+
+// Share-preview text (WhatsApp/Facebook/Google) is admin-editable —
+// Page Content → Share previews. Falls back to the object above.
+export async function generateMetadata(): Promise<Metadata> {
+  return withShareText("/gallery/all", pageMetadata);
+}
 
 export default async function GalleryAllPage() {
   const items  = await getGalleryItems();

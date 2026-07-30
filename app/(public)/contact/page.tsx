@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withShareText } from "@/lib/seo";
 import ContactForm from "./ContactForm";
 
 const contactPageSchema = {
@@ -41,7 +42,7 @@ const breadcrumbSchema = {
   ],
 };
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: { absolute: "Contact Yogmandu — Yoga in Kathmandu, Nepal" },
   description:
     "Book yoga classes, teacher training or sound healing at Yogmandu in Mid-Baneshwor, Kathmandu — near New Baneshwor. WhatsApp +977-9810263277 · info@yogmandu.com.",
@@ -58,6 +59,12 @@ export const metadata: Metadata = {
     images: ["/opengraph-image.png"],
   },
 };
+
+// Share-preview text (WhatsApp/Facebook/Google) is admin-editable —
+// Page Content → Share previews. Falls back to the object above.
+export async function generateMetadata(): Promise<Metadata> {
+  return withShareText("/contact", pageMetadata);
+}
 
 export default function ContactPage() {
   return (

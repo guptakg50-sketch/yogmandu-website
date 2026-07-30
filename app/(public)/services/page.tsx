@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import { withShareText } from "@/lib/seo";
 import ServicesGrid from "./ServicesGrid";
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: { absolute: "Our Services — Yoga, Sound Healing & Retreats | Yogmandu" },
   description:
     "Yogmandu's services in Kathmandu, Nepal: yoga teacher training, daily classes, private & corporate yoga, retreats, yoga therapy and Tibetan sound healing.",
@@ -25,6 +26,12 @@ export const metadata: Metadata = {
     images: ["/opengraph-image.png"],
   },
 };
+
+// Share-preview text (WhatsApp/Facebook/Google) is admin-editable —
+// Page Content → Share previews. Falls back to the object above.
+export async function generateMetadata(): Promise<Metadata> {
+  return withShareText("/services", pageMetadata);
+}
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",

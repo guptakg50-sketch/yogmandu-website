@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withShareText } from "@/lib/seo";
 import CourseProgram from "../CourseProgram";
 import { getCurriculum } from "@/lib/pageContent";
 
@@ -6,7 +7,7 @@ import { getCurriculum } from "@/lib/pageContent";
 export const revalidate = 300;
 import type { CourseConfig } from "../CourseProgram";
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: { absolute: "500-Hour Yoga Teacher Training in Nepal — RYS 500 | Yogmandu" },
   description:
     "Yoga Alliance RYS 500 advanced yoga teacher training in Kathmandu, Nepal. A 45-day immersion in advanced asana, pranayama, meditation, philosophy & healing — the highest level of yoga certification.",
@@ -30,6 +31,12 @@ export const metadata: Metadata = {
     description: "Yoga Alliance RYS 500 · 45-day advanced immersion in Kathmandu, Nepal.",
   },
 };
+
+// Share-preview text (WhatsApp/Facebook/Google) is admin-editable —
+// Page Content → Share previews. Falls back to the object above.
+export async function generateMetadata(): Promise<Metadata> {
+  return withShareText("/yoga-teacher-training/500-hour", pageMetadata);
+}
 
 const config: Omit<CourseConfig, "curriculum"> = {
   hours:       "500",

@@ -4,6 +4,7 @@ import { SERVICE_CONFIGS, type ServiceConfig, type ServiceConfigKey } from "@/ap
 import { HUB_CONFIGS, type HubConfig, type HubConfigKey } from "@/app/(public)/service/hubContent";
 import { TIER_SETS, type TierSet, type TierSetKey } from "@/app/(public)/yoga-teacher-training/pricingTiers";
 import { CURRICULA, type Curriculum, type CurriculumKey } from "@/app/(public)/yoga-teacher-training/curriculumContent";
+import { SHARE_PAGES, type SharePage } from "@/lib/shareContent";
 
 // Editable page content, stored as extra rows in yogmandu_site_config
 // (id = "content:<key>", data = the override object). Every document has a
@@ -37,6 +38,11 @@ export const CLASSES_WE_OFFER_DEFAULT = {
   image: "/images/schedule/classes-we-offer.webp",
   imageAlt: "Yoga classes we offer at Yogmandu — Power Yoga for strength and stamina, Flexibility Yoga for mobility, Hatha Yoga for balance of body, breath and mind, Vinyasa Flow for dynamic strength and discipline, Asana & Meditation for mindfulness, and Pranayama & Suryanamaskar for breath control and energising sun salutations",
 };
+
+// Share previews — the title and blurb WhatsApp/Facebook/Google show for a
+// pasted link. Defaults live in shareContent.ts (extracted from each page), and
+// the admin saves overrides on top of them.
+export const SHARE_PREVIEWS_DEFAULT = { pages: SHARE_PAGES };
 
 // Optional image bands. Every section built as "small eyebrow line + heading"
 // has one of these slots directly under the heading; leaving the image blank
@@ -161,6 +167,7 @@ const SECTION_DEFAULTS = {
   CLASSES_WE_OFFER: CLASSES_WE_OFFER_DEFAULT,
   HOME_QUICK_LINKS: HOME_QUICK_LINKS_DEFAULT,
   SECTION_IMAGES:   SECTION_IMAGES_DEFAULT,
+  SHARE_PREVIEWS:   SHARE_PREVIEWS_DEFAULT,
   SESSION_TYPES:    SESSION_TYPES_DEFAULT,
   YTT_GRADUATION:   YTT_GRADUATION_DEFAULT,
   YTT_CANCELLATION: YTT_CANCELLATION_DEFAULT,
@@ -176,7 +183,7 @@ export type SectionKey = keyof typeof SECTION_DEFAULTS;
 // Field schemas let the admin render a form for each bespoke section without
 // hardcoding shapes client-side. types: text | textarea | image | lines |
 // pairs (when/refund rows) | photos (src+alt list).
-type FieldDef = { name: string; label: string; type: "text" | "textarea" | "image" | "lines" | "pairs" | "photos" | "cards" | "slots" };
+type FieldDef = { name: string; label: string; type: "text" | "textarea" | "image" | "lines" | "pairs" | "photos" | "cards" | "slots" | "share" };
 
 const SECTION_META: Record<SectionKey, { label: string; page: string; fields: FieldDef[] }> = {
   INSIDE_STUDIO: {
@@ -209,6 +216,13 @@ const SECTION_META: Record<SectionKey, { label: string; page: string; fields: Fi
     fields: [
       { name: "image", label: "Graphic", type: "image" },
       { name: "imageAlt", label: "Graphic alt text (SEO)", type: "textarea" },
+    ],
+  },
+  SHARE_PREVIEWS: {
+    label: "Share previews (WhatsApp / Facebook / Google text)",
+    page: "what people see when a link to the site is shared",
+    fields: [
+      { name: "pages", label: "Pages", type: "share" },
     ],
   },
   SECTION_IMAGES: {
@@ -389,6 +403,20 @@ export async function getContent<T extends object>(key: string, fallback: T): Pr
 
 export async function getSectionContent<K extends SectionKey>(key: K): Promise<(typeof SECTION_DEFAULTS)[K]> {
   return getContent(`section:${key}`, SECTION_DEFAULTS[key]);
+}
+
+/**
+ * Share text for one route, admin override merged over the built-in default.
+ * Cached per request so several lookups in one render hit the database once.
+ */
+export const getSharePages = cache(async (): Promise<SharePage[]> => {
+  const { pages } = await getSectionContent("SHARE_PREVIEWS");
+  return Array.isArray(pages) ? (pages as SharePage[]) : SHARE_PAGES;
+});
+
+export async function getSharePage(path: string): Promise<SharePage | undefined> {
+  const pages = await getSharePages().catch(() => SHARE_PAGES);
+  return pages.find((p) => p.path === path) ?? SHARE_PAGES.find((p) => p.path === path);
 }
 
 export type SectionImageSlot = { id: string; label: string; image: string; alt: string };

@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { withShareText } from "@/lib/seo";
 import CategoryHub from "../service/CategoryHub";
 import { getHubConfig } from "@/lib/pageContent";
 
 // Hub cards are admin-editable (Page Content → Cards & Pricing).
 export const revalidate = 300;
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: { absolute: "Prenatal, Kids, Senior & School Yoga in Kathmandu | Yogmandu" },
   description:
     "Yoga adapted for every stage of life at Yogmandu, Kathmandu — prenatal & postnatal yoga, children's yoga, senior citizens' yoga and school programs.",
@@ -17,6 +18,12 @@ export const metadata: Metadata = {
     images: ["/opengraph-image.png"],
   },
 };
+
+// Share-preview text (WhatsApp/Facebook/Google) is admin-editable —
+// Page Content → Share previews. Falls back to the object above.
+export async function generateMetadata(): Promise<Metadata> {
+  return withShareText("/specialized-yoga", pageMetadata);
+}
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",

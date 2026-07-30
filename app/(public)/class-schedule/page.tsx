@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withShareText } from "@/lib/seo";
 import Link from "next/link";
 import ScheduleGrid from "./ScheduleGrid";
 import HeroDecor from "./HeroDecor";
@@ -9,7 +10,7 @@ import { getHubConfig, getSectionContent } from "@/lib/pageContent";
 
 export const revalidate = 300;
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: { absolute: "Yoga Classes in Baneshwor, Kathmandu | Yogmandu" },
   description:
     "Daily yoga classes in Baneshwor, Kathmandu — near New Baneshwor. Hatha, Vinyasa, Ashtanga, Yin, pranayama & meditation. All levels welcome. See the timetable.",
@@ -32,6 +33,12 @@ export const metadata: Metadata = {
     images: ["/opengraph-image.png"],
   },
 };
+
+// Share-preview text (WhatsApp/Facebook/Google) is admin-editable —
+// Page Content → Share previews. Falls back to the object above.
+export async function generateMetadata(): Promise<Metadata> {
+  return withShareText("/class-schedule", pageMetadata);
+}
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",
