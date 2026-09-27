@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import type { ServiceConfig } from "./serviceContent";
 import TimingNotice from "@/components/TimingNotice";
 
@@ -6,6 +7,9 @@ import TimingNotice from "@/components/TimingNotice";
 // child pages (CourseProgram): hero → overview → who-it's-for + what's-included
 // → how-it-works → pricing/booking → FAQ → also-explore. All content comes from
 // a ServiceConfig so every service page stays visually identical.
+//
+// `hub` is an optional band of cards dropped in after "what's included" — a
+// page can list the individual therapies it offers before asking for a booking.
 
 const WHATSAPP = "https://wa.me/9779810263277";
 const PALETTE = ["#6B2D8B", "#F7941D", "#8DC63F"];
@@ -40,7 +44,7 @@ function CheckList({ items, color = "#6B2D8B", cols = 2 }: { items: string[]; co
   );
 }
 
-export default function ServicePage({ config: c }: { config: ServiceConfig }) {
+export default function ServicePage({ config: c, hub }: { config: ServiceConfig; hub?: ReactNode }) {
   return (
     <>
       {/* Hero */}
@@ -102,6 +106,8 @@ export default function ServicePage({ config: c }: { config: ServiceConfig }) {
           </div>
         </div>
       </section>
+
+      {hub}
 
       {/* How it works */}
       <section className="py-20 px-6" style={{ background: "#F9F5FF" }}>
@@ -191,7 +197,7 @@ export default function ServicePage({ config: c }: { config: ServiceConfig }) {
           <div className="flex flex-wrap justify-center gap-4">
             <Link href={`/book?service=${c.slug}`}
               className="cta-lift px-10 py-4 rounded-full text-white font-medium" style={{ background: c.accent }}>{c.bookLabel}</Link>
-            <a href="mailto:info@yogmandu.com"
+            <a href="mailto:yogmandu@gmail.com"
               className="cta-lift px-10 py-4 rounded-full font-medium" style={{ border: "1.5px solid #F7941D", color: "#F7941D" }}>Email us</a>
           </div>
           {c.siblingLinks.length > 0 && (
@@ -207,7 +213,7 @@ export default function ServicePage({ config: c }: { config: ServiceConfig }) {
           )}
           <div className="mt-10 flex justify-center gap-8 text-sm" style={{ color: "#7A5840" }}>
             <span>📞 +977-9810263277</span>
-            <span>✉️ info@yogmandu.com</span>
+            <span>✉️ yogmandu@gmail.com</span>
           </div>
         </div>
       </section>

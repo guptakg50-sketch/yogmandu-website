@@ -7,7 +7,7 @@ import { getHubConfig } from "@/lib/pageContent";
 export const revalidate = 300;
 
 const pageMetadata: Metadata = {
-  title: { absolute: "Yoga Therapy, Reiki & Diet Consultation in Kathmandu | Yogmandu" },
+  title: { absolute: "Yoga Therapy, Reiki & Diet Nepal | Yogmandu" },
   description:
     "One-to-one therapy and wellness at Yogmandu, Kathmandu — yoga therapy, Reiki energy healing and personalised Ayurvedic diet consultation.",
   alternates: { canonical: "https://yogmandu.com/therapy-wellness" },

@@ -66,12 +66,12 @@ export default function CategoryHub({ config: c }: { config: CategoryHubConfig }
           <div className="flex flex-wrap justify-center gap-4">
             <a href={WHATSAPP} target="_blank" rel="noopener noreferrer"
               className="cta-lift px-10 py-4 rounded-full text-white font-medium" style={{ background: c.accent }}>Ask on WhatsApp</a>
-            <a href="mailto:info@yogmandu.com"
+            <a href="mailto:yogmandu@gmail.com"
               className="cta-lift px-10 py-4 rounded-full font-medium" style={{ border: "1.5px solid #F7941D", color: "#F7941D" }}>Email us</a>
           </div>
           <div className="mt-10 flex justify-center gap-8 text-sm" style={{ color: "#7A5840" }}>
             <span>📞 +977-9810263277</span>
-            <span>✉️ info@yogmandu.com</span>
+            <span>✉️ yogmandu@gmail.com</span>
           </div>
         </div>
       </section>

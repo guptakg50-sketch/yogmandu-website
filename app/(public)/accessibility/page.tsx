@@ -115,11 +115,11 @@ export default function AccessibilityPage() {
               working days, and will help you book by phone or WhatsApp in the meantime.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.9rem" }}>
-              <a href="mailto:info@yogmandu.com?subject=Website%20accessibility" className="cta-lift"
+              <a href="mailto:yogmandu@gmail.com?subject=Website%20accessibility" className="cta-lift"
                 style={{ display: "inline-block", padding: "0.8rem 1.8rem", borderRadius: 999,
                   background: "#6B2D8B", color: "#fff", fontSize: "0.9rem", fontWeight: 500,
                   textDecoration: "none", boxShadow: "0 6px 20px rgba(107,45,139,0.3)" }}>
-                Email info@yogmandu.com
+                Email yogmandu@gmail.com
               </a>
               <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="cta-lift"
                 style={{ display: "inline-block", padding: "0.8rem 1.8rem", borderRadius: 999,

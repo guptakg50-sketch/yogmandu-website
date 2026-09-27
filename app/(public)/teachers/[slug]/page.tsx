@@ -8,6 +8,7 @@ import {
   instructorSlug,
   styleToAccent,
 } from "@/lib/publicData";
+import { shareImage } from "@/lib/seo";
 
 // Re-fetch from Supabase at most once a minute so admin edits to a teacher
 // appear without a redeploy. New slugs are rendered on first request.
@@ -48,9 +49,17 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       title: `${t.name} | Yogmandu`,
       description: desc,
       url,
-      images: t.photo ? [t.photo] : ["/opengraph-image.png"],
+      siteName: "Yogmandu",
+      locale: "en_US",
+      type: "profile",
+      images: [shareImage(t.photo || "", t.name, "teacher")],
     },
-    twitter: { title: `${t.name} | Yogmandu`, description: desc },
+    twitter: {
+      card: "summary_large_image",
+      title: `${t.name} | Yogmandu`,
+      description: desc,
+      images: [shareImage(t.photo || "", t.name, "teacher").url],
+    },
   };
 }
 

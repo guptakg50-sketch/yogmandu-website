@@ -129,7 +129,7 @@ export const ONLINE_TIER: Tier = {
     "Teaching methodology",
   ],
   ctaLabel:  "Get Details",
-  ctaHref:   "mailto:info@yogmandu.com",
+  ctaHref:   "mailto:yogmandu@gmail.com",
 };
 
 // Name-keyed tier sets — iterated by the admin "Page Content" editor and

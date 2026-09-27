@@ -7,10 +7,12 @@ import { getCurriculum } from "@/lib/pageContent";
 export const revalidate = 300;
 import type { CourseConfig } from "../CourseProgram";
 
+// Title kept to ~55 chars and the description to ~155 so neither is
+// truncated in the search result; the old description ran to 226.
 const pageMetadata: Metadata = {
-  title: { absolute: "300-Hour Advanced Yoga Teacher Training in Nepal — RYS 300 | Yogmandu" },
+  title: { absolute: "300-Hour Advanced Yoga Teacher Training Nepal | Yogmandu" },
   description:
-    "Yoga Alliance RYS 300 advanced yoga teacher training in Kathmandu, Nepal. The next step for certified 200hr teachers — advanced asana, pranayama, philosophy, anatomy & teaching methodology. Combine with your 200hr for RYT 500.",
+    "Yoga Alliance RYS 300 advanced yoga teacher training in Kathmandu, Nepal. For certified 200hr teachers — advanced asana, pranayama, philosophy and anatomy.",
   keywords: [
     "300 hour yoga teacher training Nepal",
     "advanced yoga teacher training Kathmandu",
@@ -179,6 +181,15 @@ const courseSchema = {
     name: "Yogmandu",
     address: { "@type": "PostalAddress", streetAddress: "Miteri Marg, Mid-Baneshwor-31", addressLocality: "Kathmandu", addressCountry: "NP" },
   },
+  // Google needs hasCourseInstance before a Course is eligible for the
+  // course info rich result — Course on its own is not enough.
+  hasCourseInstance: {
+    "@type": "CourseInstance",
+    courseMode: "onsite",
+    courseWorkload: "PT300H",
+    location: { "@type": "Place", name: "Yogmandu", address: { "@type": "PostalAddress", addressLocality: "Kathmandu", addressCountry: "NP" } },
+  },
+  educationalCredentialAwarded: "Yoga Alliance RYS 300",
 };
 
 const faqSchema = {

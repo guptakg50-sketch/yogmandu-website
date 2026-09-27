@@ -55,7 +55,7 @@ export default function TermsPage() {
               <li>You must be at least 16 years old to create an account.</li>
               <li>You are responsible for keeping your password secure and for all activity under your account.</li>
               <li>You must provide accurate, current and complete information.</li>
-              <li>You may delete your account at any time by emailing <a href="mailto:info@yogmandu.com" style={linkStyle}>info@yogmandu.com</a>.</li>
+              <li>You may delete your account at any time by emailing <a href="mailto:yogmandu@gmail.com" style={linkStyle}>yogmandu@gmail.com</a>.</li>
               <li>We may suspend or terminate accounts that violate these terms.</li>
             </ul>
           </Section>
@@ -142,7 +142,7 @@ export default function TermsPage() {
             <div style={{ marginTop: 12, padding: "16px 20px", background: "#FAF6F0", borderRadius: 12 }}>
               <strong>Yogmandu</strong><br />
               Miteri Marg, Mid-Baneshwor-31, Kathmandu, Nepal<br />
-              <a href="mailto:info@yogmandu.com" style={linkStyle}>info@yogmandu.com</a><br />
+              <a href="mailto:yogmandu@gmail.com" style={linkStyle}>yogmandu@gmail.com</a><br />
               +977-9810263277
             </div>
           </Section>

@@ -76,8 +76,23 @@ const nextConfig: NextConfig = {
       { source: "/testimonials/:path*", destination: "/about", permanent: true },
       { source: "/yoga-retreat-packages", destination: "/services", permanent: true },
       { source: "/yoga-retreat-packages/:path*", destination: "/services", permanent: true },
-      { source: "/events", destination: "/class-schedule", permanent: true },
-      { source: "/events/:path*", destination: "/class-schedule", permanent: true },
+      // /events is a real section again as of 2026-08-21, so these no longer
+      // redirect to the class timetable. Individual old event URLs fall
+      // through to /events; when the team recreates one of them under the
+      // same slug, its page is served directly and the redirect never fires.
+      { source: "/events/free-108-om-chanting", destination: "/events", permanent: true },
+      { source: "/events/ashtanga-vinyasa-with-roshan-shrestha", destination: "/events", permanent: true },
+      { source: "/events/ashtanga-vinyasa-roshan-shrestha", destination: "/events", permanent: true },
+      { source: "/events/kids-yoga-teacher-training-workshop", destination: "/events", permanent: true },
+      { source: "/events/kids-yoga-learning-session", destination: "/events", permanent: true },
+      { source: "/events/eco-yoga-hike-to-bishnudwar", destination: "/events", permanent: true },
+      { source: "/events/laughter-yoga-training", destination: "/events", permanent: true },
+      { source: "/events/international-womens-day-celebration-with-yogmandu", destination: "/events", permanent: true },
+      { source: "/events/energy-healing-with-sound", destination: "/events", permanent: true },
+      { source: "/events/21-day-meditation-practice", destination: "/events", permanent: true },
+      // These two have permanent service pages, which beat the events list.
+      { source: "/events/weight-loss-bootcamp", destination: "/yoga-retreat-nepal/weight-loss-bootcamp", permanent: true },
+      { source: "/events/7-weeks-weight-loss-bootcamp", destination: "/yoga-retreat-nepal/weight-loss-bootcamp", permanent: true },
       { source: "/history-of-hatha-yoga", destination: "/blog/history-of-hatha-yoga", permanent: true },
       { source: "/history-of-hatha-yoga/:path*", destination: "/blog/history-of-hatha-yoga", permanent: true },
       { source: "/kids-yoga-guide-to-teaching-benefits-mindfulness", destination: "/blog/kids-yoga-guide-to-teaching-benefits-mindfulness", permanent: true },
@@ -86,6 +101,32 @@ const nextConfig: NextConfig = {
       { source: "/blog/mystical-power-of-om", destination: "/blog/the-mystical-power-of-om", permanent: true },
       // Shortened the over-long weight-loss slug (blog migration 2026-06-07)
       { source: "/blog/weight-loss-myths-vs-facts-a-scientific-take-with-yogic-wisdomby-yogmandu-kathmandus-trusted-yoga-wellness-studio", destination: "/blog/weight-loss-myths-vs-facts", permanent: true },
+      // ── Search Console "Not found (404)" sweep, 2026-08-17 ──────────────
+      // The old WordPress site served posts at the site root (/post-slug/);
+      // the new site serves them under /blog. Only two of those were mapped,
+      // so the rest hard-404'd. Each entry below points at its real
+      // successor rather than at a hub — a redirect to a vaguely related
+      // page reads as a soft 404 and gets dropped anyway.
+      { source: "/the-mystical-power-of-om", destination: "/blog/the-mystical-power-of-om", permanent: true },
+      { source: "/the-mystical-power-of-om/feed", destination: "/blog/the-mystical-power-of-om", permanent: true },
+      { source: "/yogic-mantra", destination: "/blog/yogic-mantra", permanent: true },
+      { source: "/terms-conditions-ytt-residential-course", destination: "/blog/terms-conditions-ytt-residential-course", permanent: true },
+      { source: "/digital-marketing-yogipreneurs", destination: "/blog/digital-marketing-yogipreneurs", permanent: true },
+      { source: "/learning-from-a-master-is-always-of-value-says-yog-guru-kabindra-rajthala", destination: "/blog/learning-from-a-master-is-always-of-value-says-yog-guru-kabindra-rajthala", permanent: true },
+      { source: "/traveling-nepal-yoga-teacher-training", destination: "/blog/traveling-nepal-yoga-teacher-training", permanent: true },
+      // Devanagari slugs from the Nepali-language posts. These MUST be
+      // percent-encoded: Next matches `source` against the raw (still
+      // encoded) pathname, so the literal "/मन्त्र-र-त्यस्का-प्रकार" never
+      // matches and the URL keeps 404ing. Verified both forms locally.
+      //   /मन्त्र-र-त्यस्का-प्रकार
+      { source: "/%E0%A4%AE%E0%A4%A8%E0%A5%8D%E0%A4%A4%E0%A5%8D%E0%A4%B0-%E0%A4%B0-%E0%A4%A4%E0%A5%8D%E0%A4%AF%E0%A4%B8%E0%A5%8D%E0%A4%95%E0%A4%BE-%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A4%95%E0%A4%BE%E0%A4%B0", destination: "/blog/mantra-ra-tyaska-prakar", permanent: true },
+      //   /कोरोनाको-भयबाट-हुने-मानस-2
+      { source: "/%E0%A4%95%E0%A5%8B%E0%A4%B0%E0%A5%8B%E0%A4%A8%E0%A4%BE%E0%A4%95%E0%A5%8B-%E0%A4%AD%E0%A4%AF%E0%A4%AC%E0%A4%BE%E0%A4%9F-%E0%A4%B9%E0%A5%81%E0%A4%A8%E0%A5%87-%E0%A4%AE%E0%A4%BE%E0%A4%A8%E0%A4%B8-2", destination: "/blog/niyamit-yoga-mansik-swasthya", permanent: true },
+      // Course pages that now have exact equivalents.
+      { source: "/foundational-sound-healing-teacher-training-course-level-2", destination: "/sound-healing-therapy/course-level-2", permanent: true },
+      { source: "/200-hours-yoga-teacher-training-residential-course", destination: "/yoga-teacher-training/residential", permanent: true },
+      { source: "/200-hours-virtual-yoga-teacher-training", destination: "/yoga-teacher-training/online", permanent: true },
+
       { source: "/contact/", destination: "/contact", permanent: true },
       { source: "/yoga-teacher-training/", destination: "/yoga-teacher-training", permanent: true },
       { source: "/sound-healing-therapy/", destination: "/sound-healing-therapy", permanent: true },

@@ -2,7 +2,16 @@ import type { MetadataRoute } from "next";
 import { statSync } from "fs";
 import { join } from "path";
 import { getPublishedBlogs, getCustomSitemapUrls, getGalleryItems } from "@/lib/publicData";
+import { getPublishedEvents, isPastEvent } from "@/lib/events";
 import { resolveGalleryPhotos, toAbsoluteSrc } from "./(public)/gallery/galleryData";
+
+// Re-generate at most once every 5 minutes, matching the public pages.
+//
+// Without this the sitemap is baked at build time, so a post published from
+// the admin never appears in it until someone redeploys — new content was
+// silently undiscoverable by Google. Blog posts, events and admin-managed
+// custom URLs all come from the database, so this route must revalidate too.
+export const revalidate = 300;
 
 // Cache mtime lookups at module load so we don't stat repeatedly per request.
 function mtime(relPath: string): Date {
@@ -40,6 +49,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/contact`,                       lastModified: mtime("app/(public)/contact/page.tsx"),               changeFrequency: "yearly",  priority: 0.75 },
     { url: `${base}/gallery`,                       lastModified: mtime("app/(public)/gallery/page.tsx"),               changeFrequency: "monthly", priority: 0.65, images: galleryImages },
     { url: `${base}/gallery/all`,                   lastModified: mtime("app/(public)/gallery/all/page.tsx"),           changeFrequency: "monthly", priority: 0.6,  images: galleryImages },
+    { url: `${base}/events`,                        lastModified: mtime("app/(public)/events/page.tsx"),                changeFrequency: "weekly",  priority: 0.75 },
     { url: `${base}/blog`,                          lastModified: mtime("app/(public)/blog/page.tsx"),                  changeFrequency: "weekly",  priority: 0.7 },
     { url: `${base}/privacy`,                       lastModified: mtime("app/(public)/privacy/page.tsx"),               changeFrequency: "yearly",  priority: 0.3 },
     { url: `${base}/accessibility`,                 lastModified: mtime("app/(public)/accessibility/page.tsx"),         changeFrequency: "yearly",  priority: 0.35 },
@@ -99,6 +109,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }))
     : [];
 
+  // Published events. Upcoming ones change often and are the point of the
+  // page, so they rank above the past archive.
+  const events = await getPublishedEvents().catch(() => null);
+  const eventRoutes: MetadataRoute.Sitemap = (events ?? []).map((event) => ({
+    url:             `${base}/events/${event.slug}`,
+    lastModified:    BUILD_DATE,
+    changeFrequency: isPastEvent(event) ? ("yearly" as const) : ("weekly" as const),
+    priority:        isPastEvent(event) ? 0.4 : 0.7,
+  }));
+
   // Admin-managed custom URLs (Supabase). Degrades gracefully if unavailable.
   const custom = await getCustomSitemapUrls().catch(() => null);
   const customRoutes: MetadataRoute.Sitemap = (custom ?? []).map((row) => ({
@@ -108,5 +128,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority:        row.priority,
   }));
 
-  return [...staticRoutes, ...blogRoutes, ...fallbackRoutes, ...customRoutes];
+  return [...staticRoutes, ...blogRoutes, ...fallbackRoutes, ...eventRoutes, ...customRoutes];
 }

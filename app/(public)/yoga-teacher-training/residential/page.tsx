@@ -9,10 +9,12 @@ export const revalidate = 300;
 import IntakeMonths from "../IntakeMonths";
 import TimingNotice from "@/components/TimingNotice";
 
+// Title kept to ~56 chars so Google doesn't truncate it to fit the device
+// width; description to ~150 for the same reason on the snippet.
 const pageMetadata: Metadata = {
-  title: { absolute: "Residential Full Board 200hr Yoga Teacher Training — Nepal | Yogmandu" },
+  title: { absolute: "Residential 200hr Yoga Teacher Training Nepal | Yogmandu" },
   description:
-    "Live-in Residential Full Board 200-hour Yoga Teacher Training in Kathmandu, Nepal. Yoga Alliance RYT 200 with accommodation and all organic meals included (USD 1,400).",
+    "Live-in 200-hour Yoga Teacher Training in Kathmandu, Nepal. Yoga Alliance RYT 200 with accommodation and all organic meals included. From USD 1,400.",
   keywords: [
     "residential yoga teacher training Nepal",
     "full board yoga teacher training Kathmandu",
@@ -96,7 +98,16 @@ const courseSchema = {
   provider: { "@type": "Organization", name: "Yogmandu", sameAs: "https://yogmandu.com" },
   courseMode: "onsite",
   location: { "@type": "Place", name: "Yogmandu", address: { "@type": "PostalAddress", streetAddress: "Miteri Marg, Mid-Baneshwor-31", addressLocality: "Kathmandu", addressCountry: "NP" } },
-  offers: [{ "@type": "Offer", priceCurrency: "USD", price: "1400", name: "Residential (Full Board)" }],
+  offers: [{ "@type": "Offer", priceCurrency: "USD", price: "1400", name: "Residential (Full Board)", availability: "https://schema.org/InStock", url: "https://yogmandu.com/yoga-teacher-training/residential" }],
+  // Google needs hasCourseInstance before a Course is eligible for the
+  // course info rich result — Course on its own is not enough.
+  hasCourseInstance: {
+    "@type": "CourseInstance",
+    courseMode: "onsite",
+    courseWorkload: "PT200H",
+    location: { "@type": "Place", name: "Yogmandu", address: { "@type": "PostalAddress", addressLocality: "Kathmandu", addressCountry: "NP" } },
+  },
+  educationalCredentialAwarded: "Yoga Alliance RYT 200",
 };
 const faqSchema = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) };
 const breadcrumbSchema = {

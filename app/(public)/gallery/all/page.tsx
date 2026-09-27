@@ -17,7 +17,7 @@ const breadcrumbSchema = {
 };
 
 const pageMetadata: Metadata = {
-  title: "All Photos | Yogmandu Gallery — Yoga & Sound Healing Nepal",
+  title: { absolute: "All Photos — Yoga & Sound Healing Nepal | Yogmandu" },
   description:
     "Every moment from Yogmandu Kathmandu — yoga classes, Tibetan singing bowl sessions, teacher training graduates, and the spirit of Nepal. Browse all 50 photos.",
   alternates: { canonical: "https://yogmandu.com/gallery/all" },
@@ -26,6 +26,7 @@ const pageMetadata: Metadata = {
     description:
       "Browse all photos from yoga classes, sound healing sessions, and teacher training at Yogmandu Kathmandu.",
     url: "https://yogmandu.com/gallery/all",
+    images: ["/opengraph-image.png"],
   },
 };
 

@@ -45,6 +45,12 @@ export function PricingCard({ tier }: { tier: Tier }) {
     if (priceRef.current) priceRef.current.style.transform = "translate(0, 0)";
   }, [tier.color, tier.featured]);
 
+  // Cards are admin-created, so every field a person can clear needs a floor:
+  // an empty ctaHref used to throw on .startsWith() and blank the whole page.
+  const ctaHref  = tier.ctaHref || tier.cardHref || "/book";
+  const external = ctaHref.startsWith("http");
+  const features = tier.features ?? [];
+
   // Initial featured lift via inline style on first render
   const initialTransform = tier.featured
     ? "perspective(1000px) rotateY(0deg) rotateX(0deg) translateY(-10px) scale(1.02)"
@@ -205,7 +211,7 @@ export function PricingCard({ tier }: { tier: Tier }) {
 
         {/* Feature list with animated check */}
         <ul className="space-y-2.5 mb-8 relative">
-          {tier.features.map((f, i) => (
+          {features.map((f, i) => (
             <li key={f} className="ytt-feat flex items-start gap-3 text-sm"
               style={{
                 color: "#3D2515",
@@ -227,9 +233,9 @@ export function PricingCard({ tier }: { tier: Tier }) {
 
         {/* CTA */}
         <a
-          href={tier.ctaHref}
-          target={tier.ctaHref.startsWith("http") ? "_blank" : undefined}
-          rel={tier.ctaHref.startsWith("http") ? "noopener noreferrer" : undefined}
+          href={ctaHref}
+          target={external ? "_blank" : undefined}
+          rel={external ? "noopener noreferrer" : undefined}
           className="ytt-cta block text-center w-full py-3.5 rounded-full font-medium text-sm relative overflow-hidden"
           style={{
             background:
@@ -245,7 +251,7 @@ export function PricingCard({ tier }: { tier: Tier }) {
           }}
         >
           <span style={{ position: "relative", zIndex: 2 }}>
-            {tier.ctaLabel} {tier.ctaHref.startsWith("http") ? "→" : ""}
+            {tier.ctaLabel} {external ? "→" : ""}
           </span>
           <span style={{
             position: "absolute", inset: 0, zIndex: 1,

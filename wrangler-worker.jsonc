@@ -8,6 +8,14 @@
   "main": ".open-next/worker.js",
   "compatibility_date": "2025-03-25",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  // Both MUST stay false. With no `routes` block (see the note below),
+  // wrangler otherwise defaults workers.dev ON and publishes the entire site
+  // a second time at yogmandu-site.<account>.workers.dev, plus a preview URL
+  // per version — indexable duplicates of every page competing with
+  // yogmandu.com. Traffic reaches this Worker through zone Worker Routes, so
+  // the workers.dev hostname serves no purpose here.
+  "workers_dev": false,
+  "preview_urls": false,
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
@@ -27,10 +35,18 @@
     "enabled": true,
     "head_sampling_rate": 1
   },
-  "routes": [
-    { "pattern": "yogmandu.com", "custom_domain": true },
-    { "pattern": "www.yogmandu.com", "custom_domain": true }
-  ],
+  // NO "routes" here on purpose. Declaring these hostnames as
+  // `custom_domain: true` makes wrangler attempt a custom-domain attach after
+  // every upload, which always fails with 100117 ("hostname already has
+  // externally managed DNS records") because the apex still carries the
+  // proxied records from the old Pages project. The attach is not what serves
+  // the site: traffic reaches this Worker via zone-level **Worker Routes**
+  // (`yogmandu.com/*` and `www.yogmandu.com/*` in zone
+  // b59b2ef53863028f13237041e9f425a1), created directly through the API and
+  // persisted independently of this config. Leaving the block in only made a
+  // successful deploy exit non-zero and hid real failures.
+  // Do NOT delete those DNS records to "fix" the attach — that orphans the
+  // proxied records and 522s the site.
   "services": [
     {
       "binding": "WORKER_SELF_REFERENCE",

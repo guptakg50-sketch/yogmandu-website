@@ -9,10 +9,12 @@ export const revalidate = 300;
 import IntakeMonths from "../IntakeMonths";
 import TimingNotice from "@/components/TimingNotice";
 
+// Title kept to ~59 chars so it isn't truncated; "non-residential" leads
+// because that is the phrase people actually search for.
 const pageMetadata: Metadata = {
-  title: { absolute: "Commuter (Non-Residential) 200hr Yoga Teacher Training — Nepal | Yogmandu" },
+  title: { absolute: "Non-Residential 200hr Yoga Teacher Training Nepal | Yogmandu" },
   description:
-    "Non-residential Commuter 200-hour Yoga Teacher Training in Kathmandu, Nepal. Train by day and stay in your own accommodation. Yoga Alliance RYT 200 from USD 600.",
+    "Non-residential 200-hour Yoga Teacher Training in Kathmandu, Nepal. Train by day, stay in your own accommodation. Yoga Alliance RYT 200 from USD 600.",
   keywords: [
     "non-residential yoga teacher training Nepal",
     "commuter yoga teacher training Kathmandu",
@@ -100,7 +102,16 @@ const courseSchema = {
   courseMode: "onsite",
   duration: "P28D",
   location: { "@type": "Place", name: "Yogmandu", address: { "@type": "PostalAddress", streetAddress: "Miteri Marg, Mid-Baneshwor-31", addressLocality: "Kathmandu", addressCountry: "NP" } },
-  offers: [{ "@type": "Offer", priceCurrency: "USD", price: "600", name: "Commuter (Non-Residential)" }],
+  offers: [{ "@type": "Offer", priceCurrency: "USD", price: "600", name: "Commuter (Non-Residential)", availability: "https://schema.org/InStock", url: "https://yogmandu.com/yoga-teacher-training/commuter" }],
+  // Google needs hasCourseInstance before a Course is eligible for the
+  // course info rich result — Course on its own is not enough.
+  hasCourseInstance: {
+    "@type": "CourseInstance",
+    courseMode: "onsite",
+    courseWorkload: "PT200H",
+    location: { "@type": "Place", name: "Yogmandu", address: { "@type": "PostalAddress", addressLocality: "Kathmandu", addressCountry: "NP" } },
+  },
+  educationalCredentialAwarded: "Yoga Alliance RYT 200",
 };
 const faqSchema = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) };
 const breadcrumbSchema = {

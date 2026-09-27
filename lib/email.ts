@@ -3,7 +3,7 @@ import { Resend } from "resend";
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM_EMAIL     = process.env.EMAIL_FROM     || "Yogmandu <no-reply@yogmandu.com>";
 // EMAIL_NOTIFY accepts a single address or a comma-separated list — sends to all.
-const NOTIFY_EMAIL: string[] = (process.env.EMAIL_NOTIFY || "info@yogmandu.com")
+const NOTIFY_EMAIL: string[] = (process.env.EMAIL_NOTIFY || "yogmandu@gmail.com")
   .split(",")
   .map(s => s.trim())
   .filter(Boolean);
@@ -95,7 +95,7 @@ ${preheader}
         <tr>
           <td style="padding:24px 40px;border-top:1px solid #f0e8f8;background:#fafafa;color:#9A7860;font-size:12px;line-height:1.6">
             <strong style="color:#6B2D8B">Yogmandu</strong> · Miteri Marg, Mid-Baneshwor-31, Kathmandu, Nepal<br />
-            <a href="${SITE_URL}" style="color:#6B2D8B;text-decoration:none">yogmandu.com</a> · <a href="mailto:info@yogmandu.com" style="color:#6B2D8B;text-decoration:none">info@yogmandu.com</a>
+            <a href="${SITE_URL}" style="color:#6B2D8B;text-decoration:none">yogmandu.com</a> · <a href="mailto:yogmandu@gmail.com" style="color:#6B2D8B;text-decoration:none">yogmandu@gmail.com</a>
           </td>
         </tr>
       </table>

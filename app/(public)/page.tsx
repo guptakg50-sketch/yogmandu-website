@@ -10,12 +10,13 @@ import PhotoCarousel from "@/components/PhotoCarousel";
 import { DeferUntilIdle, DeferUntilVisible } from "@/components/DeferredHeavy";
 import CardIcon from "@/components/CardIcon";
 import SectionImage from "@/components/SectionImage";
+import UpcomingEvents from "@/components/UpcomingEvents";
 import { getSectionContent } from "@/lib/pageContent";
 
 export const revalidate = 300;
 
 const pageMetadata: Metadata = {
-  title: { absolute: "Yoga Classes & Teacher Training in Kathmandu | Yogmandu" },
+  title: { absolute: "Yoga Classes & Teacher Training Kathmandu | Yogmandu" },
   description:
     "Daily yoga classes in Baneshwor, Kathmandu — near New Baneshwor. Beginner-friendly classes, sound healing & Yoga Alliance teacher training. Book today.",
   keywords: [
@@ -351,6 +352,8 @@ export default async function HomePage() {
       </section>
 
       {/* ── WHY YOGMANDU ── */}
+      <UpcomingEvents />
+
       <WhySection />
 
       {/* ── PHOTO CAROUSEL — "Life at Yogmandu" trust band, defer until visible ── */}

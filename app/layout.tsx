@@ -68,7 +68,7 @@ const localBusinessSchema = {
   logo: "https://yogmandu.com/logo.png",
   image: "https://yogmandu.com/logo.png",
   telephone: "+977-9810263277",
-  email: "info@yogmandu.com",
+  email: "yogmandu@gmail.com",
   address: {
     "@type": "PostalAddress",
     streetAddress: "Miteri Marg, Mid-Baneshwor-31",

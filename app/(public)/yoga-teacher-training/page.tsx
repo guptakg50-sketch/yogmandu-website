@@ -474,7 +474,7 @@ export default async function YogaTeacherTrainingPage() {
           </div>
           <div className="mt-8 flex justify-center gap-8 text-sm" style={{ color: "#7A5840" }}>
             <span>📞 +977-9810263277</span>
-            <span>✉️ info@yogmandu.com</span>
+            <span>✉️ yogmandu@gmail.com</span>
           </div>
         </div>
       </section>

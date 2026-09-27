@@ -85,7 +85,7 @@ const faqs = [
   },
   {
     q: "How do I book a sound healing session in Kathmandu?",
-    a: "All sessions require pre-booking. Contact us via WhatsApp at +977-9810263277 or email info@yogmandu.com. We are located at Miteri Marg, Mid-Baneshwor-31, Kathmandu.",
+    a: "All sessions require pre-booking. Contact us via WhatsApp at +977-9810263277 or email yogmandu@gmail.com. We are located at Miteri Marg, Mid-Baneshwor-31, Kathmandu.",
   },
 ];
 

@@ -87,7 +87,7 @@ const courseFacts = [
 const faqs = [
   { q: "Are the online classes live or pre-recorded?", a: "Live. The USD 500 online program runs as real-time sessions over Zoom alongside our resident cohort — not pre-recorded videos. You can ask questions and receive feedback in the moment." },
   { q: "Is the certification the same as the in-person course?", a: "Yes. The online program leads to the identical Yoga Alliance RYT 200 certificate as our Commuter and Residential formats. The curriculum is the same." },
-  { q: "How do I register?", a: "Registration is via a Google Form. Message us on WhatsApp (+977-9810263277) or email info@yogmandu.com and we'll send you the link." },
+  { q: "How do I register?", a: "Registration is via a Google Form. Message us on WhatsApp (+977-9810263277) or email yogmandu@gmail.com and we'll send you the link." },
   { q: "Will I get to practise teaching?", a: "Yes. Supervised teaching practice is part of the course — you'll teach and receive feedback from teachers and fellow students, all online." },
 ];
 
@@ -141,7 +141,7 @@ export default async function OnlinePage() {
             Earn the same Yoga Alliance RYT 200 certificate from anywhere in the world with real-time online classes — practice, study and teach live alongside our Kathmandu cohort.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <a href="mailto:info@yogmandu.com" className="cta-lift px-8 py-3.5 rounded-full font-medium text-sm text-white" style={{ background: "#6B2D8B", boxShadow: "0 6px 20px rgba(107,45,139,0.35)" }}>Get Details</a>
+            <a href="mailto:yogmandu@gmail.com" className="cta-lift px-8 py-3.5 rounded-full font-medium text-sm text-white" style={{ background: "#6B2D8B", boxShadow: "0 6px 20px rgba(107,45,139,0.35)" }}>Get Details</a>
             <Link href="/yoga-teacher-training/residential" className="cta-lift px-8 py-3.5 rounded-full font-medium text-sm" style={{ border: "1.5px solid #6B2D8B", color: "#6B2D8B" }}>Prefer to train in Nepal? →</Link>
           </div>
         </div>

@@ -462,7 +462,7 @@ export default function AboutContent({ team }: { team?: TeamMember[] }) {
               <em style={{ color: "#F7941D" }}>rooted in the mountains</em>
             </h1>
             <p style={{ fontSize: "1rem", lineHeight: 1.8, color: "rgba(255,255,255,0.7)", maxWidth: 460, marginBottom: 32 }}>
-              Nepal&apos;s first Yoga Alliance registered school — a complete one-stop solution for health and fitness, making people healthy physically, mentally, socially, and spiritually at an affordable cost.
+              Nepal's first Yoga Alliance registered sister school — a complete one-stop solution for health and fitness, making people healthy physically, mentally, socially, and spiritually at an affordable cost.
             </p>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
               <Link href="/yoga-teacher-training" style={{
@@ -534,7 +534,7 @@ export default function AboutContent({ team }: { team?: TeamMember[] }) {
             {[
               { badge: "RYS 200, 300 & 500", org: "Yoga Alliance USA", color: "#6B2D8B" },
               { badge: "Certified School", org: "Yoga Alliance Registered", color: "#F7941D" },
-              { badge: "Since 2018", org: "Nepal's First Registered Yoga School", color: "#8DC63F" },
+              { badge: "Since 2018", org: "Nepal's first Yoga Alliance registered sister school", color: "#8DC63F" },
             ].map(a => (
               <TiltCard key={a.org} style={{
                 padding: "1.25rem 1.5rem", borderRadius: "1rem",

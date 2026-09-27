@@ -15,18 +15,28 @@ const DEFAULT_CONFIG = {
   tagline:     "Nepal is calling.",
   taglineEm:   "Are you ready?",
   description: "Yoga Alliance certified teacher training & authentic Tibetan Sound Healing in Kathmandu, Nepal. Transforming practitioners since 2018.",
+  // This list is the site's only crawlable link to several hub pages: the
+  // Services nav dropdown renders client-side, so a crawler without JS never
+  // sees it. /therapy-wellness and /specialized-yoga were missing here and
+  // linked from nowhere else, which left them and their 7 child pages sitting
+  // in Search Console as "Discovered - currently not indexed" (never crawled).
+  // Each entry points at a distinct page — duplicate hrefs waste a slot that
+  // could be carrying link equity to a page that has none.
   programs: [
-    { href: "/class-schedule",        label: "Class Schedule" },
-    { href: "/yoga-for-beginners",    label: "Yoga for Beginners" },
-    { href: "/yoga-teacher-training", label: "200hr Teacher Training" },
-    { href: "/yoga-teacher-training", label: "300hr Advanced Training" },
-    { href: "/yoga-retreat-nepal",    label: "Yoga Retreat Nepal" },
-    { href: "/sound-healing-therapy", label: "Sound Healing Sessions" },
-    { href: "/sound-healing-therapy", label: "Sound Healing Cert." },
+    { href: "/class-schedule",                       label: "Class Schedule" },
+    { href: "/yoga-for-beginners",                   label: "Yoga for Beginners" },
+    { href: "/yoga-teacher-training",                label: "200hr Teacher Training" },
+    { href: "/yoga-teacher-training/300-hour",       label: "300hr Advanced Training" },
+    { href: "/yoga-retreat-nepal",                   label: "Yoga Retreat Nepal" },
+    { href: "/sound-healing-therapy",                label: "Sound Healing Sessions" },
+    { href: "/sound-healing-therapy/course-level-1", label: "Sound Healing Cert." },
+    { href: "/therapy-wellness",                     label: "Therapy & Wellness" },
+    { href: "/specialized-yoga",                     label: "Yoga for Specific Groups" },
   ],
   company: [
     { href: "/about",   label: "About Us" },
     { href: "/gallery", label: "Gallery" },
+    { href: "/events",  label: "Events" },
     { href: "/blog",    label: "Blog" },
     { href: "/contact", label: "Contact" },
     { href: "/privacy", label: "Privacy" },
@@ -36,7 +46,7 @@ const DEFAULT_CONFIG = {
   contact: [
     { icon: "📍", text: "Mid-Baneshwor-31, Kathmandu, Nepal" },
     { icon: "📞", text: "+977-9810263277" },
-    { icon: "✉️", text: "info@yogmandu.com" },
+    { icon: "✉️", text: "yogmandu@gmail.com" },
     { icon: "🕐", text: "Sun–Fri · 5:30–18:30" },
   ],
   mapQuery:     "Yogmandu, Miteri Marg, Mid-Baneshwor, Kathmandu",
@@ -308,7 +318,7 @@ export default function Footer() {
                 padding: "0.5rem 1.1rem", borderRadius: 999, border: "1.5px solid rgba(107,45,139,0.35)" }}>
               Accessibility statement
             </Link>
-            <a href="mailto:info@yogmandu.com?subject=Website%20accessibility"
+            <a href="mailto:yogmandu@gmail.com?subject=Website%20accessibility"
               style={{ fontSize: "0.85rem", fontWeight: 500, color: "#A65808", textDecoration: "none",
                 padding: "0.5rem 1.1rem", borderRadius: 999, border: "1.5px solid rgba(166,88,8,0.35)" }}>
               Report a problem

@@ -68,7 +68,7 @@ const DEFAULT_CONFIG = {
     },
   ] as ServiceGroup[],
   leftLinks:    [{ href: "/about", label: "About" }, { href: "/gallery", label: "Gallery" }],
-  rightLinks:   [{ href: "/blog", label: "Blog" }, { href: "/contact", label: "Contact" }],
+  rightLinks:   [{ href: "/events", label: "Events" }, { href: "/blog", label: "Blog" }, { href: "/contact", label: "Contact" }],
   youtubeUrl:   "https://www.youtube.com/@yogmandu",
   tagline:      "Yoga & Sound Healing · Nepal",
   bookNowLabel: "Book Now",

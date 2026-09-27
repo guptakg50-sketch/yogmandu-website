@@ -72,6 +72,7 @@ export const defaultNavConfig = {
     { href: "/gallery", label: "Gallery" },
   ],
   rightLinks: [
+    { href: "/events",  label: "Events" },
     { href: "/blog",    label: "Blog" },
     { href: "/contact", label: "Contact" },
   ],
@@ -100,7 +101,7 @@ export const defaultFooterConfig = {
   contact: [
     { icon: "📍", text: "Miteri Marg, Mid-Baneshwor-31, Kathmandu, Nepal" },
     { icon: "📞", text: "+977-9810263277" },
-    { icon: "✉️", text: "info@yogmandu.com" },
+    { icon: "✉️", text: "yogmandu@gmail.com" },
     { icon: "🕐", text: "Sun–Fri · 5:30–18:30" },
   ],
   // Google Maps location — a name+address query, or a full Maps URL. Drives the

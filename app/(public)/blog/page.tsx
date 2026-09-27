@@ -32,7 +32,7 @@ const breadcrumbSchema = {
 };
 
 const pageMetadata: Metadata = {
-  title: { absolute: "Yoga Blog — Philosophy, Breathwork & Sound Healing | Yogmandu" },
+  title: { absolute: "Yoga Blog — Philosophy & Sound Healing | Yogmandu" },
   description:
     "Articles on yoga philosophy, pranayama, Tibetan sound healing and teacher training from Dr. Chintamani Gautam and the Yogmandu team in Kathmandu, Nepal.",
   keywords: [

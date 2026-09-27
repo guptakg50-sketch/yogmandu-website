@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useRef, useState, useEffect, Suspense } from "react";
+import { useCallback, useRef, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Spinner from "@/components/Spinner";
+import { SOUND_THERAPIES, SOUND_THERAPY_GROUP } from "@/lib/soundTherapies";
 
 export type TeacherPhoto = { name: string; photo: string };
 export type ClassPhoto   = { name: string; image: string };
@@ -41,9 +42,15 @@ const SERVICES: BookingService[] = [
   { id: "hotel",      group: "Workshops & Extras",   color: "#F7941D", icon: "🏨", title: "Yoga at Hotel",           subtitle: "For travellers & retreats" },
   { id: "chair",      group: "Workshops & Extras",   color: "#8DC63F", icon: "💺", title: "Chair Yoga",              subtitle: "For limited mobility" },
   { id: "acupressure",group: "Workshops & Extras",   color: "#6B2D8B", icon: "👐", title: "Acupressure Yoga",        subtitle: "Marma + yoga" },
+  // The twelve sound therapies, each bookable in its own right so the studio
+  // knows exactly which one was requested. Defined in lib/soundTherapies.ts.
+  ...SOUND_THERAPIES.map((t) => ({
+    id: t.bookingId, group: SOUND_THERAPY_GROUP, color: t.color,
+    icon: t.icon, title: t.title, subtitle: t.subtitle,
+  })),
 ];
 
-const GROUPS = ["All", "Yoga Programs", "Special Programs", "Therapy & Wellness", "For Specific Groups", "Workshops & Extras"] as const;
+const GROUPS = ["All", "Yoga Programs", "Special Programs", "Therapy & Wellness", SOUND_THERAPY_GROUP, "For Specific Groups", "Workshops & Extras"] as const;
 
 // ── 3-D tilt service selector card ───────────────────────────────────────────
 function ServiceCard({
@@ -647,18 +654,19 @@ function BookPageInner({ teachers, classPhotos }: { teachers: TeacherPhoto[]; cl
     ? classPhotos.find((c) => sameName(c.name, parsedClass.name))?.image ?? ""
     : "";
 
-  const [step,     setStep]     = useState<1 | 2 | 3>(1);
-  const [selected, setSelected] = useState<BookingService[]>([]);
+  // Arriving with ?service= means the person already chose on a service page,
+  // so skip the picker entirely and open the details form for that one service.
+  // Showing them the other twenty was the complaint: they should be booking the
+  // thing they clicked, not browsing the menu again. "← Back" still reopens the
+  // picker for anyone who landed on the wrong one.
+  //
+  // Set as initial state rather than in an effect, so the picker never flashes
+  // up for a moment before being replaced. An unrecognised id falls through to
+  // the normal picker.
+  const preselected = preServiceId ? SERVICES.find(s => s.id === preServiceId) : undefined;
 
-  // Pre-select service; if a specific class is given, jump straight to step 2
-  useEffect(() => {
-    if (!preServiceId) return;
-    const found = SERVICES.find(s => s.id === preServiceId);
-    if (!found) return;
-    setSelected([found]);
-    if (parsedClass || monthParam) setStep(2); // skip service picker when coming from a class card or an intake month
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preServiceId, clsParam, monthParam]);
+  const [step,     setStep]     = useState<1 | 2 | 3>(preselected ? 2 : 1);
+  const [selected, setSelected] = useState<BookingService[]>(preselected ? [preselected] : []);
 
   function handleSelect(s: BookingService) {
     setSelected(prev =>

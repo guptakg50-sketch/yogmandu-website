@@ -68,7 +68,7 @@ export const SHARE_PAGES: SharePage[] = [
     path: "/contact",
     label: "/contact",
     title: "Contact Yogmandu | Book Yoga & Sound Healing in Kathmandu",
-    description: "WhatsApp +977-9810263277 \u00b7 info@yogmandu.com \u00b7 Miteri Marg, Mid-Baneshwor-31, Kathmandu, Nepal.",
+    description: "WhatsApp +977-9810263277 \u00b7 yogmandu@gmail.com \u00b7 Miteri Marg, Mid-Baneshwor-31, Kathmandu, Nepal.",
   },
   {
     path: "/gallery",
@@ -97,8 +97,8 @@ export const SHARE_PAGES: SharePage[] = [
   {
     path: "/sound-healing-therapy/course-level-1",
     label: "/sound-healing-therapy/course-level-1",
-    title: "Sound Healing Course \u2014 Level I | Yogmandu",
-    description: "The 20-hour foundational course in Tibetan singing bowls. Internationally recognised certificate.",
+    title: "Sound Healing Certification Level I, Nepal | Yogmandu",
+    description: "Level I foundational sound healing certification in Kathmandu, Nepal. 20 hours of Tibetan singing bowl history, technique and session basics.",
   },
   {
     path: "/sound-healing-therapy/course-level-2",
@@ -206,7 +206,7 @@ export const SHARE_PAGES: SharePage[] = [
     path: "/yoga-teacher-training/300-hour",
     label: "/yoga-teacher-training/300-hour",
     title: "300-Hour Advanced Yoga Teacher Training Nepal | Yogmandu",
-    description: "Yoga Alliance RYS 300 \u00b7 advanced training in Kathmandu for certified 200hr teachers. Path to RYT 500.",
+    description: "Yoga Alliance RYS 300 advanced yoga teacher training in Kathmandu, Nepal. For certified 200hr teachers: advanced asana, pranayama, philosophy and anatomy.",
   },
   {
     path: "/yoga-teacher-training/500-hour",
@@ -217,8 +217,8 @@ export const SHARE_PAGES: SharePage[] = [
   {
     path: "/yoga-teacher-training/commuter",
     label: "/yoga-teacher-training/commuter",
-    title: "Commuter (Non-Residential) 200hr Yoga Teacher Training | Yogmandu",
-    description: "Train by day, stay in your own accommodation. Yoga Alliance RYT 200 from USD 600. Kathmandu, Nepal.",
+    title: "Non-Residential 200hr Yoga Teacher Training Nepal | Yogmandu",
+    description: "Non-residential 200-hour Yoga Teacher Training in Kathmandu, Nepal. Train by day, stay in your own accommodation. Yoga Alliance RYT 200 from USD 600.",
   },
   {
     path: "/yoga-teacher-training/online",
@@ -227,10 +227,16 @@ export const SHARE_PAGES: SharePage[] = [
     description: "Earn your Yoga Alliance RYT 200 online with live real-time classes. USD 500.",
   },
   {
+    path: "/events",
+    label: "/events",
+    title: "Yoga Events & Workshops in Kathmandu | Yogmandu",
+    description: "Upcoming yoga workshops, sound healing evenings, meditation courses and retreats at Yogmandu in Kathmandu, Nepal.",
+  },
+  {
     path: "/yoga-teacher-training/residential",
     label: "/yoga-teacher-training/residential",
-    title: "Residential Full Board 200hr Yoga Teacher Training | Yogmandu",
-    description: "Live-in RYT 200 training in Kathmandu \u2014 accommodation + all organic meals included. USD 1,400.",
+    title: "Residential 200hr Yoga Teacher Training Nepal | Yogmandu",
+    description: "Live-in 200-hour Yoga Teacher Training in Kathmandu, Nepal. Yoga Alliance RYT 200 with accommodation and all organic meals included. From USD 1,400.",
   },
 ];
 

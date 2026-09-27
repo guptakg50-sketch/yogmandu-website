@@ -64,7 +64,7 @@ const faqs = [
   },
   {
     q: "When are the retreat dates and how much does it cost?",
-    a: "Because every retreat is tailored to the group's length, accommodation and focus, dates and pricing vary. Contact us on WhatsApp (+977-9810263277) or email info@yogmandu.com for current dates and a personalised quote.",
+    a: "Because every retreat is tailored to the group's length, accommodation and focus, dates and pricing vary. Contact us on WhatsApp (+977-9810263277) or email yogmandu@gmail.com for current dates and a personalised quote.",
   },
   {
     q: "Can you arrange a private or group retreat?",
@@ -312,7 +312,7 @@ export default async function YogaRetreatNepalPage() {
           </div>
           <div className="mt-8 flex justify-center gap-8 text-sm" style={{ color: "#7A5840" }}>
             <span>📞 +977-9810263277</span>
-            <span>✉️ info@yogmandu.com</span>
+            <span>✉️ yogmandu@gmail.com</span>
           </div>
         </div>
       </section>

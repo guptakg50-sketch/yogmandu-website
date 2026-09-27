@@ -41,7 +41,7 @@ export default function PrivacyPolicyPage() {
           <Section title="1. Who we are">
             Yogmandu (“we”, “us”, “our”) is a yoga teacher-training and sound-healing centre located at
             Miteri Marg, Mid-Baneshwor-31, Kathmandu, Nepal. We can be reached at{" "}
-            <a href="mailto:info@yogmandu.com" style={linkStyle}>info@yogmandu.com</a>.
+            <a href="mailto:yogmandu@gmail.com" style={linkStyle}>yogmandu@gmail.com</a>.
           </Section>
 
           <Section title="2. What we collect">
@@ -68,7 +68,7 @@ export default function PrivacyPolicyPage() {
             Account data is retained while your account is active. Contact-form submissions are retained
             for up to 24 months. Analytics data is retained for 14 months. You can request deletion of your
             account and associated personal data at any time by emailing{" "}
-            <a href="mailto:info@yogmandu.com" style={linkStyle}>info@yogmandu.com</a>.
+            <a href="mailto:yogmandu@gmail.com" style={linkStyle}>yogmandu@gmail.com</a>.
           </Section>
 
           <Section title="5. Who we share it with">
@@ -102,7 +102,7 @@ export default function PrivacyPolicyPage() {
               <li>Withdraw consent at any time.</li>
             </ul>
             To exercise any of these rights, email{" "}
-            <a href="mailto:info@yogmandu.com" style={linkStyle}>info@yogmandu.com</a>. We respond within 30 days.
+            <a href="mailto:yogmandu@gmail.com" style={linkStyle}>yogmandu@gmail.com</a>. We respond within 30 days.
           </Section>
 
           <Section title="8. Security">
@@ -133,7 +133,7 @@ export default function PrivacyPolicyPage() {
             <div style={{ marginTop: 12, padding: "16px 20px", background: "#FAF6F0", borderRadius: 12 }}>
               <strong>Yogmandu</strong><br />
               Miteri Marg, Mid-Baneshwor-31, Kathmandu, Nepal<br />
-              <a href="mailto:info@yogmandu.com" style={linkStyle}>info@yogmandu.com</a><br />
+              <a href="mailto:yogmandu@gmail.com" style={linkStyle}>yogmandu@gmail.com</a><br />
               +977-9810263277
             </div>
           </Section>

@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getBlogBySlug, getPublishedBlogs } from "@/lib/publicData";
+import { renderMarkdown, stripMarkdown, trimTo } from "@/lib/markdown";
+import ShareButtons from "@/components/ShareButtons";
+import { shareImage, shareTopicForCategory } from "@/lib/seo";
 
 // Re-fetch from Supabase at most once a minute so edits made in the admin
 // Blog Manager appear on the live site without a rebuild/redeploy. New slugs
@@ -29,35 +32,34 @@ const FALLBACK_POSTS = [
   { slug: "sound-healing-trauma", category: "Sound Healing", title: "Sound Healing and Trauma: What to Know Before Your First Session", excerpt: "Sound baths can move deep material. What you should tell your practitioner before you begin.", readTime: "9 min", date: "November 2024", color: "#8DC63F", author: "Arjun Neupane", body: "" },
 ];
 
-// Render a single block of inline text with markdown links and bold/italic.
-function renderInline(text: string, keyPrefix: string): React.ReactNode[] {
-  const nodes: React.ReactNode[] = [];
-  const pattern = /\[([^\]]+)\]\(([^)\s]+)\)|\*\*([^*]+)\*\*|_([^_]+)_/g;
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-  let i = 0;
-  while ((match = pattern.exec(text)) !== null) {
-    if (match.index > lastIndex) nodes.push(text.slice(lastIndex, match.index));
-    if (match[1] && match[2]) {
-      nodes.push(
-        <a key={`${keyPrefix}-${i++}`} href={match[2]} target={match[2].startsWith("http") ? "_blank" : undefined}
-          rel={match[2].startsWith("http") ? "noopener noreferrer" : undefined}
-          style={{ color: "#6B2D8B", textDecoration: "underline" }}>
-          {match[1]}
-        </a>,
-      );
-    } else if (match[3]) {
-      nodes.push(<strong key={`${keyPrefix}-${i++}`}>{match[3]}</strong>);
-    } else if (match[4]) {
-      nodes.push(<em key={`${keyPrefix}-${i++}`}>{match[4]}</em>);
-    }
-    lastIndex = match.index + match[0].length;
-  }
-  if (lastIndex < text.length) nodes.push(text.slice(lastIndex));
-  return nodes;
+type Params = Promise<{ slug: string }>;
+
+// Google truncates the title link to fit the device width. Post titles are
+// admin-authored and can run long — the Pashupati post produced an 86-char
+// tag once the root layout's "| Yogmandu Nepal" template was appended — so
+// build the tag directly and keep the brand suffix only when it still fits.
+function buildBlogTitle(title: string): string {
+  const brand = " | Yogmandu";
+  if (title.length + brand.length <= 60) return title + brand;
+  if (title.length <= 60) return title;
+  return trimTo(title, 60);
 }
 
-type Params = Promise<{ slug: string }>;
+// The description used to be the raw excerpt, but excerpts can be a single
+// line — "🕉 Om Namah Shivaya" is a real one — which makes a useless snippet.
+// Fall back to the opening prose of the body when the excerpt is too thin.
+function buildBlogDescription(excerpt: string, body: string, title: string): string {
+  const clean = stripMarkdown(excerpt);
+  if (clean.length >= 80) return trimTo(clean, 155);
+  // Several posts open by repeating their own headline; drop that so the
+  // snippet starts on real prose instead of echoing the title above it.
+  let prose = stripMarkdown(body);
+  const heading = stripMarkdown(title);
+  if (heading && prose.toLowerCase().startsWith(heading.toLowerCase())) {
+    prose = prose.slice(heading.length).replace(/^[\s\p{P}]+/u, "");
+  }
+  return prose ? trimTo(prose, 155) : clean;
+}
 
 export async function generateStaticParams() {
   const db = await getPublishedBlogs();
@@ -75,23 +77,38 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     : FALLBACK_POSTS.find((p) => p.slug === slug);
   if (!post) return {};
 
+  // Facebook/WhatsApp/X show the post's own featured photo; posts without one
+  // fall back to the site card. Metadata is merged *shallowly* between
+  // segments, so an openGraph/twitter object here replaces the root layout's
+  // entirely — siteName, locale and twitter.card must be restated or they are
+  // dropped from the share preview.
+  const topic = shareTopicForCategory(post.category);
+  const previewImage = (post as { featuredImage?: string }).featuredImage || "";
+  const metaTitle = buildBlogTitle(post.title);
+  const metaDescription = buildBlogDescription(post.excerpt ?? "", (post as { body?: string }).body ?? "", post.title);
+
   return {
-    title: post.title,
-    description: post.excerpt,
+    title: { absolute: metaTitle },
+    description: metaDescription,
     authors: [{ name: post.author, url: "https://yogmandu.com/about" }],
     alternates: { canonical: `https://yogmandu.com/blog/${post.slug}` },
     openGraph: {
-      title: post.title,
-      description: post.excerpt,
+      title: metaTitle,
+      description: metaDescription,
       url: `https://yogmandu.com/blog/${post.slug}`,
+      siteName: "Yogmandu",
+      locale: "en_US",
       type: "article",
       publishedTime: post.date,
       authors: [post.author],
       tags: [post.category, "Yoga Nepal", "Kathmandu"],
+      images: [shareImage(previewImage, post.title, topic)],
     },
     twitter: {
-      title: post.title,
-      description: post.excerpt,
+      card: "summary_large_image",
+      title: metaTitle,
+      description: metaDescription,
+      images: [shareImage(previewImage, post.title, topic).url],
     },
   };
 }
@@ -213,38 +230,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
           {/* Article body */}
           {"body" in post && post.body ? (
             <div className="prose-yogmandu">
-              {post.body.split(/\n\n+/).map((block, i) => {
-                const imageMatch = block.trim().match(/^!\[([^\]]*)\]\(([^)\s]+)\)$/);
-                if (imageMatch) {
-                  // Skip if this is the same image already shown as the hero above.
-                  if (heroImage && heroImage === imageMatch[2]) return null;
-                  return (
-                    <figure key={i} style={{ margin: "2.5rem 0" }}>
-                      <img src={imageMatch[2]} alt={imageMatch[1]} loading="lazy"
-                        style={{ width: "100%", borderRadius: 14, display: "block", boxShadow: "0 8px 28px rgba(42,18,8,0.12)" }} />
-                      {imageMatch[1] && (
-                        <figcaption style={{ marginTop: 10, fontSize: "1rem", color: "rgba(42,18,8,0.55)", textAlign: "center", fontStyle: "italic" }}>
-                          {imageMatch[1]}
-                        </figcaption>
-                      )}
-                    </figure>
-                  );
-                }
-                if (block.startsWith("## ")) {
-                  return <h2 key={i} style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.8rem", fontWeight: 400, color: "#2A1208", margin: "2.5rem 0 1rem" }}>{block.slice(3)}</h2>;
-                }
-                if (block.startsWith("# ")) {
-                  return <h1 key={i} style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "2.2rem", fontWeight: 400, color: "#2A1208", margin: "2.5rem 0 1rem" }}>{block.slice(2)}</h1>;
-                }
-                if (block.startsWith("> ")) {
-                  return <blockquote key={i} style={{ margin: "2rem 0", padding: "0.5rem 1.5rem", borderLeft: `3px solid ${post.color}`, fontStyle: "italic", color: "#4A2E1A", fontSize: "1.1rem", lineHeight: 1.7 }}>{renderInline(block.slice(2), `bq-${i}`)}</blockquote>;
-                }
-                if (block.startsWith("- ")) {
-                  const items = block.split("\n").filter(l => l.startsWith("- ")).map(l => l.slice(2));
-                  return <ul key={i} style={{ margin: "1.5rem 0", paddingLeft: "1.5rem" }}>{items.map((item, j) => <li key={j} style={{ fontSize: "1rem", lineHeight: 1.9, color: "#4A2E1A", marginBottom: "0.5rem" }}>{renderInline(item, `li-${i}-${j}`)}</li>)}</ul>;
-                }
-                return <p key={i} style={{ fontSize: "1.05rem", lineHeight: 1.9, color: "#4A2E1A", marginBottom: "1.5rem" }}>{renderInline(block, `p-${i}`)}</p>;
-              })}
+              {renderMarkdown(post.body, { accent: post.color, skipImage: heroImage })}
             </div>
           ) : (
             <div className="rounded-2xl p-10 text-center" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(42,18,8,0.08)" }}>
@@ -258,6 +244,12 @@ export default async function BlogPostPage({ params }: { params: Params }) {
               </a>
             </div>
           )}
+
+          <ShareButtons
+            url={`https://yogmandu.com/blog/${post.slug}`}
+            title={post.title}
+            color={post.color}
+          />
         </div>
       </section>
 

@@ -161,6 +161,24 @@ export const TIMING_NOTICE_DEFAULT = {
   ctaHref: "https://wa.me/9779810263277",
 };
 
+// Headings and copy on /events. Kept admin-editable so the wording (and the
+// message shown when nothing is scheduled) can be changed without a deploy.
+export const EVENTS_PAGE_DEFAULT = {
+  eyebrow: "What's on",
+  headingA: "Events &",
+  headingEm: "workshops",
+  intro:
+    "Workshops, sound healing evenings, meditation courses and seasonal gatherings at our Kathmandu studio and beyond. Everything here happens on a specific date — for our ongoing classes and trainings, see the class schedule.",
+  upcomingLabel: "Upcoming",
+  pastLabel: "Past events",
+  emptyBody:
+    "No events are scheduled just now. Our regular classes and teacher trainings run year-round — or message us and we'll tell you what's coming next.",
+  homeEyebrow: "What's on",
+  homeHeadingA: "Upcoming",
+  homeHeadingEm: "events",
+  homeLinkLabel: "See all events",
+};
+
 const SECTION_DEFAULTS = {
   INSIDE_STUDIO:    INSIDE_STUDIO_DEFAULT,
   HOME_HERO_PHOTO:  HOME_HERO_PHOTO_DEFAULT,
@@ -174,6 +192,7 @@ const SECTION_DEFAULTS = {
   YTT_PLEASE_NOTE:  YTT_PLEASE_NOTE_DEFAULT,
   SOUND_IN_SESSION: SOUND_IN_SESSION_DEFAULT,
   TIMING_NOTICE:    TIMING_NOTICE_DEFAULT,
+  EVENTS_PAGE:      EVENTS_PAGE_DEFAULT,
 } as const;
 
 export type SectionKey = keyof typeof SECTION_DEFAULTS;
@@ -286,6 +305,23 @@ const SECTION_META: Record<SectionKey, { label: string; page: string; fields: Fi
       { name: "photos", label: "Photos", type: "photos" },
     ],
   },
+  EVENTS_PAGE: {
+    label: "Events page headings & empty message",
+    page: "/events and the homepage events strip",
+    fields: [
+      { name: "eyebrow", label: "Small label above the heading", type: "text" },
+      { name: "headingA", label: "Heading (first part)", type: "text" },
+      { name: "headingEm", label: "Heading (accented tail)", type: "text" },
+      { name: "intro", label: "Intro paragraph", type: "textarea" },
+      { name: "upcomingLabel", label: "\"Upcoming\" label", type: "text" },
+      { name: "pastLabel", label: "\"Past events\" label", type: "text" },
+      { name: "emptyBody", label: "Message when no events are scheduled", type: "textarea" },
+      { name: "homeEyebrow", label: "Homepage strip — small label", type: "text" },
+      { name: "homeHeadingA", label: "Homepage strip — heading", type: "text" },
+      { name: "homeHeadingEm", label: "Homepage strip — accented tail", type: "text" },
+      { name: "homeLinkLabel", label: "Homepage strip — link label", type: "text" },
+    ],
+  },
   TIMING_NOTICE: {
     label: "Timing notice (site-wide banner)",
     page: "every page that shows times",
@@ -317,6 +353,7 @@ const CURRICULUM_LABELS: Record<CurriculumKey, { label: string; page: string }> 
 const HUB_LABELS: Record<HubConfigKey, { label: string; page: string }> = {
   YOGA_CLASSES:     { label: "Yoga Classes hub cards",       page: "/class-schedule" },
   SOUND_HEALING:    { label: "Sound Healing hub cards",      page: "/sound-healing-therapy" },
+  SOUND_THERAPIES:  { label: "Sound Healing therapy cards",  page: "/sound-healing-therapy/sessions" },
   RETREATS:         { label: "Retreats & Special hub cards", page: "/yoga-retreat-nepal" },
   THERAPY_WELLNESS: { label: "Therapy & Wellness hub cards", page: "/therapy-wellness" },
   SPECIALIZED:      { label: "Specific Groups hub cards",    page: "/specialized-yoga" },

@@ -1,4 +1,5 @@
 import type { Tier } from "../yoga-teacher-training/pricingTiers";
+import { SOUND_THERAPIES, therapyBookingHref } from "@/lib/soundTherapies";
 
 // Hub definitions — one per nav category. Each is rendered by <ServiceHub> as a
 // grid of the same 3D tilt cards used on the Teacher Training hub. Every card's
@@ -122,11 +123,29 @@ export const SPECIALIZED_HUB: HubConfig = {
   ],
 };
 
+// ── The individual therapies → /sound-healing-therapy/sessions ──────────────
+// Built from lib/soundTherapies.ts so each card's button books that exact
+// therapy rather than a generic "sound healing" enquiry.
+//
+// Prices mirror what the studio entered in the admin in September 2026. The
+// saved admin copy still wins at runtime; these are the fallback. The team
+// changes them in Admin → Cards & Pricing → "Sound Healing therapy cards".
+export const SOUND_THERAPIES_HUB: HubConfig = {
+  eyebrow: "Our Therapies", title: "Individual", titleEm: "healing therapies",
+  subtitle: "Each therapy is booked on its own, at our Mid-Baneshwor studio. Tell us what you are looking for and we will confirm the price, length and timing before you book.",
+  tiers: SOUND_THERAPIES.map((t) =>
+    card(t.cardId, t.category, t.title, t.icon, t.price, t.priceSub,
+      "Studio in Kathmandu", t.color, t.features, therapyBookingHref(t.bookingId),
+      { ctaLabel: "Enquire & book" }),
+  ),
+};
+
 // Name-keyed map of every hub — iterated by the admin "Page Content" editor
 // and lib/pageContent.ts (DB overrides merge over these code defaults).
 export const HUB_CONFIGS = {
   YOGA_CLASSES:     YOGA_CLASSES_HUB,
   SOUND_HEALING:    SOUND_HEALING_HUB,
+  SOUND_THERAPIES:  SOUND_THERAPIES_HUB,
   RETREATS:         RETREATS_HUB,
   THERAPY_WELLNESS: THERAPY_WELLNESS_HUB,
   SPECIALIZED:      SPECIALIZED_HUB,

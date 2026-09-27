@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import {
   Archive,
   Bell,
@@ -701,7 +701,7 @@ function makeInitialState() {
       logoUrl: "/logo.png",
       address: "Miteri Marg, Mid-Baneshwor-31, Kathmandu, Nepal",
       phone: "+977-9862909469 / +977-9810263277",
-      email: "info@yogmandu.com",
+      email: "yogmandu@gmail.com",
       defaultOgImage: "https://images.unsplash.com/photo-1545389336-cf090694435e?w=1200&auto=format&fit=crop",
       twitterHandle: "@yogmandu",
       analyticsId: "",
@@ -850,9 +850,13 @@ function TextInput({ className = "", ...props }) {
   return <input className={classNames("w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-800 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100", className)} {...props} />;
 }
 
-function TextArea({ className = "", ...props }) {
-  return <textarea className={classNames("min-h-24 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-800 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100", className)} {...props} />;
-}
+// forwardRef so the markdown toolbars can reach the real <textarea> and read
+// selectionStart/selectionEnd. Without a ref the toolbar cannot know what the
+// user highlighted, which is how it ended up appending a literal
+// "selected text" placeholder instead of formatting the selection.
+const TextArea = React.forwardRef(function TextArea({ className = "", ...props }, ref) {
+  return <textarea ref={ref} className={classNames("min-h-24 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-800 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100", className)} {...props} />;
+});
 
 function Select({ className = "", ...props }) {
   return <select className={classNames("w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-800 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100", className)} {...props} />;
@@ -1366,8 +1370,19 @@ function BlogEditor({ post, blogs, setBlogs, media, setMedia, onClose, toast }) 
     onClose();
   };
 
+  const bodyRef = useRef(null);
+
   const wrap = (before, after = before) => {
-    setDraft({ ...draft, body: `${draft.body}${draft.body ? "\n" : ""}${before}selected text${after}` });
+    const el = bodyRef.current;
+    const next = applyMarkdown(el, draft.body, before, after);
+    setDraft({ ...draft, body: next.body });
+    // Restore focus and reselect the affected text so the user can keep typing
+    // or immediately apply a second marker.
+    requestAnimationFrame(() => {
+      if (!el) return;
+      el.focus();
+      el.setSelectionRange(next.from, next.to);
+    });
   };
 
   const insertAtEnd = (snippet) => {
@@ -1433,9 +1448,9 @@ function BlogEditor({ post, blogs, setBlogs, media, setMedia, onClose, toast }) 
                 </label>
               </div>
               <p className="mb-2 text-xs text-stone-500">Insert images on their own line. Markdown: <code className="rounded bg-stone-100 px-1">![alt](url)</code></p>
-              <TextArea rows={14} value={draft.body} onChange={(e) => setDraft({ ...draft, body: e.target.value })} />
+              <TextArea ref={bodyRef} rows={14} value={draft.body} onChange={(e) => setDraft({ ...draft, body: e.target.value })} />
             </div>
-            <GalleryEditor items={draft.gallery} onChange={(gallery) => setDraft({ ...draft, gallery })} />
+            <GalleryEditor items={draft.gallery || []} onChange={(gallery) => setDraft({ ...draft, gallery })} />
           </div>
           <aside className="space-y-4">
             <Field label="Featured Image"><TextInput value={draft.featuredImage} onChange={(e) => setDraft({ ...draft, featuredImage: e.target.value, ogImage: e.target.value, twitterImage: e.target.value })} /></Field>
@@ -1453,7 +1468,7 @@ function BlogEditor({ post, blogs, setBlogs, media, setMedia, onClose, toast }) 
         </div>
       )}
       {tab === "SEO" && <SeoEditorFields value={draft} onChange={setDraft} allPages={blogs} />}
-      {tab === "Revisions" && <div className="space-y-3">{(draft.revisions || []).length ? draft.revisions.map((rev) => <div key={rev.savedAt} className="flex items-center justify-between rounded-xl border border-stone-200 bg-white p-3"><div><p className="font-medium">{rev.title}</p><p className="text-sm text-stone-500">{new Date(rev.savedAt).toLocaleString()}</p></div><Button variant="secondary" onClick={() => setDraft({ ...draft, ...rev })}><RefreshCw size={16} /> Restore</Button></div>) : <EmptyState icon={Clock} title="No revisions yet" text="Auto-save keeps the last five saved versions here." />}</div>}
+      {tab === "Revisions" && <div className="space-y-3">{(draft.revisions || []).length ? (draft.revisions || []).map((rev) => <div key={rev.savedAt} className="flex items-center justify-between rounded-xl border border-stone-200 bg-white p-3"><div><p className="font-medium">{rev.title}</p><p className="text-sm text-stone-500">{new Date(rev.savedAt).toLocaleString()}</p></div><Button variant="secondary" onClick={() => setDraft({ ...draft, ...rev })}><RefreshCw size={16} /> Restore</Button></div>) : <EmptyState icon={Clock} title="No revisions yet" text="Auto-save keeps the last five saved versions here." />}</div>}
       {preview && <Modal title="Post Preview" onClose={() => setPreview(false)} wide><article className="mx-auto max-w-3xl rounded-xl bg-white p-8"><h1 className="text-4xl font-semibold text-stone-900">{draft.title}</h1><p className="mt-3 text-stone-500">{draft.excerpt}</p>{draft.featuredImage && <img src={draft.featuredImage} alt="" className="my-6 h-72 w-full rounded-xl object-cover" />}<pre className="whitespace-pre-wrap font-sans leading-7 text-stone-700">{draft.body}</pre></article></Modal>}
     </Modal>
   );
@@ -1479,7 +1494,60 @@ function Toggle({ label, checked, onChange }) {
   return <label className="flex items-center justify-between rounded-lg border border-stone-200 bg-white p-3 text-sm font-medium text-stone-700"><span>{label}</span><input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-5 w-5 accent-emerald-600" /></label>;
 }
 
-function GalleryEditor({ items, onChange }) {
+// `items` defaults to [] because most saved records predate this field and
+// store no `gallery` at all. Without the default, items.map() below threw
+// "Cannot read properties of undefined (reading 'map')" and the editor
+// modal crashed on open — which silently blocked editing 14 of 19 posts.
+
+/**
+ * Apply a markdown marker to whatever is selected in a textarea.
+ *
+ * The old toolbar ignored the selection entirely and appended the literal
+ * string "selected text" to the end of the body, so highlighting a line and
+ * clicking H2 or B did nothing to that line — the client reported this as
+ * "H1/H2/H3 and bolding not working".
+ *
+ * Inline markers (bold, italic, code) wrap the selection. Block markers —
+ * where `after` is empty, i.e. headings, list bullets, quotes — prefix each
+ * selected line and strip any marker already there, so clicking H3 on a line
+ * that is already "## Foo" gives "### Foo" rather than "### ## Foo".
+ *
+ * Returns the new body plus the selection range to restore afterwards.
+ */
+function applyMarkdown(el, body, before, after) {
+  const hasSel = el && typeof el.selectionStart === "number";
+  const start = hasSel ? el.selectionStart : body.length;
+  const end   = hasSel ? el.selectionEnd   : body.length;
+
+  // Block-level marker: operate on whole lines.
+  if (after === "") {
+    const lineStart = body.lastIndexOf("\n", start - 1) + 1;
+    let lineEnd = body.indexOf("\n", end);
+    if (lineEnd === -1) lineEnd = body.length;
+    const target = body.slice(lineStart, lineEnd);
+    const lines = (target || "Heading").split("\n");
+    const out = lines
+      .map((line) => before + line.replace(/^(#{1,6} +|[-*+] +|\d+\. +|> +)/, ""))
+      .join("\n");
+    return {
+      body: body.slice(0, lineStart) + out + body.slice(lineEnd),
+      from: lineStart + before.length,
+      to: lineStart + out.length,
+    };
+  }
+
+  // Inline marker: wrap the selection, or insert a placeholder to overtype.
+  const selected = body.slice(start, end);
+  const text = selected || "text";
+  const out = before + text + after;
+  return {
+    body: body.slice(0, start) + out + body.slice(end),
+    from: start + before.length,
+    to: start + before.length + text.length,
+  };
+}
+
+function GalleryEditor({ items = [], onChange }) {
   return (
     <section className="rounded-xl border border-stone-200 bg-white p-4">
       <div className="mb-3 flex items-center justify-between"><h3 className="font-semibold">Image Gallery</h3><Button variant="secondary" onClick={() => onChange([...items, { id: uid("gallery"), url: "", caption: "" }])}><Plus size={16} /> Add Image</Button></div>
@@ -1747,7 +1815,7 @@ function SessionEditor({ session, sessions, setSessions, instructors, media, set
       </div>
       {tab === "Basic" && <div className="grid gap-4 md:grid-cols-2"><Field label="Session Name" hint={`${draft.name.length}/80`}><TextInput maxLength={80} value={draft.name} onChange={(e) => update("name", e.target.value)} /></Field><Field label="Type"><Select value={draft.type} onChange={(e) => update("type", e.target.value)}>{(sessionTypes.includes(draft.type) ? sessionTypes : [draft.type, ...sessionTypes]).map((item) => <option key={item}>{item}</option>)}</Select></Field><Field label="Short Description" hint={`${draft.shortDescription.length}/200`} className="md:col-span-2"><TextArea maxLength={200} value={draft.shortDescription} onChange={(e) => update("shortDescription", e.target.value)} /></Field><Field label="Full Description" className="md:col-span-2"><TextArea rows={6} value={draft.fullDescription} onChange={(e) => update("fullDescription", e.target.value)} /></Field><Field label="Difficulty"><Select value={draft.level} onChange={(e) => update("level", e.target.value)}>{LEVELS.map((item) => <option key={item}>{item}</option>)}</Select></Field><Field label="Language"><Select value={draft.language} onChange={(e) => update("language", e.target.value)}>{["English", "Nepali", "Both"].map((item) => <option key={item}>{item}</option>)}</Select></Field><TagChooser label="Styles" options={STYLES} value={draft.styles} onChange={(value) => update("styles", value)} /><TagInput value={draft.tags} onChange={(value) => update("tags", value)} /></div>}
       {tab === "Schedule" && <div className="grid gap-4 md:grid-cols-2"><Toggle label="Recurring session" checked={draft.recurring} onChange={(checked) => update("recurring", checked)} />{draft.recurring ? <TagChooser label="Days of week" options={DAYS} value={draft.days} onChange={(value) => update("days", value)} /> : <Field label="Specific date"><TextInput type="date" value={draft.date} onChange={(e) => update("date", e.target.value)} /></Field>}<Field label="Start time"><TextInput type="time" value={draft.startTime} onChange={(e) => update("startTime", e.target.value)} /></Field><Field label="End time"><TextInput type="time" value={draft.endTime} onChange={(e) => update("endTime", e.target.value)} /></Field><Field label="Start date"><TextInput type="date" value={draft.startDate} onChange={(e) => update("startDate", e.target.value)} /></Field><Field label="Optional end date"><TextInput type="date" value={draft.endDate} onChange={(e) => update("endDate", e.target.value)} /></Field><div className="rounded-xl bg-stone-100 p-4 text-sm text-stone-600">Duration: {calculateDuration(draft.startTime, draft.endTime, draft.duration)} min<br />Time zone: Nepal Time, UTC+5:45</div><Field label="Instructor"><Select value={draft.instructorId} onChange={(e) => update("instructorId", e.target.value)}>{instructors.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</Select></Field><Field label="Location"><Select value={draft.location} onChange={(e) => update("location", e.target.value)}>{["In-studio", "Online", "Both"].map((item) => <option key={item}>{item}</option>)}</Select></Field>{draft.location !== "Online" && <Field label="Room"><TextInput value={draft.room} onChange={(e) => update("room", e.target.value)} /></Field>}{draft.location !== "In-studio" && <Field label="Meeting link"><TextInput value={draft.meetingLink} onChange={(e) => update("meetingLink", e.target.value)} /></Field>}<Field label="Max Capacity"><TextInput type="number" value={draft.capacity} onChange={(e) => update("capacity", Number(e.target.value))} /></Field><Field label="Current Enrollment"><TextInput readOnly value={draft.enrolled} /></Field><Toggle label="Allow waitlist when full" checked={draft.waitlist} onChange={(checked) => update("waitlist", checked)} /><Field label="Pricing type"><Select value={draft.pricingType} onChange={(e) => update("pricingType", e.target.value)}>{["Free", "Fixed Price", "Drop-in + Package"].map((item) => <option key={item}>{item}</option>)}</Select></Field><Field label="NPR Amount"><TextInput type="number" value={draft.price} onChange={(e) => update("price", Number(e.target.value))} /></Field><Toggle label="Trial class available" checked={draft.trial} onChange={(checked) => update("trial", checked)} /><Field label="Status"><Select value={draft.status} onChange={(e) => update("status", e.target.value)}>{SESSION_STATUSES.map((item) => <option key={item}>{item}</option>)}</Select></Field><Toggle label="Show on homepage" checked={draft.homepage} onChange={(checked) => update("homepage", checked)} /><Toggle label="Featured session" checked={draft.featured} onChange={(checked) => update("featured", checked)} /><Field label="Display order"><TextInput type="number" value={draft.priority} onChange={(e) => update("priority", Number(e.target.value))} /></Field></div>}
-      {tab === "Media" && <div className="space-y-4"><Field label="Featured Image"><TextInput value={draft.image} onChange={(e) => update("image", e.target.value)} /></Field><input type="file" accept="image/*" onChange={(e) => uploadFile(e, (url, item) => { update("image", url); setMedia([item || { id: uid("media"), url, caption: draft.name, usedBy: draft.id }, ...media]); }, { caption: draft.name, usedBy: draft.id })} className="text-sm" />{draft.image && <img src={draft.image} alt="" className="h-64 w-full rounded-xl object-cover" />}<GalleryEditor items={draft.gallery} onChange={(gallery) => update("gallery", gallery)} /><Field label="Promo video URL"><TextInput value={draft.video} onChange={(e) => update("video", e.target.value)} /></Field></div>}
+      {tab === "Media" && <div className="space-y-4"><Field label="Featured Image"><TextInput value={draft.image} onChange={(e) => update("image", e.target.value)} /></Field><input type="file" accept="image/*" onChange={(e) => uploadFile(e, (url, item) => { update("image", url); setMedia([item || { id: uid("media"), url, caption: draft.name, usedBy: draft.id }, ...media]); }, { caption: draft.name, usedBy: draft.id })} className="text-sm" />{draft.image && <img src={draft.image} alt="" className="h-64 w-full rounded-xl object-cover" />}<GalleryEditor items={draft.gallery || []} onChange={(gallery) => update("gallery", gallery)} /><Field label="Promo video URL"><TextInput value={draft.video} onChange={(e) => update("video", e.target.value)} /></Field></div>}
       {tab === "SEO" && <SeoEditorFields value={sessionSeoDraft(draft)} onChange={(next) => setDraft({ ...draft, ...next })} allPages={sessions.map(sessionSeoDraft)} />}
       {tab === "Notes" && <div className="grid gap-4"><Field label="Admin-only notes"><TextArea rows={5} value={draft.notes} onChange={(e) => update("notes", e.target.value)} /></Field><Field label="Props / equipment needed"><TextArea value={draft.equipment} onChange={(e) => update("equipment", e.target.value)} /></Field><Field label="Prerequisites"><TextArea value={draft.prerequisites} onChange={(e) => update("prerequisites", e.target.value)} /></Field></div>}
     </Modal>
@@ -2690,6 +2758,7 @@ function AdminWorkspace({ onLogout }) {
     ["seo",         "SEO Manager",  ShieldCheck],
     ["sitemap",     "Sitemap",      Link],
     ["blog",        "Blog Manager", BookOpen],
+    ["events",      "Events",       CalendarDays],
     ["sessions",    "Sessions",     CalendarDays],
     ["instructors", "Instructors",  Users],
     ["media",       "Media",        Camera],
@@ -2730,6 +2799,7 @@ function AdminWorkspace({ onLogout }) {
           {active === "seo"        && <SeoManager toast={notify} />}
           {active === "sitemap"    && <SitemapManager toast={notify} />}
           {active === "blog" && <BlogManager blogs={state.blogs} setBlogs={setPart("blogs")} media={state.media} setMedia={setPart("media")} toast={notify} />}
+          {active === "events" && <EventsManager toast={notify} />}
           {active === "sessions" && <SessionsManager sessions={state.sessions} setSessions={setPart("sessions")} instructors={state.instructors} setInstructors={setPart("instructors")} media={state.media} setMedia={setPart("media")} sessionTypes={state.sessionTypes} setSessionTypes={setPart("sessionTypes")} toast={notify} />}
           {active === "instructors" && <InstructorsManager instructors={state.instructors} setInstructors={setPart("instructors")} sessions={state.sessions} toast={notify} />}
           {active === "media" && <MediaLibrary media={state.media} setMedia={setPart("media")} blogs={state.blogs} sessions={state.sessions} toast={notify} />}
@@ -2818,7 +2888,7 @@ const DEFAULT_FOOTER = {
   contact: [
     { icon: "📍", text: "Miteri Marg, Mid-Baneshwor-31, Kathmandu, Nepal" },
     { icon: "📞", text: "+977-9862909469 / +977-9810263277" },
-    { icon: "✉️", text: "info@yogmandu.com" },
+    { icon: "✉️", text: "yogmandu@gmail.com" },
     { icon: "🕐", text: "Sun–Fri · 5:30–18:30" },
   ],
   mapQuery:     "Yogmandu, Miteri Marg, Mid-Baneshwor, Kathmandu",
@@ -4108,27 +4178,70 @@ function ServiceFields({ draft, setDraft }) {
 }
 
 // Form for a list of pricing/hub cards (Tier objects).
+/**
+ * The 3D cards used on every hub and pricing page. Cards can be added, removed
+ * and reordered here — a new card starts blank with "On request" as its price,
+ * because an invented figure on a live page is worse than no figure at all.
+ */
 function TierListFields({ tiers, onChange }) {
   const setTier = (i, patch) => onChange(tiers.map((t, j) => (j === i ? { ...t, ...patch } : t)));
+  const move = (i, dir) => {
+    const j = i + dir;
+    if (j < 0 || j >= tiers.length) return;
+    const next = [...tiers];
+    [next[i], next[j]] = [next[j], next[i]];
+    onChange(next);
+  };
+  const remove = (i) => {
+    const t = tiers[i];
+    if (!window.confirm(`Remove the "${t.title || "untitled"}" card from this page?`)) return;
+    onChange(tiers.filter((_, j) => j !== i));
+  };
+  const add = () => {
+    // Copy the accent of the last card so a new one doesn't arrive colourless.
+    const color = tiers[tiers.length - 1]?.color || "#6B2D8B";
+    onChange([...tiers, {
+      id: uid("card"), badge: "", badgeColor: color, category: "", title: "", icon: "🌿",
+      price: "On request", priceSub: "Price confirmed on enquiry", priceNote: "Studio in Kathmandu",
+      color, features: [], ctaLabel: "Enquire & book", ctaHref: "/book?service=sound",
+      cardHref: "/book?service=sound", featured: false,
+    }]);
+  };
+
   return (
     <div className="space-y-4">
       {tiers.map((t, i) => (
         <div key={t.id || i} className="rounded-xl border border-stone-200 bg-white p-4">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-emerald-700">{t.title || `Card ${i + 1}`}</p>
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">{t.title || `Card ${i + 1}`}</p>
+            <div className="flex gap-1">
+              <Button variant="ghost" onClick={() => move(i, -1)} disabled={i === 0}>↑</Button>
+              <Button variant="ghost" onClick={() => move(i, 1)} disabled={i === tiers.length - 1}>↓</Button>
+              <Button variant="ghost" onClick={() => remove(i)}><Trash2 size={15} /></Button>
+            </div>
+          </div>
           <div className="grid gap-3 md:grid-cols-2">
             <Field label="Title"><TextInput value={t.title} onChange={(e) => setTier(i, { title: e.target.value })} /></Field>
             <Field label="Category line"><TextInput value={t.category} onChange={(e) => setTier(i, { category: e.target.value })} /></Field>
             <Field label="Badge" hint="leave blank for no badge"><TextInput value={t.badge || ""} onChange={(e) => setTier(i, { badge: e.target.value })} /></Field>
             <Field label="Icon (emoji)"><TextInput value={t.icon || ""} onChange={(e) => setTier(i, { icon: e.target.value })} /></Field>
-            <Field label="Price"><TextInput value={t.price} onChange={(e) => setTier(i, { price: e.target.value })} /></Field>
+            <Field label="Price" hint="write On request if unconfirmed"><TextInput value={t.price} onChange={(e) => setTier(i, { price: e.target.value })} /></Field>
             <Field label="Price subtitle"><TextInput value={t.priceSub || ""} onChange={(e) => setTier(i, { priceSub: e.target.value })} /></Field>
             <Field label="Price note"><TextInput value={t.priceNote || ""} onChange={(e) => setTier(i, { priceNote: e.target.value })} /></Field>
+            <Field label="Accent colour" hint="hex, e.g. #6B2D8B">
+              <div className="flex items-center gap-2">
+                <span className="inline-block h-6 w-6 flex-shrink-0 rounded-full border border-stone-300" style={{ background: t.color || "#6B2D8B" }} />
+                <TextInput value={t.color || ""} onChange={(e) => setTier(i, { color: e.target.value, badgeColor: e.target.value })} />
+              </div>
+            </Field>
             <Field label="Button label"><TextInput value={t.ctaLabel || ""} onChange={(e) => setTier(i, { ctaLabel: e.target.value })} /></Field>
-            <Field label="Button link"><TextInput value={t.ctaHref || ""} onChange={(e) => setTier(i, { ctaHref: e.target.value })} /></Field>
+            <Field label="Button link"><TextInput value={t.ctaHref || ""} onChange={(e) => setTier(i, { ctaHref: e.target.value, cardHref: e.target.value })} /></Field>
           </div>
           <div className="mt-3"><Field label="Feature list (one per line)"><LinesArea value={t.features} onChange={(v) => setTier(i, { features: v })} /></Field></div>
+          <div className="mt-3"><Toggle label="Highlight this card (lifted, with a glowing ring)" checked={Boolean(t.featured)} onChange={(v) => setTier(i, { featured: v })} /></div>
         </div>
       ))}
+      <Button variant="secondary" onClick={add}><Plus size={15} /> Add card</Button>
     </div>
   );
 }
@@ -4234,6 +4347,272 @@ function ContentDocEditor({ doc, toast, onSaved, onReset, onClose }) {
         </div>
       </div>
     </Modal>
+  );
+}
+
+// ── Events ────────────────────────────────────────────────────────────────────
+// Dated occurrences (workshops, hikes, multi-week bootcamps), distinct from the
+// permanent service pages. Uses per-row POST/DELETE rather than a full-replace
+// PUT, so one stale tab cannot wipe rows it never loaded.
+
+const EVENT_STATUSES = ["Draft", "Published", "Cancelled"];
+const BOOKING_MODES = [
+  ["website",  "Book on the website"],
+  ["whatsapp", "Book via WhatsApp"],
+  ["none",     "No booking button"],
+];
+
+function blankEvent() {
+  const today = new Date().toISOString().slice(0, 10);
+  return {
+    id: uid("event"), slug: "", title: "", summary: "", body: "",
+    status: "Draft", startDate: today, endDate: "", startTime: "", endTime: "",
+    locationName: "", locationAddress: "", priceNpr: "", priceUsd: "", spots: "",
+    featuredImage: "", gallery: [], bookingMode: "website", statusNote: "", relatedService: "",
+  };
+}
+
+/** Today in Kathmandu — "past" must mean past *there*, not in the browser's zone. */
+function todayInNepal() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kathmandu", year: "numeric", month: "2-digit", day: "2-digit",
+  }).format(new Date());
+}
+
+function EventEditor({ draft: initial, onSave, onClose, onDelete, toast }) {
+  const [draft, setDraft] = useState(initial);
+  const [saving, setSaving] = useState(false);
+  const set = (key, value) => setDraft((d) => ({ ...d, [key]: value }));
+
+  const bodyRef = useRef(null);
+
+  const wrap = (before, after = before) => {
+    const el = bodyRef.current;
+    const next = applyMarkdown(el, draft.body, before, after);
+    setDraft((d) => ({ ...d, body: next.body }));
+    requestAnimationFrame(() => {
+      if (!el) return;
+      el.focus();
+      el.setSelectionRange(next.from, next.to);
+    });
+  };
+  const insertAtEnd = (snippet) => {
+    setDraft((d) => ({ ...d, body: `${d.body}${d.body ? "\n\n" : ""}${snippet}` }));
+  };
+
+  const save = async () => {
+    if (!draft.title.trim()) return toast("Give the event a title");
+    if (!draft.slug.trim()) return toast("Give the event a URL slug");
+    if (!draft.startDate) return toast("Give the event a start date");
+    if (draft.endDate && draft.endDate < draft.startDate) return toast("End date cannot be before the start date");
+    setSaving(true);
+    try {
+      await onSave(draft);
+      onClose();
+    } catch (err) {
+      toast(err.message || "Could not save the event");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Modal title={draft.title || "Event"} onClose={onClose} wide>
+      <div className="mb-4 flex flex-wrap items-center justify-end gap-2">
+        {onDelete && (
+          <Button variant="danger" onClick={() => { if (confirm("Delete this event?")) { onDelete(draft); onClose(); } }}>
+            <Trash2 size={16} /> Delete
+          </Button>
+        )}
+        <Button onClick={save} disabled={saving}><Save size={16} /> {saving ? "Saving…" : "Save"}</Button>
+      </div>
+
+      <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
+        <div className="space-y-4">
+          <Field label="Title" hint={`${draft.title.length} chars`}>
+            <TextInput value={draft.title}
+              onChange={(e) => setDraft({ ...draft, title: e.target.value, slug: draft.slug || slugify(e.target.value) })} />
+          </Field>
+          <Field label="URL slug" hint={`/events/${draft.slug || "…"}`}>
+            <TextInput value={draft.slug} onChange={(e) => set("slug", slugify(e.target.value))} />
+          </Field>
+          <Field label="Short summary" hint={`${(draft.summary || "").length} chars — used on cards and in Google results`}>
+            <TextArea rows={2} value={draft.summary} onChange={(e) => set("summary", e.target.value)} />
+          </Field>
+
+          <div className="rounded-xl border border-stone-200 bg-white p-3">
+            <div className="mb-3 flex flex-wrap gap-2">
+              {[["B", "**", "**"], ["I", "_", "_"], ["U", "<u>", "</u>"], ["S", "~~", "~~"],
+                ["H1", "# ", ""], ["H2", "## ", ""], ["H3", "### ", ""], ["H4", "#### ", ""],
+                ["•", "- ", ""], ["1.", "1. ", ""], ["Quote", "> ", ""], ["Code", "`", "`"],
+                ["Block", "```\n", "\n```"], ["HR", "\n---\n", ""]]
+                .map(([label, before, after]) => (
+                  <Button key={label} variant="secondary" onClick={() => wrap(before, after)}>{label}</Button>
+                ))}
+              <Button variant="secondary" onClick={() => wrap("[link text](", ")")}>Link</Button>
+              <Button variant="secondary" onClick={() => {
+                const url = window.prompt("Image URL");
+                if (url) insertAtEnd(`![](${url})`);
+              }}>Image URL</Button>
+            </div>
+            <p className="mb-2 text-xs text-stone-500">
+              Same formatting as blog posts. Use Preview on the live page to check sizing — this box shows the raw text.
+            </p>
+            <TextArea ref={bodyRef} rows={14} value={draft.body} onChange={(e) => set("body", e.target.value)} />
+          </div>
+        </div>
+
+        <aside className="space-y-4">
+          <Field label="Status">
+            <Select value={draft.status} onChange={(e) => set("status", e.target.value)}>
+              {EVENT_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+            </Select>
+          </Field>
+          {(draft.status === "Cancelled" || draft.statusNote) && (
+            <Field label="Note shown on the page" hint="e.g. why it was cancelled, or the new date">
+              <TextArea rows={2} value={draft.statusNote} onChange={(e) => set("statusNote", e.target.value)} />
+            </Field>
+          )}
+
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Start date"><TextInput type="date" value={draft.startDate} onChange={(e) => set("startDate", e.target.value)} /></Field>
+            <Field label="End date" hint="optional"><TextInput type="date" value={draft.endDate} onChange={(e) => set("endDate", e.target.value)} /></Field>
+            <Field label="Start time" hint="Nepal time"><TextInput type="time" value={draft.startTime} onChange={(e) => set("startTime", e.target.value)} /></Field>
+            <Field label="End time" hint="optional"><TextInput type="time" value={draft.endTime} onChange={(e) => set("endTime", e.target.value)} /></Field>
+          </div>
+
+          <Field label="Location name" hint="Leave blank for the studio">
+            <TextInput value={draft.locationName} placeholder="Yogmandu" onChange={(e) => set("locationName", e.target.value)} />
+          </Field>
+          <Field label="Location address" hint="Leave blank for the studio">
+            <TextInput value={draft.locationAddress} placeholder="Miteri Marg, Mid-Baneshwor-31" onChange={(e) => set("locationAddress", e.target.value)} />
+          </Field>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Price NPR" hint="blank = free"><TextInput value={draft.priceNpr} placeholder="2,500" onChange={(e) => set("priceNpr", e.target.value)} /></Field>
+            <Field label="Price USD" hint="blank = free"><TextInput value={draft.priceUsd} placeholder="25" onChange={(e) => set("priceUsd", e.target.value)} /></Field>
+          </div>
+          <Field label="Places" hint="free text, e.g. Limited to 20">
+            <TextInput value={draft.spots} onChange={(e) => set("spots", e.target.value)} />
+          </Field>
+
+          <Field label="Booking">
+            <Select value={draft.bookingMode} onChange={(e) => set("bookingMode", e.target.value)}>
+              {BOOKING_MODES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+            </Select>
+          </Field>
+          <Field label="Related service page" hint="optional, e.g. /yoga-retreat-nepal/weight-loss-bootcamp">
+            <TextInput value={draft.relatedService} onChange={(e) => set("relatedService", e.target.value)} />
+          </Field>
+
+          <Field label="Featured image" hint="landscape ~1200×630 for share previews">
+            <TextInput value={draft.featuredImage} onChange={(e) => set("featuredImage", e.target.value)} />
+          </Field>
+          {draft.featuredImage && <img src={draft.featuredImage} alt="" className="h-40 w-full rounded-xl object-cover" />}
+
+          <Field label="Photo gallery" hint="shown under the description — good for photos after the event">
+            <GalleryEditor items={draft.gallery || []} onChange={(gallery) => set("gallery", gallery)} />
+          </Field>
+        </aside>
+      </div>
+    </Modal>
+  );
+}
+
+function EventsManager({ toast }) {
+  const [events, setEvents] = useState(null);
+  const [error, setError] = useState("");
+  const [needsMigration, setNeedsMigration] = useState(false);
+  const [tab, setTab] = useState("Upcoming");
+  const [editing, setEditing] = useState(null);
+
+  const load = () => {
+    setError("");
+    fetchJson("/api/admin/events")
+      .then((res) => { setEvents(res.data || []); setNeedsMigration(Boolean(res.needsMigration)); })
+      .catch((err) => { setEvents([]); setError(err.message || "Could not load events"); });
+  };
+  useEffect(load, []);
+
+  const save = async (event) => {
+    const res = await fetchJson("/api/admin/events", { method: "POST", body: JSON.stringify(event) });
+    setEvents((list) => {
+      const rest = (list || []).filter((e) => e.id !== event.id);
+      return [event, ...rest];
+    });
+    toast("Event saved — live within a few minutes");
+    return res;
+  };
+
+  const remove = (event) => {
+    fetchJson(`/api/admin/events?id=${encodeURIComponent(event.id)}`, { method: "DELETE" })
+      .then(() => { setEvents((list) => (list || []).filter((e) => e.id !== event.id)); toast("Event deleted"); })
+      .catch((err) => toast(err.message || "Could not delete"));
+  };
+
+  if (events === null) return <p className="text-sm text-stone-500">Loading events…</p>;
+
+  const today = todayInNepal();
+  const isPast = (e) => (e.endDate || e.startDate) < today;
+  const upcoming = events.filter((e) => !isPast(e)).sort((a, b) => a.startDate.localeCompare(b.startDate));
+  const past = events.filter(isPast).sort((a, b) => (b.endDate || b.startDate).localeCompare(a.endDate || a.startDate));
+  const shown = tab === "Upcoming" ? upcoming : past;
+
+  return (
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex gap-2">
+          {["Upcoming", "Past"].map((t) => (
+            <Button key={t} variant={tab === t ? "primary" : "secondary"} onClick={() => setTab(t)}>
+              {t} ({t === "Upcoming" ? upcoming.length : past.length})
+            </Button>
+          ))}
+        </div>
+        <Button onClick={() => setEditing(blankEvent())}><Plus size={16} /> New event</Button>
+      </div>
+
+      {needsMigration && (
+        <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+          The <code>yogmandu_events</code> table does not exist yet. Run
+          <code className="mx-1 rounded bg-amber-100 px-1">supabase/migrations/014_events.sql</code>
+          in the Supabase SQL editor, then reload this page. Events cannot be saved until then.
+        </div>
+      )}
+      {error && <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-sm text-red-800">{error}</div>}
+
+      {shown.length === 0 ? (
+        <EmptyState icon={CalendarDays} title={`No ${tab.toLowerCase()} events`}
+          text={tab === "Upcoming" ? "Add an event and it appears on /events once published." : "Past events are archived here automatically."} />
+      ) : (
+        <div className="overflow-hidden rounded-xl border border-stone-200 bg-white">
+          {shown.map((event) => (
+            <button key={event.id} onClick={() => setEditing(event)}
+              className="flex w-full items-center gap-4 border-b border-stone-100 p-4 text-left last:border-0 hover:bg-stone-50">
+              {event.featuredImage
+                ? <img src={event.featuredImage} alt="" className="h-12 w-16 rounded object-cover" />
+                : <div className="h-12 w-16 rounded bg-stone-100" />}
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium text-stone-900">{event.title || "(untitled)"}</p>
+                <p className="truncate text-xs text-stone-500">
+                  {event.startDate}{event.endDate ? ` → ${event.endDate}` : ""} · /events/{event.slug}
+                </p>
+              </div>
+              <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                event.status === "Published" ? "bg-green-100 text-green-800"
+                : event.status === "Cancelled" ? "bg-red-100 text-red-800"
+                : "bg-stone-100 text-stone-600"}`}>
+                {event.status}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {editing && (
+        <EventEditor draft={editing} onSave={save} onClose={() => setEditing(null)} toast={toast}
+          onDelete={events.some((e) => e.id === editing.id) ? remove : null} />
+      )}
+    </div>
   );
 }
 
