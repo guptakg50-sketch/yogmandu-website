@@ -22,7 +22,15 @@ const SERVICES: BookingService[] = [
   { id: "home",       group: "Yoga Programs",        color: "#8DC63F", icon: "🏡", title: "Yoga at Home",            subtitle: "We come to you" },
   { id: "private",    group: "Yoga Programs",        color: "#F7941D", icon: "🌿", title: "Private Yoga Classes",    subtitle: "1-on-1 or max 4 students" },
   // Special Programs
-  { id: "ytt-200",    group: "Special Programs",     color: "#6B2D8B", icon: "📜", title: "200hr Yoga Teacher Training", subtitle: "Yoga Alliance RYS 200" },
+  // One option per format. A single "ytt-200" meant commuter, residential and
+  // online applications all arrived identical and the studio had to ask which
+  // one the person meant.
+  { id: "ytt-200-commuter",    group: "Special Programs", color: "#F7941D", icon: "🚪", title: "200hr TTC — Commuter",    subtitle: "Non-residential · your own accommodation" },
+  { id: "ytt-200-residential", group: "Special Programs", color: "#6B2D8B", icon: "🏡", title: "200hr TTC — Residential", subtitle: "Full board · 25 nights" },
+  { id: "ytt-200-online",      group: "Special Programs", color: "#8DC63F", icon: "💻", title: "200hr TTC — Online",      subtitle: "Live · from anywhere" },
+  { id: "ytt-300",             group: "Special Programs", color: "#6B2D8B", icon: "📖", title: "300hr Advanced Training", subtitle: "For certified 200hr teachers" },
+  { id: "ytt-500",             group: "Special Programs", color: "#F7941D", icon: "🏔", title: "500hr Master Pathway",    subtitle: "200 + 300 combined" },
+  { id: "ytt-200",    group: "Special Programs",     color: "#6B2D8B", icon: "📜", title: "200hr Yoga Teacher Training", subtitle: "Not sure which format yet" },
   { id: "retreat",    group: "Special Programs",     color: "#6B2D8B", icon: "⛰", title: "Yoga Retreat",            subtitle: "Outside Kathmandu Valley" },
   { id: "bootcamp",   group: "Special Programs",     color: "#F7941D", icon: "🔥", title: "Weight Loss Bootcamp",    subtitle: "49-day transformation" },
   { id: "corporate",  group: "Special Programs",     color: "#8DC63F", icon: "💼", title: "Corporate Yoga",          subtitle: "For your team & office" },

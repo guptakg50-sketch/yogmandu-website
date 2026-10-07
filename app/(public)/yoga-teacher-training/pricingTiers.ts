@@ -83,6 +83,7 @@ export const COMMUTER_TIER: Tier = {
   ctaLabel:  "Apply Now",
   ctaHref:   "https://wa.me/9779810263277",
   featured:  true,
+  cardHref:  "/book?service=ytt-200-commuter",
 };
 
 export const RESIDENTIAL_TIER: Tier = {
@@ -108,6 +109,7 @@ export const RESIDENTIAL_TIER: Tier = {
   ctaLabel:  "Apply Now",
   ctaHref:   "https://wa.me/9779810263277",
   featured:  true,
+  cardHref:  "/book?service=ytt-200-residential",
 };
 
 export const ONLINE_TIER: Tier = {
@@ -130,6 +132,7 @@ export const ONLINE_TIER: Tier = {
   ],
   ctaLabel:  "Get Details",
   ctaHref:   "mailto:yogmandu@gmail.com",
+  cardHref:  "/book?service=ytt-200-online",
 };
 
 // Name-keyed tier sets — iterated by the admin "Page Content" editor and

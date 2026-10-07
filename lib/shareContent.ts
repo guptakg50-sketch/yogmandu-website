@@ -20,7 +20,7 @@ export const SHARE_PAGES: SharePage[] = [
     path: "/",
     label: "Homepage",
     title: "Yogmandu | Yoga Classes, Sound Healing & Teacher Training in Kathmandu",
-    description: "Daily yoga classes in Baneshwor, Kathmandu \u2014 near New Baneshwor & the airport. Beginner-friendly classes, authentic Tibetan sound healing & Yoga Alliance certified teacher training.",
+    description: "Daily yoga classes, Tibetan sound healing and Yoga Alliance certified teacher training in Baneshwor, Kathmandu. Beginners welcome, since 2018.",
   },
   {
     path: "/about",
@@ -32,7 +32,7 @@ export const SHARE_PAGES: SharePage[] = [
     path: "/blog",
     label: "/blog",
     title: "Yoga Blog \u2014 Philosophy, Breathwork & Sound Healing | Yogmandu Nepal",
-    description: "Yoga philosophy, pranayama, Tibetan sound healing insights from the Yogmandu teaching team in Kathmandu.",
+    description: "Articles on yoga philosophy, pranayama, sound healing, teacher training and practising in Kathmandu, from the Yogmandu teaching team in Nepal.",
   },
   {
     path: "/class-schedule",
@@ -50,7 +50,7 @@ export const SHARE_PAGES: SharePage[] = [
     path: "/class-schedule/home",
     label: "/class-schedule/home",
     title: "Yoga at Home Kathmandu | Yogmandu",
-    description: "Our teacher comes to you \u2014 practise privately at home in and around Kathmandu.",
+    description: "A Yogmandu teacher comes to your home anywhere in and around Kathmandu — private one-to-one or family yoga in your own space, by appointment.",
   },
   {
     path: "/class-schedule/private",
@@ -80,7 +80,7 @@ export const SHARE_PAGES: SharePage[] = [
     path: "/gallery/all",
     label: "/gallery/all",
     title: "All Photos | Yogmandu Gallery",
-    description: "Browse all photos from yoga classes, sound healing sessions, and teacher training at Yogmandu Kathmandu.",
+    description: "Photos from yoga classes, Tibetan singing bowl sessions, teacher training graduations and retreats at Yogmandu in Kathmandu, Nepal.",
   },
   {
     path: "/services",
@@ -110,7 +110,7 @@ export const SHARE_PAGES: SharePage[] = [
     path: "/sound-healing-therapy/sessions",
     label: "/sound-healing-therapy/sessions",
     title: "Sound Healing Sessions Kathmandu | Yogmandu",
-    description: "A restorative sound bath with authentic Tibetan singing bowls. Individual or group. From NPR 2,500.",
+    description: "Restorative Tibetan singing bowl sound baths in Kathmandu, Nepal. Individual or group sessions, no experience needed. From NPR 2,500.",
   },
   {
     path: "/specialized-yoga",
@@ -122,7 +122,7 @@ export const SHARE_PAGES: SharePage[] = [
     path: "/specialized-yoga/childrens-yoga",
     label: "/specialized-yoga/childrens-yoga",
     title: "Children's Yoga Kathmandu | Yogmandu",
-    description: "Playful, story-led yoga that helps kids build strength, focus and calm \u2014 while having fun.",
+    description: "Playful, story-led yoga classes for children in Kathmandu — building strength, balance, confidence and focus through playful movement and calm.",
   },
   {
     path: "/specialized-yoga/prenatal",
@@ -134,19 +134,19 @@ export const SHARE_PAGES: SharePage[] = [
     path: "/specialized-yoga/school-yoga",
     label: "/specialized-yoga/school-yoga",
     title: "School Yoga Programs Kathmandu | Yogmandu",
-    description: "Yoga for students and staff \u2014 focus, wellbeing and resilience, delivered at your school.",
+    description: "Curriculum-friendly yoga for students and staff, delivered at your school in Kathmandu. Builds focus, wellbeing and resilience, with flexible scheduling.",
   },
   {
     path: "/specialized-yoga/senior-yoga",
     label: "/specialized-yoga/senior-yoga",
     title: "Senior Citizens' Yoga Kathmandu | Yogmandu",
-    description: "Gentle, low-impact yoga to stay mobile, steady and strong \u2014 chair-supported options available.",
+    description: "Gentle, low-impact yoga for older adults in Kathmandu — improve balance, mobility and strength at your own pace, with chair-supported options available.",
   },
   {
     path: "/therapy-wellness",
     label: "/therapy-wellness",
     title: "Therapy & Wellness \u2014 Yoga Therapy, Reiki, Diet | Yogmandu",
-    description: "Personalised healing and wellbeing: yoga therapy, Reiki and nutrition guidance in Kathmandu, Nepal.",
+    description: "One-to-one yoga therapy, Reiki healing and personalised diet consultation in Kathmandu, Nepal. Individual support for pain, stress and wellbeing.",
   },
   {
     path: "/therapy-wellness/diet-consultation",
@@ -224,7 +224,7 @@ export const SHARE_PAGES: SharePage[] = [
     path: "/yoga-teacher-training/online",
     label: "/yoga-teacher-training/online",
     title: "Online 200hr Yoga Teacher Training \u2014 Live Virtual | Yogmandu",
-    description: "Earn your Yoga Alliance RYT 200 online with live real-time classes. USD 500.",
+    description: "Earn your Yoga Alliance RYT 200 online with live real-time classes taught from Kathmandu — not recordings. USD 500, same certificate as on-site.",
   },
   {
     path: "/events",

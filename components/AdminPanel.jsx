@@ -826,6 +826,7 @@ function Button({ children, variant = "primary", className = "", ...props }) {
   };
   return (
     <button
+      type="button"
       className={classNames("inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50", variants[variant], className)}
       {...props}
     >
@@ -1371,10 +1372,22 @@ function BlogEditor({ post, blogs, setBlogs, media, setMedia, onClose, toast }) 
   };
 
   const bodyRef = useRef(null);
+  const selRef  = useRef(null);
+  // Record the caret/selection while the textarea still has it.
+  const rememberSel = () => {
+    const el = bodyRef.current;
+    if (el) selRef.current = { start: el.selectionStart, end: el.selectionEnd };
+  };
 
   const wrap = (before, after = before) => {
     const el = bodyRef.current;
-    const next = applyMarkdown(el, draft.body, before, after);
+    const next = applyMarkdown(el, draft.body, before, after, selRef.current);
+    if (!next) {
+      if (el) el.focus();
+      toast("Click in the article text first, then choose a format");
+      return;
+    }
+    selRef.current = { start: next.from, end: next.to };
     setDraft({ ...draft, body: next.body });
     // Restore focus and reselect the affected text so the user can keep typing
     // or immediately apply a second marker.
@@ -1448,7 +1461,7 @@ function BlogEditor({ post, blogs, setBlogs, media, setMedia, onClose, toast }) 
                 </label>
               </div>
               <p className="mb-2 text-xs text-stone-500">Insert images on their own line. Markdown: <code className="rounded bg-stone-100 px-1">![alt](url)</code></p>
-              <TextArea ref={bodyRef} rows={14} value={draft.body} onChange={(e) => setDraft({ ...draft, body: e.target.value })} />
+              <TextArea ref={bodyRef} rows={14} value={draft.body} onChange={(e) => setDraft({ ...draft, body: e.target.value })} onSelect={rememberSel} onKeyUp={rememberSel} onClick={rememberSel} onFocus={rememberSel} />
             </div>
             <GalleryEditor items={draft.gallery || []} onChange={(gallery) => setDraft({ ...draft, gallery })} />
           </div>
@@ -1514,10 +1527,22 @@ function Toggle({ label, checked, onChange }) {
  *
  * Returns the new body plus the selection range to restore afterwards.
  */
-function applyMarkdown(el, body, before, after) {
-  const hasSel = el && typeof el.selectionStart === "number";
-  const start = hasSel ? el.selectionStart : body.length;
-  const end   = hasSel ? el.selectionEnd   : body.length;
+function applyMarkdown(el, body, before, after, remembered) {
+  // Prefer the selection recorded while the caret was actually in the textarea.
+  // Reading it off the element at click time is unreliable: the toolbar button
+  // takes focus first, and if the box has never been clicked selectionStart is
+  // 0, which silently formats line 1 instead of where the user is looking —
+  // indistinguishable from "the button does nothing".
+  const sel = remembered
+    || (el && typeof el.selectionStart === "number" && (el.selectionStart > 0 || el.selectionEnd > 0)
+        ? { start: el.selectionStart, end: el.selectionEnd }
+        : null);
+  // No caret anywhere means we genuinely don't know what to format. Appending
+  // to the end is what used to happen, and it reads as a bug: stray ** turn up
+  // at the bottom and the view jumps down there. Say so instead.
+  if (!sel) return null;
+  const start = sel.start;
+  const end   = sel.end;
 
   // Block-level marker: operate on whole lines.
   if (after === "") {
@@ -3771,16 +3796,20 @@ function SiteLayoutManager({ toast }) {
   const updateNav    = (key, val) => setNav(prev    => ({ ...prev, [key]: val }));
   const updateFooter = (key, val) => setFooter(prev => ({ ...prev, [key]: val }));
 
+  const saveButton = (
+    <Button onClick={save} disabled={saving}>
+      <Save size={16} /> {saving ? "Saving…" : "Save & Publish"}
+    </Button>
+  );
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="sticky top-0 z-20 -mx-1 flex items-center justify-between gap-3 border-b border-stone-200 bg-white/95 px-1 py-3 backdrop-blur">
         <div>
           <h2 className="text-lg font-semibold text-stone-900">Site Layout</h2>
           <p className="text-sm text-stone-500">Edit the navigation bar and footer. Changes are live after saving.</p>
         </div>
-        <Button onClick={save} disabled={saving}>
-          <Save size={16} /> {saving ? "Saving…" : "Save & Publish"}
-        </Button>
+        {saveButton}
       </div>
 
       <div className="flex gap-2 border-b border-stone-200 pb-0">
@@ -3863,6 +3892,9 @@ function SiteLayoutManager({ toast }) {
           </div>
         </div>
       )}
+      <div className="flex justify-end border-t border-stone-200 pt-4">
+        {saveButton}
+      </div>
     </div>
   );
 }
@@ -4385,10 +4417,21 @@ function EventEditor({ draft: initial, onSave, onClose, onDelete, toast }) {
   const set = (key, value) => setDraft((d) => ({ ...d, [key]: value }));
 
   const bodyRef = useRef(null);
+  const selRef  = useRef(null);
+  const rememberSel = () => {
+    const el = bodyRef.current;
+    if (el) selRef.current = { start: el.selectionStart, end: el.selectionEnd };
+  };
 
   const wrap = (before, after = before) => {
     const el = bodyRef.current;
-    const next = applyMarkdown(el, draft.body, before, after);
+    const next = applyMarkdown(el, draft.body, before, after, selRef.current);
+    if (!next) {
+      if (el) el.focus();
+      toast("Click in the description first, then choose a format");
+      return;
+    }
+    selRef.current = { start: next.from, end: next.to };
     setDraft((d) => ({ ...d, body: next.body }));
     requestAnimationFrame(() => {
       if (!el) return;
@@ -4458,7 +4501,7 @@ function EventEditor({ draft: initial, onSave, onClose, onDelete, toast }) {
             <p className="mb-2 text-xs text-stone-500">
               Same formatting as blog posts. Use Preview on the live page to check sizing — this box shows the raw text.
             </p>
-            <TextArea ref={bodyRef} rows={14} value={draft.body} onChange={(e) => set("body", e.target.value)} />
+            <TextArea ref={bodyRef} rows={14} value={draft.body} onChange={(e) => set("body", e.target.value)} onSelect={rememberSel} onKeyUp={rememberSel} onClick={rememberSel} onFocus={rememberSel} />
           </div>
         </div>
 

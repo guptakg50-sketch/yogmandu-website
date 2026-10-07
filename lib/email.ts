@@ -7,6 +7,12 @@ const NOTIFY_EMAIL: string[] = (process.env.EMAIL_NOTIFY || "yogmandu@gmail.com"
   .split(",")
   .map(s => s.trim())
   .filter(Boolean);
+
+// Where a customer's reply should land. Mail is sent from the no-reply address
+// on yogmandu.com, whose mailbox is out of service — so every message we send
+// to a customer must carry a reply-to the studio actually reads, or pressing
+// Reply silently loses the enquiry.
+const REPLY_TO = NOTIFY_EMAIL[0];
 const SITE_URL       = process.env.NEXT_PUBLIC_SITE_URL || "https://yogmandu.com";
 
 export const isEmailConfigured = Boolean(RESEND_API_KEY);
@@ -115,6 +121,7 @@ export function sendWelcomeEmail(opts: { to: string; fullName: string; verifyUrl
     : "";
   return send({
     to: opts.to,
+    replyTo: REPLY_TO,
     subject: "Welcome to Yogmandu",
     html: wrap({
       title: `Welcome, ${greeting} 🙏`,
@@ -142,6 +149,7 @@ export function sendVerifyEmail(opts: { to: string; fullName: string; verifyUrl:
   const greeting = opts.fullName.split(" ")[0] || "there";
   return send({
     to: opts.to,
+    replyTo: REPLY_TO,
     subject: "Confirm your Yogmandu email",
     html: wrap({
       title: "Confirm your email",
@@ -165,6 +173,7 @@ export function sendPasswordResetEmail(opts: { to: string; fullName: string; res
   const greeting = opts.fullName?.split(" ")[0] || "there";
   return send({
     to: opts.to,
+    replyTo: REPLY_TO,
     subject: "Reset your Yogmandu password",
     html: wrap({
       title: "Reset your password",
@@ -188,6 +197,7 @@ export function sendContactAck(opts: { to: string; name: string; program: string
   const greeting = opts.name.split(" ")[0] || "there";
   return send({
     to: opts.to,
+    replyTo: REPLY_TO,
     subject: "We received your message — Yogmandu",
     html: wrap({
       title: "Thank you for reaching out",
@@ -293,6 +303,7 @@ export function sendBookingAck(opts: {
     : "";
   return send({
     to: opts.to,
+    replyTo: REPLY_TO,
     subject: `Booking request received — ${opts.serviceTitle} | Yogmandu`,
     html: wrap({
       title: "We've received your booking",

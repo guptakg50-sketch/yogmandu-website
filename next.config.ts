@@ -11,7 +11,10 @@ const CSP = [
   "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://challenges.cloudflare.com https://cloudflareinsights.com https://static.cloudflareinsights.com",
   "media-src 'self' blob:",
   "worker-src 'self' blob:",  // Three.js workers
-  "frame-src https://challenges.cloudflare.com",  // Turnstile widget
+  // Turnstile widget + the Google Maps embed on /contact. Without the Google
+  // origins the map iframe is refused with ERR_BLOCKED_BY_CSP and the studio
+  // location shows as a blocked-content panel for every visitor.
+  "frame-src https://challenges.cloudflare.com https://www.google.com https://maps.google.com",
   "frame-ancestors 'none'",   // clickjacking protection (stronger than X-Frame-Options)
   "base-uri 'self'",          // prevent base-tag injection
   "form-action 'self'",

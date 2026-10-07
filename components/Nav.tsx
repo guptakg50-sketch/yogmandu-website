@@ -258,7 +258,7 @@ export default function Nav() {
                 <Link href={l.href} style={{
                   color: activeColor(l.href), fontWeight: 400,
                   borderBottom: pathname === l.href ? "1.5px solid rgba(247,148,29,0.6)" : "1.5px solid transparent",
-                  paddingBottom: "2px", transition: "color 0.2s",
+                  paddingBottom: "2px", transition: "color 0.2s", whiteSpace: "nowrap",
                 }}
                   onMouseEnter={e => ((e.target as HTMLElement).style.color = "#6B2D8B")}
                   onMouseLeave={e => ((e.target as HTMLElement).style.color = activeColor(l.href))}
@@ -274,7 +274,7 @@ export default function Nav() {
               <source srcSet="/logo-nav-136-q70.webp" type="image/webp" />
               <img src="/logo-sm-136.png" alt="Yogmandu" width={120} height={48} fetchPriority="high" decoding="async" style={{ height: 48, width: "auto", objectFit: "contain" }} />
             </picture>
-            <span style={{ fontSize: "0.95rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "#7A5840", whiteSpace: "nowrap" }}>
+            <span className="hidden lg:inline" style={{ fontSize: "0.95rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "#7A5840", whiteSpace: "nowrap" }}>
               {cfg.tagline}
             </span>
           </Link>
@@ -286,7 +286,7 @@ export default function Nav() {
                 <Link href={l.href} style={{
                   color: activeColor(l.href), fontWeight: 400,
                   borderBottom: pathname === l.href ? "1.5px solid rgba(247,148,29,0.6)" : "1.5px solid transparent",
-                  paddingBottom: "2px", transition: "color 0.2s",
+                  paddingBottom: "2px", transition: "color 0.2s", whiteSpace: "nowrap",
                 }}
                   onMouseEnter={e => ((e.target as HTMLElement).style.color = "#6B2D8B")}
                   onMouseLeave={e => ((e.target as HTMLElement).style.color = activeColor(l.href))}
@@ -341,9 +341,10 @@ export default function Nav() {
               </a>
             </li>
 
-            <li>
+            <li style={{ flexShrink: 0 }}>
               <Link href={cfg.bookNowHref} className="cta-lift px-5 py-2 rounded-full text-sm font-medium"
-                style={{ background: "#A65808", color: "#fff", boxShadow: "0 4px 14px rgba(247,148,29,0.35)" }}>
+                style={{ background: "#A65808", color: "#fff", boxShadow: "0 4px 14px rgba(247,148,29,0.35)",
+                  whiteSpace: "nowrap", display: "inline-block" }}>
                 {cfg.bookNowLabel}
               </Link>
             </li>
