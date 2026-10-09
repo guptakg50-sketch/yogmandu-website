@@ -58,14 +58,25 @@ async function send(opts: {
 
 // ─── HTML template wrapper ──────────────────────────────────────────────────
 function wrap(opts: { preheader?: string; title: string; bodyHtml: string; ctaHref?: string; ctaLabel?: string }): string {
+  // Brand palette. Kept here so every email stays consistent with the site.
+  const PURPLE = "#6B2D8B";
+  const GREEN  = "#4A6418";   // darker than the site's #8DC63F so it passes
+                              // contrast on a light background
+  const BEIGE  = "#FAF6F0";
+  const SAND   = "#EFE7DA";
+  const INK    = "#4A2E1A";
+
   const preheader = opts.preheader
-    ? `<div style="display:none;max-height:0;overflow:hidden;font-size:1px;line-height:1px;color:#fff;opacity:0">${opts.preheader}</div>`
+    ? `<div style="display:none;max-height:0;overflow:hidden;font-size:1px;line-height:1px;color:${BEIGE};opacity:0">${opts.preheader}</div>`
     : "";
+
+  // Buttons are a table, not a styled <a>: Outlook ignores padding on inline
+  // elements and the button collapses to bare text.
   const cta = opts.ctaHref && opts.ctaLabel
-    ? `<table role="presentation" cellspacing="0" cellpadding="0" style="margin:32px 0">
+    ? `<table role="presentation" cellspacing="0" cellpadding="0" style="margin:30px 0 4px">
          <tr>
-           <td style="background:#F7941D;border-radius:999px">
-             <a href="${opts.ctaHref}" style="display:inline-block;padding:14px 32px;color:#ffffff;text-decoration:none;font-weight:500;font-size:15px;font-family:'DM Sans',Arial,sans-serif">
+           <td align="center" style="background:${PURPLE};border-radius:999px">
+             <a href="${opts.ctaHref}" style="display:inline-block;padding:14px 34px;color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;font-family:'DM Sans',Helvetica,Arial,sans-serif">
                ${opts.ctaLabel}
              </a>
            </td>
@@ -77,31 +88,55 @@ function wrap(opts: { preheader?: string; title: string; bodyHtml: string; ctaHr
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="color-scheme" content="light only" />
+<meta name="supported-color-schemes" content="light only" />
 <title>${opts.title}</title>
 </head>
-<body style="margin:0;padding:0;background:#FAF6F0;font-family:'DM Sans',Arial,sans-serif;color:#2A1208">
+<body style="margin:0;padding:0;background:${SAND};font-family:'DM Sans',Helvetica,Arial,sans-serif;color:${INK};-webkit-font-smoothing:antialiased">
 ${preheader}
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#FAF6F0;padding:40px 0">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:${SAND};padding:32px 12px">
   <tr>
     <td align="center">
-      <table role="presentation" width="560" cellspacing="0" cellpadding="0" style="max-width:560px;width:100%;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 32px rgba(107,45,139,0.08)">
+      <table role="presentation" width="560" cellspacing="0" cellpadding="0" border="0" style="max-width:560px;width:100%;background:#FFFFFF;border-radius:18px;overflow:hidden;border:1px solid rgba(107,45,139,0.10)">
+
+        <!-- Logo band -->
         <tr>
-          <td style="padding:36px 40px 0">
-            <div style="display:inline-block;background:linear-gradient(135deg,#6B2D8B,#F7941D);width:48px;height:48px;border-radius:50%;line-height:48px;text-align:center;color:#fff;font-size:22px;font-weight:600;font-family:Georgia,serif">Y</div>
-            <h1 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#2A1208;margin:24px 0 8px;line-height:1.2">${opts.title}</h1>
+          <td align="center" style="background:${BEIGE};padding:28px 40px 22px">
+            <img src="${SITE_URL}/email-logo.png" width="190" alt="Yogmandu"
+                 style="display:block;width:190px;max-width:60%;height:auto;border:0;outline:none;text-decoration:none" />
+            <p style="margin:10px 0 0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:${GREEN};font-weight:600">
+              Yoga &amp; Sound Healing &middot; Nepal
+            </p>
+          </td>
+        </tr>
+
+        <!-- Green rule -->
+        <tr><td style="height:3px;line-height:3px;font-size:0;background:${GREEN}">&nbsp;</td></tr>
+
+        <!-- Title + body -->
+        <tr>
+          <td style="padding:32px 40px 8px">
+            <h1 style="font-family:Georgia,'Cormorant Garamond',serif;font-size:26px;font-weight:500;color:${PURPLE};margin:0;line-height:1.25">${opts.title}</h1>
           </td>
         </tr>
         <tr>
-          <td style="padding:8px 40px 40px;color:#4A2E1A;font-size:15px;line-height:1.7">
+          <td style="padding:6px 40px 36px;color:${INK};font-size:15px;line-height:1.7">
             ${opts.bodyHtml}
             ${cta}
           </td>
         </tr>
+
+        <!-- Footer -->
         <tr>
-          <td style="padding:24px 40px;border-top:1px solid #f0e8f8;background:#fafafa;color:#9A7860;font-size:12px;line-height:1.6">
-            <strong style="color:#6B2D8B">Yogmandu</strong> · Miteri Marg, Mid-Baneshwor-31, Kathmandu, Nepal<br />
-            <a href="${SITE_URL}" style="color:#6B2D8B;text-decoration:none">yogmandu.com</a> · <a href="mailto:yogmandu@gmail.com" style="color:#6B2D8B;text-decoration:none">yogmandu@gmail.com</a>
+          <td style="padding:22px 40px 26px;border-top:1px solid rgba(107,45,139,0.12);background:${BEIGE};color:#7A5840;font-size:12px;line-height:1.7">
+            <strong style="color:${PURPLE};font-size:13px">Yogmandu</strong><br />
+            Miteri Marg, Mid-Baneshwor-31, Kathmandu, Nepal<br />
+            <a href="${SITE_URL}" style="color:${PURPLE};text-decoration:none;font-weight:600">yogmandu.com</a>
+            <span style="color:${GREEN}">&nbsp;&bull;&nbsp;</span>
+            <a href="mailto:yogmandu@gmail.com" style="color:${PURPLE};text-decoration:none;font-weight:600">yogmandu@gmail.com</a>
+            <span style="color:${GREEN}">&nbsp;&bull;&nbsp;</span>
+            <a href="tel:+9779810263277" style="color:${PURPLE};text-decoration:none;font-weight:600">+977-9810263277</a>
           </td>
         </tr>
       </table>
@@ -205,10 +240,17 @@ export function sendContactAck(opts: { to: string; name: string; program: string
       bodyHtml: `
         <p style="margin:0 0 16px">Namaste ${greeting},</p>
         <p style="margin:0 0 16px">Thank you for getting in touch with Yogmandu. We've received your message and will reply within 24 hours.</p>
-        ${opts.program ? `<p style="margin:0 0 8px;color:#9A7860;font-size:13px">Interested in: <strong style="color:#6B2D8B">${escapeHtml(opts.program)}</strong></p>` : ""}
-        <div style="margin:16px 0;padding:14px 18px;background:#FAF6F0;border-left:3px solid #F7941D;border-radius:8px;font-size:14px;color:#5C3D2E;white-space:pre-wrap">${escapeHtml(opts.message)}</div>
+
+        <div style="margin:20px 0;padding:18px 20px;background:#FAF6F0;border-radius:12px;border:1px solid rgba(107,45,139,0.12)">
+          <p style="margin:0 0 6px;font-size:12px;color:#9A7860;text-transform:uppercase;letter-spacing:0.1em">Your Enquiry</p>
+          ${opts.program ? `<p style="margin:0 0 10px;font-size:16px;font-weight:600;color:#6B2D8B">${escapeHtml(opts.program)}</p>` : ""}
+          <p style="margin:0;font-size:14px;color:#4A2E1A;line-height:1.6;white-space:pre-wrap">${escapeHtml(opts.message)}</p>
+        </div>
+
         <p style="margin:0">Need a faster reply? Message us directly on <a href="https://wa.me/9779810263277" style="color:#6B2D8B">WhatsApp</a>.</p>
       `,
+      ctaHref: "https://wa.me/9779810263277",
+      ctaLabel: "Chat on WhatsApp",
     }),
     text:
       `Namaste ${greeting},\n\n` +

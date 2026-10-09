@@ -48,7 +48,10 @@ export const PROGRAM_TIERS: Tier[] = [
   },
   {
     id: "p-300", badge: "", badgeColor: "#6B2D8B", category: "RYS 300 · Advanced",
-    title: "300hr Advanced", icon: "📜", price: "Advanced", priceSub: "For certified 200hr teachers",
+    // No rate confirmed for the 300hr yet. "Advanced" sat in the price slot and
+    // read as a broken price; the studio sets the real figure in
+    // Admin -> Pricing -> Teacher Training program cards.
+    title: "300hr Advanced", icon: "📜", price: "On request", priceSub: "For certified 200hr teachers",
     priceNote: "Path to RYT 500", color: "#6B2D8B",
     features: ["Advanced asana & philosophy", "Refined teaching methodology", "Combine for RYT 500"],
     ctaLabel: "View program", ctaHref: "/yoga-teacher-training/300-hour", cardHref: "/yoga-teacher-training/300-hour",

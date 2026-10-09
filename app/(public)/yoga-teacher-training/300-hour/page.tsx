@@ -161,6 +161,7 @@ const config: Omit<CourseConfig, "curriculum"> = {
     { q: "Will I have free time?", a: "Yes. You'll have free time daily plus one day off each week (typically Sunday) to rest and explore." },
     { q: "Will I get the opportunity to teach during the course?", a: "Absolutely. Supervised teaching practice is central to the course; you'll teach peers and receive feedback from teachers and fellow students." },
   ],
+  bookService: "ytt-300",
   siblingLinks: [
     { href: "/yoga-teacher-training",          label: "200hr Teacher Training" },
     { href: "/yoga-teacher-training/500-hour",  label: "500hr Master Training" },

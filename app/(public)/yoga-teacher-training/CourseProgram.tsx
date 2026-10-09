@@ -34,6 +34,9 @@ export type CourseConfig = {
   contactPricing?: boolean;      // when true, shows a contact CTA instead of prices
   faqs:         { q: string; a: string }[];
   siblingLinks: { href: string; label: string }[];
+  /** Booking service id. When set, the page offers the booking form alongside
+   *  WhatsApp, so an application records which course it was for. */
+  bookService?: string;
 };
 
 const WHATSAPP = "https://wa.me/9779810263277";
@@ -98,9 +101,18 @@ export default function CourseProgram({ config: c }: { config: CourseConfig }) {
             {c.startInfo} · {c.duration} · Limited spots — secure yours today
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
+            {c.bookService && (
+              <Link href={`/book?service=${c.bookService}`}
+                className="cta-lift px-8 py-3.5 rounded-full font-medium text-sm text-white"
+                style={{ background: "#6B2D8B", boxShadow: "0 6px 20px rgba(107,45,139,0.35)" }}>
+                Apply Now
+              </Link>
+            )}
             <a href={WHATSAPP} target="_blank" rel="noopener noreferrer"
-              className="cta-lift px-8 py-3.5 rounded-full font-medium text-sm text-white"
-              style={{ background: "#6B2D8B", boxShadow: "0 6px 20px rgba(107,45,139,0.35)" }}>
+              className="cta-lift px-8 py-3.5 rounded-full font-medium text-sm"
+              style={c.bookService
+                ? { border: "1.5px solid #6B2D8B", color: "#6B2D8B" }
+                : { background: "#6B2D8B", color: "#fff", boxShadow: "0 6px 20px rgba(107,45,139,0.35)" }}>
               Register Now
             </a>
             <Link href="/yoga-teacher-training"
@@ -314,10 +326,19 @@ export default function CourseProgram({ config: c }: { config: CourseConfig }) {
               <p className="text-sm mb-6" style={{ color: "#4A2E1A" }}>
                 For current fees, accommodation options and start dates, message our team — we&apos;ll send full details within 24 hours.
               </p>
-              <a href={WHATSAPP} target="_blank" rel="noopener noreferrer"
-                className="cta-lift inline-block px-8 py-3.5 rounded-full font-medium text-sm text-white" style={{ background: "#6B2D8B" }}>
-                Get Pricing on WhatsApp
-              </a>
+              <div className="flex flex-wrap justify-center gap-3">
+                <a href={WHATSAPP} target="_blank" rel="noopener noreferrer"
+                  className="cta-lift inline-block px-8 py-3.5 rounded-full font-medium text-sm text-white" style={{ background: "#6B2D8B" }}>
+                  Get Pricing on WhatsApp
+                </a>
+                {c.bookService && (
+                  <Link href={`/book?service=${c.bookService}`}
+                    className="cta-lift inline-block px-8 py-3.5 rounded-full font-medium text-sm"
+                    style={{ border: "1.5px solid #6B2D8B", color: "#6B2D8B" }}>
+                    Apply Online
+                  </Link>
+                )}
+              </div>
             </div>
           )}
         </div>
@@ -406,8 +427,15 @@ export default function CourseProgram({ config: c }: { config: CourseConfig }) {
             Secure your place with a deposit and our team will be in touch within 24 hours.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
+            {c.bookService && (
+              <Link href={`/book?service=${c.bookService}`}
+                className="cta-lift px-10 py-4 rounded-full text-white font-medium" style={{ background: "#6B2D8B" }}>Apply Now</Link>
+            )}
             <a href={WHATSAPP} target="_blank" rel="noopener noreferrer"
-              className="cta-lift px-10 py-4 rounded-full text-white font-medium" style={{ background: "#6B2D8B" }}>Register on WhatsApp</a>
+              className="cta-lift px-10 py-4 rounded-full font-medium"
+              style={c.bookService
+                ? { border: "1.5px solid #6B2D8B", color: "#6B2D8B" }
+                : { background: "#6B2D8B", color: "#fff" }}>Register on WhatsApp</a>
             <a href="mailto:yogmandu@gmail.com"
               className="cta-lift px-10 py-4 rounded-full font-medium" style={{ border: "1.5px solid #F7941D", color: "#F7941D" }}>Email us</a>
           </div>

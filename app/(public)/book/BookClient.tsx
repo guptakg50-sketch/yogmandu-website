@@ -323,8 +323,13 @@ function Step1({
 
 // ── Step 2 — Details form ─────────────────────────────────────────────────────
 function Step2({
-  services, onBack, onSuccess, prefillMessage = "",
-}: { services: BookingService[]; onBack: () => void; onSuccess: () => void; prefillMessage?: string }) {
+  services, onBack, onSuccess, prefillMessage = "", dropInClasses = [], presetClass = "",
+}: { services: BookingService[]; onBack: () => void; onSuccess: () => void; prefillMessage?: string;
+     dropInClasses?: string[]; presetClass?: string }) {
+  // Drop-in is booked for a specific slot; every other service is not. The
+  // studio was receiving drop-in requests with no way to tell which class.
+  const needsSlot = services.some((s) => s.id === "drop-in") && dropInClasses.length > 0 && !presetClass;
+  const [slot, setSlot] = useState("");
   const service = services[0]; // primary accent colour comes from first selection
   const cardRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
@@ -358,6 +363,7 @@ function Step2({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    if (needsSlot && !slot) { setError("Please choose which class you would like to attend."); return; }
     setLoading(true);
     try {
       const res = await fetch("/api/book", {
@@ -368,7 +374,11 @@ function Step2({
           email:         form.email,
           phone:         form.phone,
           serviceId:     services.map(s => s.id).join(", "),
-          serviceTitle:  services.map(s => s.title).join(", "),
+          serviceTitle:  (() => {
+            const base = services.map(s => s.title).join(", ");
+            const chosen = presetClass || slot;
+            return chosen ? `${base} — ${chosen}` : base;
+          })(),
           message:       form.message,
         }),
       });
@@ -502,6 +512,20 @@ function Step2({
               />
             </div>
             <div style={{ gridColumn: "1 / -1" }}>
+              {needsSlot && (
+                <div style={{ marginBottom: 18 }}>
+                  <label style={labelStyle}>Which class? *</label>
+                  <select
+                    required value={slot} onChange={e => setSlot(e.target.value)}
+                    style={{ ...inputStyle, cursor: "pointer" }}>
+                    <option value="">Select a day and time…</option>
+                    {dropInClasses.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                  <p style={{ margin: "6px 0 0", fontSize: "0.8rem", color: "#9A7860" }}>
+                    Timings can shift — we confirm your slot when we reply.
+                  </p>
+                </div>
+              )}
               <label style={labelStyle}>Message / Notes</label>
               <textarea
                 rows={4} value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))}
@@ -644,7 +668,7 @@ function parseClassParam(cls: string | null): { day: string; time: string; name:
 }
 
 // ── Inner content (uses useSearchParams — must be inside Suspense) ─────────────
-function BookPageInner({ teachers, classPhotos }: { teachers: TeacherPhoto[]; classPhotos: ClassPhoto[] }) {
+function BookPageInner({ teachers, classPhotos, dropInClasses }: { teachers: TeacherPhoto[]; classPhotos: ClassPhoto[]; dropInClasses: string[] }) {
   const searchParams  = useSearchParams();
   const preServiceId  = searchParams.get("service");
   const clsParam      = searchParams.get("cls");
@@ -764,7 +788,7 @@ function BookPageInner({ teachers, classPhotos }: { teachers: TeacherPhoto[]; cl
           <Step1 selected={selected} onSelect={handleSelect} onNext={handleNext} />
         )}
         {step === 2 && selected.length > 0 && (
-          <Step2 services={selected} onBack={handleBack} onSuccess={handleSuccess} prefillMessage={
+          <Step2 services={selected} onBack={handleBack} onSuccess={handleSuccess} dropInClasses={dropInClasses} presetClass={parsedClass ? `${parsedClass.day} · ${parsedClass.time} · ${parsedClass.name}` : ""} prefillMessage={
             parsedClass
               ? `I'd like to book: ${parsedClass.name} on ${parsedClass.day} at ${parsedClass.time}${parsedClass.instructor ? ` with ${parsedClass.instructor}` : ""}.`
               : monthParam
@@ -788,7 +812,7 @@ const ORBS = [
 ];
 
 // ── Page ─────────────────────────────────────────────────────────────────────
-export default function BookClient({ teachers = [], classPhotos = [] }: { teachers?: TeacherPhoto[]; classPhotos?: ClassPhoto[] }) {
+export default function BookClient({ teachers = [], classPhotos = [], dropInClasses = [] }: { teachers?: TeacherPhoto[]; classPhotos?: ClassPhoto[]; dropInClasses?: string[] }) {
   return (
     <>
       <style>{`
@@ -900,7 +924,7 @@ export default function BookClient({ teachers = [], classPhotos = [] }: { teache
           <Suspense fallback={
             <div style={{ textAlign: "center", padding: "60px 0", color: "#9A7860" }}>Loading…</div>
           }>
-            <BookPageInner teachers={teachers} classPhotos={classPhotos} />
+            <BookPageInner teachers={teachers} classPhotos={classPhotos} dropInClasses={dropInClasses} />
           </Suspense>
         </div>
       </section>

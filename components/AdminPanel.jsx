@@ -2496,7 +2496,8 @@ function BookingsManager({ toast }) {
                 {filtered.map(b => {
                   const sc = STATUS_COLORS[b.status] || STATUS_COLORS.pending;
                   return (
-                    <tr key={b.id} className="hover:bg-stone-50 transition">
+                    <React.Fragment key={b.id}>
+                    <tr className="hover:bg-stone-50 transition">
                       <td className="px-4 py-3">
                         <p className="font-medium text-stone-900">{b.name}</p>
                         <a href={`mailto:${b.email}`} className="text-xs text-violet-600 hover:underline">{b.email}</a>
@@ -2546,6 +2547,19 @@ function BookingsManager({ toast }) {
                         </div>
                       </td>
                     </tr>
+                    {b.message && (
+                      <tr className="bg-stone-50/60">
+                        <td colSpan={6} className="px-4 pb-3 pt-0">
+                          <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-stone-400">
+                            Message from {b.name.split(" ")[0] || "them"}
+                          </p>
+                          <p className="whitespace-pre-wrap rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700">
+                            {b.message}
+                          </p>
+                        </td>
+                      </tr>
+                    )}
+                    </React.Fragment>
                   );
                 })}
               </tbody>

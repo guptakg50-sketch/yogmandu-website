@@ -210,6 +210,7 @@ const config: Omit<CourseConfig, "curriculum"> = {
     { q: "Is it necessary to be flexible to do a YTT course?", a: "No. Flexibility is not a prerequisite — the training meets you where you are and builds ability safely over time." },
     { q: "Will I get the opportunity to teach during the course?", a: "Absolutely. Supervised teaching practice is a core part of the course; you'll teach peers and receive feedback from teachers and fellow students." },
   ],
+  bookService: "ytt-500",
   siblingLinks: [
     { href: "/yoga-teacher-training",          label: "200hr Teacher Training" },
     { href: "/yoga-teacher-training/300-hour",  label: "300hr Advanced Training" },
