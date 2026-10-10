@@ -789,36 +789,61 @@ async function fetchJson(path, options) {
   return payload;
 }
 
-async function loadRemoteCms() {
-  // Every fetch gets its own catch. Without one, a single failing endpoint
-  // rejected the whole Promise.all and dropped the panel back to the seeded
-  // demo content, which reads as "my posts are missing".
-  const empty = () => ({ data: [], configured: false });
-  const [blogs, sessions, media, gallery, instructors, content] = await Promise.all([
-    fetchJson("/api/admin/blogs").catch(empty),
-    fetchJson("/api/admin/sessions").catch(empty),
-    fetchJson("/api/admin/media").catch(empty),
-    fetchJson("/api/admin/gallery").catch(empty),
-    fetchJson("/api/admin/instructors").catch(empty),
-    fetchJson("/api/admin/page-content").catch(() => ({ items: [] })),
-  ]);
+// Loads every collection from Supabase and hands each one to `apply` the moment
+// it arrives, rather than waiting on the slowest. This used to be a single
+// Promise.all: the media library alone is ~1.9 MB of JSON, so on a slow
+// connection every manager — Blog Manager included — sat on seeded demo content
+// until that download finished, which reads as "my posts are missing".
+// Resolves to a short status string once all six have settled.
+function loadRemoteCms(apply) {
+  // Every fetch also gets its own catch, so one dead endpoint can no longer
+  // reject the batch and strand the whole panel on demo content.
+  const get = (path) => fetchJson(path).catch(() => null);
 
-  // Session categories are editable content (Page Content → section:SESSION_TYPES),
-  // so the dropdown and filters always reflect whatever the client has saved.
-  const savedTypes = (content.items || []).find((d) => d.key === "section:SESSION_TYPES")?.data?.types;
+  // Each job returns true when its endpoint answered with Supabase configured.
+  const jobs = [
+    get("/api/admin/blogs").then((payload) => {
+      if (!payload) return false;
+      const blogs = asArray(payload.data).map(normalizeBlog);
+      if (blogs.length) apply({ blogs });
+      return Boolean(payload.configured);
+    }),
+    get("/api/admin/sessions").then((payload) => {
+      if (!payload) return false;
+      const sessions = asArray(payload.data).map(normalizeSession);
+      if (sessions.length) apply({ sessions });
+      return Boolean(payload.configured);
+    }),
+    get("/api/admin/media").then((payload) => {
+      if (!payload) return false;
+      if (asArray(payload.data).length) apply({ media: payload.data });
+      return Boolean(payload.configured);
+    }),
+    get("/api/admin/gallery").then((payload) => {
+      if (!payload) return false;
+      // An empty gallery is a legitimate state (the client can delete every
+      // photo), so only overwrite when the fetch actually succeeded.
+      if (payload.configured) apply({ gallery: asArray(payload.data) });
+      return Boolean(payload.configured);
+    }),
+    get("/api/admin/instructors").then((payload) => {
+      if (!payload) return false;
+      if (asArray(payload.data).length) apply({ instructors: payload.data });
+      return Boolean(payload.configured);
+    }),
+    get("/api/admin/page-content").then((payload) => {
+      // Session categories are editable content (Page Content →
+      // section:SESSION_TYPES), so the dropdown and filters always reflect
+      // whatever the client has saved.
+      const saved = (payload?.items || []).find((item) => item.key === "section:SESSION_TYPES")?.data?.types;
+      apply({ sessionTypes: Array.isArray(saved) && saved.length ? saved : SESSION_TYPES });
+      return false;
+    }),
+  ];
 
-  return {
-    configured: blogs.configured || sessions.configured || media.configured || gallery.configured || instructors.configured,
-    // An empty gallery is a legitimate state (the client can delete every
-    // photo), so distinguish "loaded, nothing in it" from "the fetch failed".
-    galleryLoaded: gallery.configured === true,
-    blogs: asArray(blogs.data).map(normalizeBlog),
-    sessions: asArray(sessions.data).map(normalizeSession),
-    media: media.data || [],
-    gallery: gallery.data || [],
-    instructors: instructors.data || [],
-    sessionTypes: Array.isArray(savedTypes) && savedTypes.length ? savedTypes : SESSION_TYPES,
-  };
+  return Promise.all(jobs).then((flags) =>
+    flags.some(Boolean) ? "Connected to Supabase" : "Supabase not configured"
+  );
 }
 
 
@@ -1306,7 +1331,15 @@ function BlogManager({ blogs, setBlogs, media, setMedia, toast }) {
           <Select value={status} onChange={(e) => setStatus(e.target.value)}>{["All", ...STATUSES].map((item) => <option key={item}>{item}</option>)}</Select>
           <Select value={sort} onChange={(e) => setSort(e.target.value)}>{["Date", "Views", "Title", "Status"].map((item) => <option key={item}>{item}</option>)}</Select>
         </div>
-        <Button onClick={() => setEditing(newPost())}><Plus size={16} /> New Post</Button>
+        <div className="flex items-center gap-3">
+          {/* Shows at a glance whether the list is filtered or simply empty. */}
+          <span className="text-xs text-stone-500">
+            {filtered.length === blogs.length
+              ? `${blogs.length} post${blogs.length === 1 ? "" : "s"}`
+              : `${filtered.length} of ${blogs.length} posts shown`}
+          </span>
+          <Button onClick={() => setEditing(newPost())}><Plus size={16} /> New Post</Button>
+        </div>
       </div>
       {selected.length > 0 && <div className="flex flex-wrap items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900"><span>{selected.length} selected</span><Button variant="secondary" onClick={() => bulk("Published")}>Publish</Button><Button variant="secondary" onClick={() => bulk("Archived")}>Archive</Button><Button variant="danger" onClick={() => { setBlogs(blogs.filter((post) => !selected.includes(post.id))); setSelected([]); toast("Selected posts deleted"); }}>Delete</Button></div>}
       <section className="overflow-hidden rounded-xl border border-stone-200 bg-white">
@@ -2785,23 +2818,11 @@ function AdminWorkspace({ onLogout }) {
   useEffect(() => {
     if (!ready) return;
     let cancelled = false;
-    loadRemoteCms()
-      .then((remote) => {
-        if (cancelled) return;
-        if (!remote.configured) {
-          setSyncStatus("Supabase not configured");
-          return;
-        }
-        setState((current) => ({
-          ...current,
-          blogs: remote.blogs.length ? remote.blogs : current.blogs,
-          sessions: remote.sessions.length ? remote.sessions : current.sessions,
-          media: remote.media.length ? remote.media : current.media,
-          gallery: remote.galleryLoaded ? remote.gallery : current.gallery,
-          instructors: remote.instructors.length ? remote.instructors : current.instructors,
-          sessionTypes: remote.sessionTypes,
-        }));
-        setSyncStatus("Connected to Supabase");
+    loadRemoteCms((patch) => {
+      if (!cancelled) setState((current) => ({ ...current, ...patch }));
+    })
+      .then((status) => {
+        if (!cancelled) setSyncStatus(status);
       })
       .catch((error) => {
         if (!cancelled) {
