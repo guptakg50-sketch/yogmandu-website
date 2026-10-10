@@ -741,6 +741,12 @@ function normalizeCmsState(state) {
   };
 }
 
+// Supabase owns these two, and they are far larger than everything else put
+// together (~1.9 MB of JSON for media alone, which took the saved state to 91%
+// of the 5 MB localStorage quota). Caching them bought nothing and risked a
+// QuotaExceededError on every save once the libraries grew.
+const UNCACHED_PARTS = ["media", "gallery"];
+
 function usePersistentAdminState() {
   const [state, setState] = useState(makeInitialState);
   const [ready, setReady] = useState(false);
@@ -748,7 +754,11 @@ function usePersistentAdminState() {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       try {
-        setState(normalizeCmsState(JSON.parse(stored)));
+        const parsed = JSON.parse(stored);
+        // Merge over the seeded state rather than replacing it: a cache written
+        // by an older build predates newer keys, and the managers read those
+        // keys unguarded.
+        setState((current) => normalizeCmsState({ ...current, ...parsed }));
       } catch {
         /* corrupt cache — fall back to seeded initial state */
       }
@@ -756,7 +766,15 @@ function usePersistentAdminState() {
     setReady(true);
   }, []);
   useEffect(() => {
-    if (ready) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    if (!ready) return;
+    const cacheable = { ...state };
+    for (const key of UNCACHED_PARTS) delete cacheable[key];
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheable));
+    } catch {
+      /* Quota exceeded or storage disabled. Supabase holds everything, so the
+         panel stays fully usable — it just reloads from the API next time. */
+    }
   }, [ready, state]);
   return [state, setState, ready];
 }
@@ -772,12 +790,16 @@ async function fetchJson(path, options) {
 }
 
 async function loadRemoteCms() {
+  // Every fetch gets its own catch. Without one, a single failing endpoint
+  // rejected the whole Promise.all and dropped the panel back to the seeded
+  // demo content, which reads as "my posts are missing".
+  const empty = () => ({ data: [], configured: false });
   const [blogs, sessions, media, gallery, instructors, content] = await Promise.all([
-    fetchJson("/api/admin/blogs"),
-    fetchJson("/api/admin/sessions"),
-    fetchJson("/api/admin/media"),
-    fetchJson("/api/admin/gallery").catch(()     => ({ data: [], configured: false })),
-    fetchJson("/api/admin/instructors").catch(() => ({ data: [], configured: false })),
+    fetchJson("/api/admin/blogs").catch(empty),
+    fetchJson("/api/admin/sessions").catch(empty),
+    fetchJson("/api/admin/media").catch(empty),
+    fetchJson("/api/admin/gallery").catch(empty),
+    fetchJson("/api/admin/instructors").catch(empty),
     fetchJson("/api/admin/page-content").catch(() => ({ items: [] })),
   ]);
 
@@ -787,6 +809,9 @@ async function loadRemoteCms() {
 
   return {
     configured: blogs.configured || sessions.configured || media.configured || gallery.configured || instructors.configured,
+    // An empty gallery is a legitimate state (the client can delete every
+    // photo), so distinguish "loaded, nothing in it" from "the fetch failed".
+    galleryLoaded: gallery.configured === true,
     blogs: asArray(blogs.data).map(normalizeBlog),
     sessions: asArray(sessions.data).map(normalizeSession),
     media: media.data || [],
@@ -2772,7 +2797,7 @@ function AdminWorkspace({ onLogout }) {
           blogs: remote.blogs.length ? remote.blogs : current.blogs,
           sessions: remote.sessions.length ? remote.sessions : current.sessions,
           media: remote.media.length ? remote.media : current.media,
-          gallery: remote.gallery,
+          gallery: remote.galleryLoaded ? remote.gallery : current.gallery,
           instructors: remote.instructors.length ? remote.instructors : current.instructors,
           sessionTypes: remote.sessionTypes,
         }));
