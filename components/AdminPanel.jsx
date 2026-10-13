@@ -1192,10 +1192,12 @@ function SeoManager({ toast }) {
 
   const load = () => {
     setError("");
-    fetchJson("/api/admin/page-content")
+    // /api/admin/share-previews returns the effective text for every page the
+    // site has, not just the ones in the last save, and keeps only genuine
+    // edits when written back.
+    fetchJson("/api/admin/share-previews")
       .then((res) => {
-        const doc = (res.items || []).find((d) => d.key === "section:SHARE_PREVIEWS");
-        const list = doc?.data?.pages || [];
+        const list = res.pages || [];
         setPages(list);
         setSelected((cur) => cur ?? list[0]?.path ?? null);
         setDirty(false);
@@ -1212,7 +1214,7 @@ function SeoManager({ toast }) {
   async function save() {
     setSaving(true);
     try {
-      await fetchJson("/api/admin/page-content", { method: "PUT", body: JSON.stringify({ key: "section:SHARE_PREVIEWS", data: { pages } }) });
+      await fetchJson("/api/admin/share-previews", { method: "PUT", body: JSON.stringify({ pages }) });
       toast("Share text saved — new shares show it within a few minutes");
       setDirty(false);
     } catch (e) {

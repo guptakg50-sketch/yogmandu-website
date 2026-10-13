@@ -442,13 +442,41 @@ export async function getSectionContent<K extends SectionKey>(key: K): Promise<(
   return getContent(`section:${key}`, SECTION_DEFAULTS[key]);
 }
 
+/** Fields of a share preview the admin screen can override. */
+export const SHARE_OVERRIDE_FIELDS = ["title", "description", "image"] as const;
+
 /**
- * Share text for one route, admin override merged over the built-in default.
+ * Share text for every route: the code defaults in lib/shareContent.ts, with
+ * the client's admin edits laid over them per page and per field.
+ *
+ * This used to replace the whole list with whatever the admin screen last
+ * saved. Because that save wrote a snapshot of all 36 pages, every page was
+ * then frozen at the moment of the first save: editing the text in code did
+ * nothing, and a page added in code never appeared on the admin screen at all.
+ * Only fields the client has actually filled in are overrides now, so code
+ * changes reach every page the client has not personally edited.
+ *
  * Cached per request so several lookups in one render hit the database once.
  */
 export const getSharePages = cache(async (): Promise<SharePage[]> => {
   const { pages } = await getSectionContent("SHARE_PREVIEWS");
-  return Array.isArray(pages) ? (pages as SharePage[]) : SHARE_PAGES;
+  const stored = Array.isArray(pages) ? (pages as Partial<SharePage>[]) : [];
+  const overrides = new Map(
+    stored.filter((page) => typeof page?.path === "string").map((page) => [page.path as string, page])
+  );
+
+  return SHARE_PAGES.map((page) => {
+    const override = overrides.get(page.path);
+    if (!override) return page;
+    const merged = { ...page };
+    for (const field of SHARE_OVERRIDE_FIELDS) {
+      const value = override[field];
+      // A blank field means "no opinion", not "make it empty" — the admin
+      // inputs start empty for anything the client has never touched.
+      if (typeof value === "string" && value.trim()) merged[field] = value;
+    }
+    return merged;
+  });
 });
 
 export async function getSharePage(path: string): Promise<SharePage | undefined> {

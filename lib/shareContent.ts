@@ -19,19 +19,19 @@ export const SHARE_PAGES: SharePage[] = [
   {
     path: "/",
     label: "Homepage",
-    title: "Yogmandu | Yoga Classes, Sound Healing & Teacher Training in Kathmandu",
+    title: "Yoga Classes & Teacher Training Kathmandu | Yogmandu",
     description: "Daily yoga classes, Tibetan sound healing and Yoga Alliance certified teacher training in Baneshwor, Kathmandu. Beginners welcome, since 2018.",
   },
   {
     path: "/about",
     label: "/about",
-    title: "About Yogmandu | Nepal's First Yoga Alliance Registered School",
+    title: "About Yogmandu | Nepal's First Yoga Alliance Registered Sister School",
     description: "Founded 2018 by Yogi Arjuna Rakhal and Dr. Chintamani Gautam. ERYT 500, PhD Yogic Science. 3,000+ teachers from 50+ countries. Kathmandu, Nepal.",
   },
   {
     path: "/blog",
     label: "/blog",
-    title: "Yoga Blog \u2014 Philosophy, Breathwork & Sound Healing | Yogmandu Nepal",
+    title: "Yoga Blog — Philosophy & Sound Healing | Yogmandu",
     description: "Articles on yoga philosophy, pranayama, sound healing, teacher training and practising in Kathmandu, from the Yogmandu teaching team in Nepal.",
   },
   {
@@ -79,7 +79,7 @@ export const SHARE_PAGES: SharePage[] = [
   {
     path: "/gallery/all",
     label: "/gallery/all",
-    title: "All Photos | Yogmandu Gallery",
+    title: "All Photos — Yoga & Sound Healing Nepal | Yogmandu",
     description: "Photos from yoga classes, Tibetan singing bowl sessions, teacher training graduations and retreats at Yogmandu in Kathmandu, Nepal.",
   },
   {
@@ -145,7 +145,7 @@ export const SHARE_PAGES: SharePage[] = [
   {
     path: "/therapy-wellness",
     label: "/therapy-wellness",
-    title: "Therapy & Wellness \u2014 Yoga Therapy, Reiki, Diet | Yogmandu",
+    title: "Yoga Therapy, Reiki & Diet Nepal | Yogmandu",
     description: "One-to-one yoga therapy, Reiki healing and personalised diet consultation in Kathmandu, Nepal. Individual support for pain, stress and wellbeing.",
   },
   {
