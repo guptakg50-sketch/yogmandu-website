@@ -120,6 +120,15 @@ const websiteSchema = {
   },
 };
 
+// Google Consent Mode defaults: nothing is stored until the visitor accepts.
+const CONSENT_DEFAULT = `{
+            ad_storage:         'denied',
+            ad_user_data:       'denied',
+            ad_personalization: 'denied',
+            analytics_storage:  'denied',
+            wait_for_update:    500
+          }`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -139,18 +148,21 @@ export default function RootLayout({
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           window.gtag = gtag;
-          gtag('consent', 'default', {
-            ad_storage:         'denied',
-            ad_user_data:       'denied',
-            ad_personalization: 'denied',
-            analytics_storage:  'denied',
-            wait_for_update:    500
-          });
+          gtag('consent', 'default', ${CONSENT_DEFAULT});
         `}</Script>
         {children}
         <CookieConsent />
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-9S0M03X13S" strategy="lazyOnload" />
+        {/* A 404 thrown by notFound() in a dynamic route (/blog/[slug] etc.) is
+            served as Next's error shell, which never runs the beforeInteractive
+            script above — so define gtag and the consent defaults here when
+            they are missing, or this call throws "gtag is not defined". */}
         <Script id="gtag-init" strategy="lazyOnload">{`
+          window.dataLayer = window.dataLayer || [];
+          if (typeof window.gtag !== 'function') {
+            window.gtag = function(){dataLayer.push(arguments);};
+            gtag('consent', 'default', ${CONSENT_DEFAULT});
+          }
           gtag('js', new Date());
           gtag('config', 'G-9S0M03X13S', { anonymize_ip: true });
         `}</Script>
