@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import type { ServiceConfig } from "./serviceContent";
 import TimingNotice from "@/components/TimingNotice";
+import FurtherReading from "@/components/FurtherReading";
 
 // Reusable rich service page — same section rhythm as the Teacher Training
 // child pages (CourseProgram): hero → overview → who-it's-for + what's-included
@@ -45,8 +46,24 @@ function CheckList({ items, color = "#6B2D8B", cols = 2 }: { items: string[]; co
 }
 
 export default function ServicePage({ config: c, hub }: { config: ServiceConfig; hub?: ReactNode }) {
+  // Built from the same faqs array as the visible FAQ section, so the markup
+  // always matches what is on the page (a Google requirement).
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: c.faqs.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
+
   return (
     <>
+      {c.faqs.length > 0 && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      )}
+
       {/* Hero */}
       <section className="relative pt-36 pb-24 px-6 overflow-hidden" style={{ background: "#FFFFFF" }}>
         <div className="absolute inset-0 pointer-events-none"
@@ -186,6 +203,10 @@ export default function ServicePage({ config: c, hub }: { config: ServiceConfig;
           .faq-item[open] .faq-mark { transform: rotate(45deg); }
         `}</style>
       </section>
+
+      {c.furtherReading && c.furtherReading.length > 0 && (
+        <FurtherReading slugs={c.furtherReading} background="#FFF7E8" />
+      )}
 
       {/* CTA + also explore */}
       <section className="py-20 px-6" style={{ background: "#F9F5FF" }}>

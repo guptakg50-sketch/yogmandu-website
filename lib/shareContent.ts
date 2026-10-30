@@ -37,8 +37,8 @@ export const SHARE_PAGES: SharePage[] = [
   {
     path: "/class-schedule",
     label: "/class-schedule",
-    title: "Yoga Class Schedule Kathmandu | Daily Classes at Yogmandu",
-    description: "Hatha, Vinyasa, Ashtanga, Yin, Pranayama, Meditation & Sound Healing \u2014 7 days a week in Kathmandu. All levels welcome.",
+    title: "Yoga Classes in Kathmandu \u2014 Timetable & Fees | Yogmandu",
+    description: "Daily yoga classes in Mid-Baneshwor, Kathmandu. Drop-in NPR 600 a class, monthly from NPR 5,000, live online from NPR 2,500 a month. See the timetable.",
   },
   {
     path: "/class-schedule/drop-in",
@@ -163,20 +163,20 @@ export const SHARE_PAGES: SharePage[] = [
   {
     path: "/therapy-wellness/yoga-therapy",
     label: "/therapy-wellness/yoga-therapy",
-    title: "Yoga Therapy Kathmandu | Yogmandu",
-    description: "Yoga applied with precision to your body \u2014 a therapeutic, one-to-one approach to pain, stress and recovery.",
+    title: "Yoga Therapy in Kathmandu \u2014 Yogic Therapy 1-to-1 | Yogmandu",
+    description: "One-to-one yogic therapy in Kathmandu for back and neck pain, stiffness, stress, poor sleep and injury recovery. Assessment, personal plan and home routine.",
   },
   {
     path: "/yoga-for-beginners",
     label: "/yoga-for-beginners",
-    title: "Yoga for Beginners in Kathmandu | Start Your Practice \u2014 Yogmandu",
-    description: "Beginner-friendly yoga in Kathmandu, Nepal. Gentle Hatha, pranayama and meditation. No experience or flexibility required \u2014 all levels welcome.",
+    title: "Yoga for Beginners in Kathmandu \u2014 From NPR 600 | Yogmandu",
+    description: "Never done yoga? Start with gentle beginner classes in Mid-Baneshwor, Kathmandu. Drop in from NPR 600, no membership. No flexibility or experience needed.",
   },
   {
     path: "/yoga-retreat-nepal",
     label: "/yoga-retreat-nepal",
-    title: "Yoga Retreat in Nepal | Kathmandu & the Himalayas \u2014 Yogmandu",
-    description: "A yoga retreat in the home of the lineage \u2014 daily practice, Tibetan sound healing, meditation and Himalayan culture. Tailored retreats in Nepal with Yogmandu.",
+    title: "Yoga Retreat in Nepal \u2014 Kathmandu & Trekking | Yogmandu",
+    description: "Tailored yoga retreats in Nepal, from 3-day resets to two-week immersions: daily yoga, Tibetan sound healing, meditation, temple visits and Himalayan treks.",
   },
   {
     path: "/yoga-retreat-nepal/corporate-yoga",
@@ -199,8 +199,8 @@ export const SHARE_PAGES: SharePage[] = [
   {
     path: "/yoga-teacher-training",
     label: "/yoga-teacher-training",
-    title: "200hr Yoga Teacher Training Nepal | Yogmandu",
-    description: "Yoga Alliance RYS 200 certified. Residential USD 1,400 \u00b7 Non-residential USD 600. 2026 batches: June, July, August. Kathmandu, Nepal.",
+    title: "200 Hour Yoga Teacher Training in Nepal | Yogmandu",
+    description: "Yoga Alliance RYS 200 teacher training in Kathmandu. Monthly intakes, 28 days, cohorts of 12. Residential USD 1,400, non-residential USD 600, online USD 500.",
   },
   {
     path: "/yoga-teacher-training/300-hour",

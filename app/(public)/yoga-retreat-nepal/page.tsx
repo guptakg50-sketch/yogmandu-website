@@ -3,14 +3,15 @@ import { withShareText } from "@/lib/seo";
 import Link from "next/link";
 import { ServiceHub } from "../service/ServiceHub";
 import { getHubConfig } from "@/lib/pageContent";
+import FurtherReading from "@/components/FurtherReading";
 
 // Hub cards are admin-editable (Page Content → Cards & Pricing).
 export const revalidate = 300;
 
 const pageMetadata: Metadata = {
-  title: { absolute: "Yoga Retreat in Nepal — Kathmandu & Himalayas | Yogmandu" },
+  title: { absolute: "Yoga Retreat in Nepal — Kathmandu & Trekking | Yogmandu" },
   description:
-    "Join a yoga retreat in Nepal with Yogmandu — daily yoga & meditation, Tibetan sound healing, mountain air and Himalayan tradition in Kathmandu. Tailored dates.",
+    "Tailored yoga retreats in Nepal, from 3-day resets to two-week immersions: daily yoga, Tibetan sound healing, meditation, temple visits and Himalayan treks.",
   keywords: [
     "yoga retreat Nepal",
     "yoga retreat Kathmandu",
@@ -21,12 +22,16 @@ const pageMetadata: Metadata = {
     "sound healing retreat Nepal",
     "yoga retreat Himalayas",
     "spiritual retreat Kathmandu",
+    "yoga retreat in Nepal",
+    "Nepal yoga retreat",
+    "15 day yoga retreat Nepal",
+    "yoga retreat center Nepal",
   ],
   alternates: { canonical: "https://yogmandu.com/yoga-retreat-nepal" },
   openGraph: {
-    title: "Yoga Retreat in Nepal | Kathmandu & the Himalayas — Yogmandu",
+    title: "Yoga Retreat in Nepal — Kathmandu & Trekking | Yogmandu",
     description:
-      "A yoga retreat in the home of the lineage — daily practice, Tibetan sound healing, meditation and Himalayan culture. Tailored retreats in Nepal with Yogmandu.",
+      "Tailored yoga retreats in Nepal, from 3-day resets to two-week immersions: daily yoga, Tibetan sound healing, meditation, temple visits and Himalayan treks.",
     url: "https://yogmandu.com/yoga-retreat-nepal",
     images: ["/opengraph-image.png"],
   },
@@ -65,6 +70,14 @@ const faqs = [
   {
     q: "When are the retreat dates and how much does it cost?",
     a: "Because every retreat is tailored to the group's length, accommodation and focus, dates and pricing vary. Contact us on WhatsApp (+977-9810263277) or email yogmandu@gmail.com for current dates and a personalised quote.",
+  },
+  {
+    q: "When is the best time for a yoga retreat in Nepal?",
+    a: "Retreats run all year. Autumn (September to November) and spring (March to May) bring the clearest skies and are best if you want to add a trek. Winter is dry and cool with cold mornings. The June to August monsoon is wet but green and quiet, and suits an indoor, inward retreat.",
+  },
+  {
+    q: "Can I combine a retreat with trekking?",
+    a: "Yes. Many guests add a yoga trek in the Himalayan foothills to their time in Kathmandu, practising on the trail each morning and evening. We plan the route and pace around your fitness and the season.",
   },
   {
     q: "Can you arrange a private or group retreat?",
@@ -119,6 +132,20 @@ const included = [
   { icon: "🏔️", title: "Himalayan Setting", desc: "Mountain air, ancient temples and the living lineage of yoga — Nepal as the practice itself.", color: "#6B2D8B" },
   { icon: "🏛️", title: "Cultural Excursions", desc: "Optional visits to Kathmandu's stupas, temples and sacred sites between practice sessions.", color: "#F7941D" },
   { icon: "🌿", title: "Small, Personal Groups", desc: "Intimate cohorts and experienced teachers mean real attention and a genuine sense of community.", color: "#8DC63F" },
+];
+
+const retreatLengths = [
+  { length: "3–5 days", name: "Kathmandu reset", desc: "Daily yoga and meditation, a Tibetan sound bath and one guided visit to a temple or stupa. Ideal on a stopover or a long weekend.", color: "#8DC63F" },
+  { length: "7 days", name: "Week-long retreat", desc: "The full daily rhythm below, with several sound healing sessions, pranayama workshops and visits to Kathmandu's sacred sites.", color: "#F7941D" },
+  { length: "10–15 days", name: "Deep immersion", desc: "Time for practice to settle. Add a Himalayan yoga trek, a weight-loss bootcamp or a sound healing course to your stay.", color: "#6B2D8B" },
+];
+
+// Our own photos, served from the gallery bucket.
+const MEDIA = "https://rwnvzjmkadwvmdcuwivg.supabase.co/storage/v1/object/public/yogmandu-media/gallery";
+const retreatPhotos = [
+  { src: `${MEDIA}/1788530111562-10febf0c-019c-4f0c-8ba6-c6a49ab14e93.webp`, alt: "Yogmandu retreat group at a waterfall in the hills around Kathmandu, Nepal" },
+  { src: `${MEDIA}/1788530116705-8f5af7ae-fffd-412d-a6cd-e13dafd21efe.webp`, alt: "Guests resting in savasana during a Tibetan singing bowl sound bath at Yogmandu, Kathmandu" },
+  { src: `${MEDIA}/1782298328203-d23a0d0e-d894-4897-a271-df204f54a4c1.webp`, alt: "Morning yoga class at the Yogmandu studio in Mid-Baneshwor, Kathmandu" },
 ];
 
 const retreatDay = [
@@ -190,6 +217,12 @@ export default async function YogaRetreatNepalPage() {
             lineage deepen every session — turning a holiday into a genuine reset for body and mind.
           </p>
         </div>
+        <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 mt-14">
+          {retreatPhotos.map((p) => (
+            <img key={p.src} src={p.src} alt={p.alt} loading="lazy" decoding="async" width={1200} height={900}
+              className="w-full rounded-2xl object-cover" style={{ aspectRatio: "4 / 3", display: "block" }} />
+          ))}
+        </div>
       </section>
 
       {/* What's included */}
@@ -214,6 +247,40 @@ export default async function YogaRetreatNepalPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Retreat lengths */}
+      <section className="py-24 px-6" style={{ background: "#FFF7E8" }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#8DC63F" }}>How Long</p>
+            <h2 className="text-4xl md:text-5xl font-light" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>
+              Choose your retreat length
+            </h2>
+            <div className="section-divider mt-6" />
+            <p className="mt-6 text-base max-w-xl mx-auto" style={{ color: "#4A2E1A" }}>
+              Three common shapes. We adjust any of them to your dates, group and budget.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {retreatLengths.map((r) => (
+              <div key={r.name} className="rounded-2xl p-8"
+                style={{ background: "#FFFFFF", border: `1.5px solid ${r.color}22`, borderTop: `3px solid ${r.color}` }}>
+                <div className="text-[2.2rem] font-light leading-none mb-2" style={{ fontFamily: "Cormorant Garamond, serif", color: r.color }}>{r.length}</div>
+                <h3 className="text-xl font-light mb-3" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>{r.name}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: "#4A2E1A" }}>{r.desc}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-sm text-center mt-10" style={{ color: "#4A2E1A" }}>
+            Adding a trek?{" "}
+            <Link href="/yoga-retreat-nepal/yoga-trekking" style={{ color: "#6B2D8B", textDecoration: "underline" }}>See yoga trekking</Link>
+            {" "}·{" "}
+            <Link href="/yoga-retreat-nepal/weight-loss-bootcamp" style={{ color: "#6B2D8B", textDecoration: "underline" }}>Weight-loss bootcamp</Link>
+            {" "}·{" "}
+            <Link href="/sound-healing-therapy/course-level-1" style={{ color: "#6B2D8B", textDecoration: "underline" }}>Sound healing course</Link>
+          </p>
         </div>
       </section>
 
@@ -292,6 +359,12 @@ export default async function YogaRetreatNepalPage() {
           .faq-item[open] .faq-mark { transform: rotate(45deg); }
         `}</style>
       </section>
+
+      <FurtherReading
+        slugs={["yoga-retreats-trekking-nepal", "best-time-yoga-nepal", "tibetan-singing-bowl-session", "the-glory-of-pashupati-kshetra-nepal-s-sacred-realm-of-liberation"]}
+        title="Plan your time in Nepal"
+        background="#FFF7E8"
+      />
 
       {/* CTA */}
       <section className="py-20 px-6" style={{ background: "#FFFFFF" }}>

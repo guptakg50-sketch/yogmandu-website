@@ -11,6 +11,7 @@ import { DeferUntilIdle, DeferUntilVisible } from "@/components/DeferredHeavy";
 import CardIcon from "@/components/CardIcon";
 import SectionImage from "@/components/SectionImage";
 import UpcomingEvents from "@/components/UpcomingEvents";
+import FurtherReading from "@/components/FurtherReading";
 import { getSectionContent } from "@/lib/pageContent";
 
 export const revalidate = 300;
@@ -355,6 +356,9 @@ export default async function HomePage() {
       <UpcomingEvents />
 
       <WhySection />
+
+      {/* ── LATEST POSTS — server-rendered links so new articles get crawled ── */}
+      <FurtherReading latest={3} eyebrow="From the Blog" title="Latest from the practice" background="#FFF7E8" />
 
       {/* ── PHOTO CAROUSEL — "Life at Yogmandu" trust band, defer until visible ── */}
       <DeferUntilVisible fallback={<div style={{ minHeight: 600 }} />}>

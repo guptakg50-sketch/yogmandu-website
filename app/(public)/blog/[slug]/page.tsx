@@ -154,10 +154,14 @@ export default async function BlogPostPage({ params }: { params: Params }) {
     ],
   };
 
-  // Prefer DB posts for related articles; fall back to static list
+  // Prefer DB posts for related articles; fall back to static list. Same
+  // category first, topped up with the newest — always taking the newest 3
+  // meant older posts were never linked from any other post.
   const relatedPosts = allDb && allDb.length > 1
-    ? allDb
-        .filter((p) => p.slug !== post.slug)
+    ? [
+        ...allDb.filter((p) => p.slug !== post.slug && p.category === post.category),
+        ...allDb.filter((p) => p.slug !== post.slug && p.category !== post.category),
+      ]
         .slice(0, 3)
         .map((p) => ({
           slug:     p.slug,

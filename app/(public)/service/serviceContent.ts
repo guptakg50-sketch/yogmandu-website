@@ -27,6 +27,8 @@ export type ServiceConfig = {
   faqs: ServiceFaq[];         // 3–4
   siblingLinks: { href: string; label: string }[];
   accent: string;             // hex accent from the palette
+  /** Blog slugs shown as "Further reading" cards; unpublished ones are skipped. */
+  furtherReading?: string[];
 };
 
 // ── Yoga Classes (/class-schedule) ─────────────────────────────────────
@@ -80,6 +82,7 @@ export const DROP_IN: ServiceConfig = {
     { q: "Where are classes held?", a: "At our studio in Mid-Baneshwor-31, Kathmandu — minutes from New Baneshwor and a short drive from the airport." },
   ],
   siblingLinks: CLASS_SIBLINGS.filter((l) => l.href !== "/class-schedule/drop-in"),
+  furtherReading: ["first-yoga-class", "yoga-class-fees-kathmandu", "pranayama-for-beginners"],
   accent: "#F7941D",
 };
 
@@ -124,6 +127,7 @@ export const VIRTUAL_YOGA: ServiceConfig = {
     { q: "Which time zones do you teach in?", a: "We schedule classes to suit students across Asia, Europe and beyond. Message us with your location and we'll find a time that works." },
   ],
   siblingLinks: CLASS_SIBLINGS.filter((l) => l.href !== "/class-schedule/virtual"),
+  furtherReading: ["online-private-home-yoga", "yoga-class-fees-kathmandu", "yoga-nidra-deep-rest"],
   accent: "#6B2D8B",
 };
 
@@ -166,6 +170,7 @@ export const PRIVATE_YOGA: ServiceConfig = {
     { q: "Is a private class good for beginners?", a: "It's one of the best ways to start. You'll learn correct alignment and breathing from day one, with the teacher's full attention." },
   ],
   siblingLinks: CLASS_SIBLINGS.filter((l) => l.href !== "/class-schedule/private"),
+  furtherReading: ["online-private-home-yoga", "yoga-therapy-kathmandu-guide", "first-yoga-class"],
   accent: "#F7941D",
 };
 
@@ -208,6 +213,7 @@ export const YOGA_AT_HOME: ServiceConfig = {
     { q: "Do you bring mats?", a: "We can advise on what to have ready and bring props where needed. Let us know your setup when you book." },
   ],
   siblingLinks: CLASS_SIBLINGS.filter((l) => l.href !== "/class-schedule/home"),
+  furtherReading: ["online-private-home-yoga", "yoga-for-every-age", "yoga-class-fees-kathmandu"],
   accent: "#6B2D8B",
 };
 
@@ -260,6 +266,7 @@ export const SOUND_SESSIONS: ServiceConfig = {
     { q: "Can I book a session for a group?", a: "Yes. Group sound baths are wonderful for friends, families or teams — message us and we'll arrange a time and a group rate." },
   ],
   siblingLinks: SOUND_SIBLINGS.filter((l) => l.href !== "/sound-healing-therapy/sessions"),
+  furtherReading: ["tibetan-singing-bowl-session", "sound-healing-therapies-explained", "yoga-nidra-deep-rest"],
   accent: "#6B2D8B",
 };
 
@@ -306,6 +313,7 @@ export const SOUND_LEVEL_1: ServiceConfig = {
     { q: "Can I go on to Level II afterwards?", a: "Absolutely — Level I is the prerequisite for the advanced Level II course, where you deepen into professional facilitation." },
   ],
   siblingLinks: SOUND_SIBLINGS.filter((l) => l.href !== "/sound-healing-therapy/course-level-1"),
+  furtherReading: ["sound-healing-practitioner", "sound-healing-therapies-explained", "tibetan-singing-bowl-session"],
   accent: "#4A6418",
 };
 
@@ -351,6 +359,7 @@ export const SOUND_LEVEL_2: ServiceConfig = {
     { q: "How much does Level II cost?", a: "Level II is NPR 55,000 for Nepalese students and USD 600 for international students, and includes your advanced practitioner certificate." },
   ],
   siblingLinks: SOUND_SIBLINGS.filter((l) => l.href !== "/sound-healing-therapy/course-level-2"),
+  furtherReading: ["sound-healing-practitioner", "sound-healing-therapies-explained", "the-mystical-power-of-om"],
   accent: "#6B2D8B",
 };
 
@@ -401,6 +410,7 @@ export const WEIGHT_LOSS_BOOTCAMP: ServiceConfig = {
     { q: "Will I keep the results?", a: "Because the focus is on building sustainable habits rather than quick fixes, the results are designed to last beyond the program." },
   ],
   siblingLinks: RETREAT_SIBLINGS.filter((l) => l.href !== "/yoga-retreat-nepal/weight-loss-bootcamp"),
+  furtherReading: ["weight-loss-myths-vs-facts", "reiki-diet-consultation", "yoga-retreats-trekking-nepal"],
   accent: "#F7941D",
 };
 
@@ -443,6 +453,7 @@ export const CORPORATE_YOGA: ServiceConfig = {
     { q: "How is pricing worked out?", a: "Pricing depends on team size, frequency and format. Request a proposal and we'll send tailored options." },
   ],
   siblingLinks: RETREAT_SIBLINGS.filter((l) => l.href !== "/yoga-retreat-nepal/corporate-yoga"),
+  furtherReading: ["corporate-yoga-workplace", "desk-yoga-back-pain", "yoga-nidra-deep-rest"],
   accent: "#8DC63F",
 };
 
@@ -485,6 +496,7 @@ export const YOGA_TREKKING: ServiceConfig = {
     { q: "What's included in the cost?", a: "Inclusions vary by route and duration. Message us for a detailed itinerary and pricing." },
   ],
   siblingLinks: RETREAT_SIBLINGS.filter((l) => l.href !== "/yoga-retreat-nepal/yoga-trekking"),
+  furtherReading: ["yoga-retreats-trekking-nepal", "best-time-yoga-nepal", "the-glory-of-pashupati-kshetra-nepal-s-sacred-realm-of-liberation"],
   accent: "#F7941D",
 };
 
@@ -498,42 +510,50 @@ const THERAPY_SIBLINGS = [
 export const YOGA_THERAPY: ServiceConfig = {
   slug: "therapy",
   breadcrumb: { href: "/therapy-wellness", label: "Therapy & Wellness" },
-  eyebrow: "Therapeutic · One-to-One",
+  eyebrow: "Yogic Therapy · One-to-One",
   heroTitleA: "Yoga",
   heroTitleEm: "therapy",
-  heroLead: "Yoga applied with precision to your body and your needs. A one-to-one therapeutic approach to ease pain, restore balance and support healing.",
-  heroMeta: "One-to-one · condition-specific · Kathmandu",
+  heroLead: "Yogic therapy in Kathmandu: posture, breath and deep relaxation applied with precision to your body and your needs. One-to-one sessions to ease pain, settle stress and support recovery.",
+  heroMeta: "One-to-one · condition-specific · Mid-Baneshwor, Kathmandu",
   bookLabel: "Book a Consultation",
   overviewHeading: "Healing, tailored to you",
   overviewBody: [
-    "Yoga therapy uses posture, breath and relaxation as precise tools to address specific issues — back pain, stiffness, stress, breathing difficulties, recovery from injury and more. It's a gentle, individualised alternative or complement to conventional care.",
-    "Your session begins with an assessment of your body and history. From there, our senior faculty design a practice tailored to you, adjusting it over time as your body responds and heals.",
+    "Yoga therapy (often called yogic therapy) uses posture, breath and relaxation as precise tools to address specific issues: back and neck pain, stiffness, stress and anxiety, poor sleep, breathing difficulties, and recovery from injury. It is a gentle, individualised complement to conventional care.",
+    "It is different from a group class. In a class, everyone follows one sequence. In therapy, the sequence is written for you: which postures, how long you hold them, which you leave out, how you breathe. You practise in a quiet one-to-one setting at our Mid-Baneshwor studio, and each session builds on what your body did last time.",
+    "Your first session begins with an assessment of your history, symptoms and daily routine. From there our senior faculty design a practice tailored to you, give you a short routine to repeat at home, and adjust it as your body responds.",
   ],
   forYou: [
-    "People managing back pain, stiffness or injury",
-    "Anyone with stress or breathing difficulties",
-    "Those wanting a gentle, individualised practice",
-    "People seeking a complement to medical care",
+    "People managing back, neck or joint pain and stiffness",
+    "Desk workers with posture-related tension",
+    "Anyone living with stress, anxiety or poor sleep",
+    "People with breathing difficulties who want gentle pranayama",
+    "Those recovering from injury, once cleared by their doctor",
+    "Older adults wanting a safe, individual practice",
   ],
   included: [
-    "A personal assessment of your needs",
+    "A personal assessment of your history and needs",
     "A therapeutic practice built for your body",
+    "Breathwork and deep-relaxation techniques",
     "Guidance from experienced senior faculty",
     "Adjustments as your body responds",
-    "Tools you can continue at home",
+    "A short routine you can continue at home",
   ],
   steps: [
-    { n: "1", t: "Assessment", b: "We discuss your history, symptoms and goals to understand your needs." },
-    { n: "2", t: "Your plan", b: "We design a therapeutic practice tailored precisely to your body." },
-    { n: "3", t: "Practise & heal", b: "Work through the practice with guidance, refining it as you progress." },
+    { n: "1", t: "Assessment", b: "We discuss your history, symptoms and goals, and look at how you move and breathe." },
+    { n: "2", t: "Your plan", b: "We design a therapeutic practice for your body: what to do, what to avoid, and how often." },
+    { n: "3", t: "Practise & heal", b: "Work through the practice with guidance, refining it session by session as you progress." },
   ],
   faqs: [
     { q: "Is yoga therapy a replacement for medical treatment?", a: "No — it's a complementary practice. We work alongside, not instead of, your medical care, and we'll always encourage you to keep your healthcare provider informed." },
     { q: "What conditions can it help with?", a: "Commonly back and joint pain, stiffness, stress, anxiety, breathing issues and injury recovery. Share your situation and we'll advise honestly whether we can help." },
     { q: "Is it a group or private session?", a: "Yoga therapy is one-to-one, so the entire session is built around your body and needs." },
     { q: "How many sessions will I need?", a: "It varies with the individual and the issue. Many people benefit from a short series; we'll give you a realistic picture after your first assessment." },
+    { q: "How is yoga therapy different from a regular yoga class?", a: "A class follows one sequence for everyone. Yoga therapy is built around one person: the postures, holds, breathing and relaxation are chosen for your condition, and anything that aggravates it is left out." },
+    { q: "How much does yoga therapy cost?", a: "Because each programme is individual, we quote after a short conversation about your needs. Message us on WhatsApp (+977-9810263277) and we'll reply with current rates within 24 hours." },
+    { q: "Do I need any yoga experience?", a: "No. Most people who come for therapy have never practised before. Wear comfortable clothes; mats and props are provided at the studio." },
   ],
   siblingLinks: THERAPY_SIBLINGS.filter((l) => l.href !== "/therapy-wellness/yoga-therapy"),
+  furtherReading: ["yoga-therapy-kathmandu-guide", "desk-yoga-back-pain", "yoga-nidra-deep-rest"],
   accent: "#6B2D8B",
 };
 
@@ -576,6 +596,7 @@ export const REIKI_HEALING: ServiceConfig = {
     { q: "How long is a session?", a: "Sessions typically run around an hour. Message us for exact timings and current rates." },
   ],
   siblingLinks: THERAPY_SIBLINGS.filter((l) => l.href !== "/therapy-wellness/reiki-healing"),
+  furtherReading: ["reiki-diet-consultation", "yoga-therapy-kathmandu-guide", "yoga-relaxation-body-mind"],
   accent: "#F7941D",
 };
 
@@ -618,6 +639,7 @@ export const DIET_CONSULTATION: ServiceConfig = {
     { q: "Is it done in person?", a: "Consultations can be arranged in person in Kathmandu or remotely. Message us to arrange what works for you." },
   ],
   siblingLinks: THERAPY_SIBLINGS.filter((l) => l.href !== "/therapy-wellness/diet-consultation"),
+  furtherReading: ["reiki-diet-consultation", "weight-loss-myths-vs-facts", "yoga-therapy-kathmandu-guide"],
   accent: "#8DC63F",
 };
 
@@ -668,6 +690,7 @@ export const PRENATAL: ServiceConfig = {
     { q: "Do I need prior yoga experience?", a: "No. These classes welcome complete beginners — the focus is on comfort, safety and connection, not performance." },
   ],
   siblingLinks: SPECIAL_SIBLINGS.filter((l) => l.href !== "/specialized-yoga/prenatal"),
+  furtherReading: ["prenatal-yoga-by-trimester", "yoga-for-every-age", "pranayama-for-beginners"],
   accent: "#6B2D8B",
 };
 
@@ -710,6 +733,7 @@ export const CHILDRENS_YOGA: ServiceConfig = {
     { q: "Can siblings join together?", a: "Often yes, depending on their ages. Let us know and we'll advise the best arrangement." },
   ],
   siblingLinks: SPECIAL_SIBLINGS.filter((l) => l.href !== "/specialized-yoga/childrens-yoga"),
+  furtherReading: ["kids-yoga-guide-to-teaching-benefits-mindfulness", "yoga-for-every-age", "first-yoga-class"],
   accent: "#F7941D",
 };
 
@@ -752,6 +776,7 @@ export const SENIOR_YOGA: ServiceConfig = {
     { q: "Can I come with a friend or partner?", a: "Of course — practising together is encouraged and often makes it more enjoyable." },
   ],
   siblingLinks: SPECIAL_SIBLINGS.filter((l) => l.href !== "/specialized-yoga/senior-yoga"),
+  furtherReading: ["yoga-for-every-age", "yoga-therapy-kathmandu-guide", "pranayama-for-beginners"],
   accent: "#8DC63F",
 };
 
@@ -794,6 +819,7 @@ export const SCHOOL_YOGA: ServiceConfig = {
     { q: "How is a program priced?", a: "Pricing depends on the number of students, frequency and duration. Request a program and we'll send tailored options." },
   ],
   siblingLinks: SPECIAL_SIBLINGS.filter((l) => l.href !== "/specialized-yoga/school-yoga"),
+  furtherReading: ["kids-yoga-guide-to-teaching-benefits-mindfulness", "yoga-for-every-age", "yoga-nidra-deep-rest"],
   accent: "#F7941D",
 };
 

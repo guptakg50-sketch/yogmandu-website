@@ -3,6 +3,7 @@ import { withShareText } from "@/lib/seo";
 import Link from "next/link";
 import { PricingCard } from "./PricingSection";
 import SectionImage from "@/components/SectionImage";
+import FurtherReading from "@/components/FurtherReading";
 import { getTierSet, getSectionContent, getCurriculum } from "@/lib/pageContent";
 
 // Program cards, graduation section and cancellation table are admin-editable
@@ -11,9 +12,9 @@ export const revalidate = 300;
 import IntakeMonths from "./IntakeMonths";
 
 const pageMetadata: Metadata = {
-  title: { absolute: "Yoga Teacher Training in Nepal — RYS 200 | Yogmandu" },
+  title: { absolute: "200 Hour Yoga Teacher Training in Nepal | Yogmandu" },
   description:
-    "Yoga Alliance RYS 200 teacher training in Kathmandu, Nepal. Residential & non-residential 2026 batches — Hatha, Ashtanga, anatomy, philosophy & practice.",
+    "Yoga Alliance RYS 200 teacher training in Kathmandu. Monthly intakes, 28 days, cohorts of 12. Residential USD 1,400, non-residential USD 600, online USD 500.",
   keywords: [
     "200hr yoga teacher training Nepal",
     "yoga teacher training Kathmandu",
@@ -24,17 +25,21 @@ const pageMetadata: Metadata = {
     "Hatha yoga teacher training Nepal",
     "Ashtanga teacher training Kathmandu",
     "yoga training residential Nepal",
+    "yoga teacher training in Nepal",
+    "200 hour yoga teacher training Nepal",
+    "best yoga teacher training Nepal",
+    "yoga school in Nepal",
   ],
   alternates: { canonical: "https://yogmandu.com/yoga-teacher-training" },
   openGraph: {
-    title: "200hr Yoga Teacher Training Nepal | Yogmandu",
-    description: "Yoga Alliance RYS 200 certified. Residential USD 1,400 · Non-residential USD 600. 2026 batches: June, July, August. Kathmandu, Nepal.",
+    title: "200 Hour Yoga Teacher Training in Nepal | Yogmandu",
+    description: "Yoga Alliance RYS 200 teacher training in Kathmandu. Monthly intakes, 28 days, cohorts of 12. Residential USD 1,400, non-residential USD 600, online USD 500.",
     url: "https://yogmandu.com/yoga-teacher-training",
     images: ["/opengraph-image.png"],
   },
   twitter: {
-    title: "200hr Yoga Teacher Training Nepal | Yogmandu",
-    description: "Yoga Alliance RYS 200 certified. Residential USD 1,400 · Non-residential USD 600. 2026 batches in Kathmandu.",
+    title: "200 Hour Yoga Teacher Training in Nepal | Yogmandu",
+    description: "Yoga Alliance RYS 200 teacher training in Kathmandu. Monthly intakes. Residential USD 1,400 · Non-residential USD 600 · Online USD 500.",
   },
 };
 
@@ -64,7 +69,9 @@ const courseSchema = {
     },
   },
   offers: [
+    { "@type": "Offer", priceCurrency: "USD", price: "1400", name: "Residential (accommodation and meals included)" },
     { "@type": "Offer", priceCurrency: "USD", price: "600",  name: "Non-Residential (Commuter)" },
+    { "@type": "Offer", priceCurrency: "USD", price: "500",  name: "Online (live over Zoom)" },
   ],
 };
 
@@ -97,8 +104,12 @@ const faqs = [
     a: "The course runs for 28 days. Daily sessions begin at 6:30 AM and cover asana, pranayama, anatomy, yoga philosophy, Sanskrit, and teaching methodology. Evenings include self-study until 9:30 PM.",
   },
   {
-    q: "When are the 2026 yoga teacher training start dates?",
-    a: "2026 batches run in June, July, and August. Each cohort is limited to 12 students. Contact us on WhatsApp (+977-9810263277) to reserve your place.",
+    q: "When does the next yoga teacher training start?",
+    a: "A new 200-hour cohort starts every month. Choose your intake month on this page and secure your place with a USD 200 deposit. Each cohort is limited to 12 students, so contact us on WhatsApp (+977-9810263277) early for popular months.",
+  },
+  {
+    q: "Can I do the 200-hour yoga teacher training online?",
+    a: "Yes. The online programme (USD 500, or NPR 40,000 for Nepali citizens) runs live over Zoom alongside the Kathmandu cohort, not as pre-recorded videos, and leads to the same Yoga Alliance RYT 200 eligible certificate.",
   },
   {
     q: "What level of yoga experience do I need to join?",
@@ -110,7 +121,7 @@ const faqs = [
   },
   {
     q: "How many students are in each class?",
-    a: "We cap each cohort at 15 students so the class never feels overcrowded and every trainee receives personal attention and feedback.",
+    a: "We cap each cohort at 12 students so the class never feels overcrowded and every trainee receives personal attention and feedback.",
   },
   {
     q: "Do I need to speak good English?",
@@ -180,11 +191,11 @@ export default async function YogaTeacherTrainingPage() {
           </p>
           <h1 className="text-5xl md:text-7xl font-light leading-[1.05] mb-8 max-w-3xl mx-auto"
             style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>
-            Become a certified yoga teacher in the{" "}
+            Yoga teacher training in the{" "}
             <em style={{ color: "#6B2D8B" }}>heart of the Himalayas</em>
           </h1>
           <p className="text-lg leading-relaxed mb-10 max-w-xl mx-auto" style={{ color: "#4A2E1A", fontWeight: 400 }}>
-            A 28-day immersive 200hr program in Kathmandu, Nepal. Yoga Alliance certified. Taught in the classical Hatha tradition by Dr. Chintamani Gautam and our senior faculty.
+            Become a certified yoga teacher on a 28-day, 200-hour programme in Kathmandu, Nepal. Yoga Alliance certified, with a new cohort every month. Taught in the classical Hatha tradition by Dr. Chintamani Gautam and our senior faculty.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/book?service=ytt-200"
@@ -269,7 +280,7 @@ export default async function YogaTeacherTrainingPage() {
         </div>
       </section>
 
-      {/* 2026 Dates */}
+      {/* Intake months */}
       <section className="py-16 px-6" style={{ background: "#F9F5FF" }}>
         <div className="max-w-5xl mx-auto text-center">
           <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#6B2D8B" }}>Plan Ahead</p>
@@ -456,6 +467,12 @@ export default async function YogaTeacherTrainingPage() {
           .faq-item[open] .faq-mark { transform: rotate(45deg); }
         `}</style>
       </section>
+
+      <FurtherReading
+        slugs={["choosing-yoga-teacher-training-nepal", "ryt-200-300-500", "best-time-yoga-nepal", "what-expect-200-hour-residential-yoga-teacher-training-course"]}
+        title="Planning your training"
+        background="#FFF7E8"
+      />
 
       {/* CTA */}
       <section className="py-20 px-6" style={{ background: "#F9F5FF" }}>

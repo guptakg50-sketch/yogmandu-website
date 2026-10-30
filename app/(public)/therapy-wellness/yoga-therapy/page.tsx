@@ -8,13 +8,21 @@ import { getServicePageConfig } from "@/lib/pageContent";
 export const revalidate = 300;
 
 const pageMetadata: Metadata = {
-  title: { absolute: "Yoga Therapy in Kathmandu — One-to-One | Yogmandu" },
+  title: { absolute: "Yoga Therapy in Kathmandu — Yogic Therapy 1-to-1 | Yogmandu" },
   description:
-    "One-to-one yoga therapy in Kathmandu to ease pain, restore balance and support healing. Personalised therapeutic practice guided by senior faculty.",
+    "One-to-one yogic therapy in Kathmandu for back and neck pain, stiffness, stress, poor sleep and injury recovery. Assessment, personal plan and home routine.",
+  keywords: [
+    "yoga therapy Kathmandu",
+    "yogic therapy in Kathmandu",
+    "therapeutic yoga Nepal",
+    "yoga for back pain Kathmandu",
+    "one-to-one yoga therapy",
+    "yoga therapy Baneshwor",
+  ],
   alternates: { canonical: "https://yogmandu.com/therapy-wellness/yoga-therapy" },
   openGraph: {
-    title: "Yoga Therapy Kathmandu | Yogmandu",
-    description: "Yoga applied with precision to your body — a therapeutic, one-to-one approach to pain, stress and recovery.",
+    title: "Yoga Therapy in Kathmandu — Yogic Therapy 1-to-1 | Yogmandu",
+    description: "One-to-one yogic therapy in Kathmandu for back and neck pain, stiffness, stress, poor sleep and injury recovery. Assessment, personal plan and home routine.",
     url: "https://yogmandu.com/therapy-wellness/yoga-therapy",
     images: ["/opengraph-image.png"],
   },

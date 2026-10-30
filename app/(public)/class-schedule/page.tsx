@@ -4,6 +4,7 @@ import Link from "next/link";
 import ScheduleGrid from "./ScheduleGrid";
 import HeroDecor from "./HeroDecor";
 import TimingNotice from "@/components/TimingNotice";
+import FurtherReading from "@/components/FurtherReading";
 import { ServiceHub } from "../service/ServiceHub";
 import { getActiveSessions, getInstructorMap } from "@/lib/publicData";
 import { getHubConfig, getSectionContent } from "@/lib/pageContent";
@@ -11,9 +12,9 @@ import { getHubConfig, getSectionContent } from "@/lib/pageContent";
 export const revalidate = 300;
 
 const pageMetadata: Metadata = {
-  title: { absolute: "Yoga Classes in Baneshwor, Kathmandu | Yogmandu" },
+  title: { absolute: "Yoga Classes in Kathmandu — Timetable & Fees | Yogmandu" },
   description:
-    "Daily yoga classes in Baneshwor, Kathmandu — near New Baneshwor. Hatha, Vinyasa, Ashtanga, Yin, pranayama & meditation. All levels welcome. See the timetable.",
+    "Daily yoga classes in Mid-Baneshwor, Kathmandu. Drop-in NPR 600 a class, monthly from NPR 5,000, live online from NPR 2,500 a month. See the timetable.",
   keywords: [
     "yoga classes Kathmandu",
     "yoga classes Baneshwor",
@@ -24,11 +25,14 @@ const pageMetadata: Metadata = {
     "morning yoga Kathmandu",
     "yoga drop-in Kathmandu",
     "sound healing class schedule",
+    "yoga classes near me with fees",
+    "yoga class fees Kathmandu",
+    "yoga fees per month Kathmandu",
   ],
   alternates: { canonical: "https://yogmandu.com/class-schedule" },
   openGraph: {
-    title: "Yoga Class Schedule Kathmandu | Daily Classes at Yogmandu",
-    description: "Hatha, Vinyasa, Ashtanga, Yin, Pranayama, Meditation & Sound Healing — 7 days a week in Kathmandu. All levels welcome.",
+    title: "Yoga Classes in Kathmandu — Timetable & Fees | Yogmandu",
+    description: "Daily yoga classes in Mid-Baneshwor, Kathmandu. Drop-in NPR 600 a class, monthly from NPR 5,000, live online from NPR 2,500 a month. See the timetable.",
     url: "https://yogmandu.com/class-schedule",
     images: ["/opengraph-image.png"],
   },
@@ -49,6 +53,9 @@ const breadcrumbSchema = {
   ],
 };
 
+// Admin price strings carry stray runs of spaces ("NPR 5000/USD 50      a month").
+const tidy = (v: string) => v.replace(/\s+/g, " ").replace(/\s*\/\s*/g, " / ").trim();
+
 const levelColor = (level: string) => {
   if (level === "Beginner")     return { bg: "rgba(141,198,63,0.1)",  text: "#5A7A20",  border: "rgba(141,198,63,0.3)" };
   if (level === "Intermediate") return { bg: "rgba(247,148,29,0.1)",  text: "#B86010",  border: "rgba(247,148,29,0.3)" };
@@ -63,9 +70,38 @@ export default async function ClassSchedulePage() {
     getSectionContent("INSIDE_STUDIO"),
     getSectionContent("CLASSES_WE_OFFER"),
   ]);
+
+  // The fees table and its FAQ answer are built from the same hub cards shown
+  // at the top of the page, so a price edited in admin changes everywhere.
+  const fees = hub.tiers.map((t) => ({ title: t.title, price: tidy(t.price), sub: tidy(t.priceSub), href: t.cardHref || t.ctaHref || "/class-schedule" }));
+  const feeFaqs = [
+    {
+      q: "How much are yoga classes at Yogmandu?",
+      a: fees.map((f) => `${f.title}: ${f.price}${f.sub ? ` (${f.sub.toLowerCase()})` : ""}.`).join(" "),
+    },
+    {
+      q: "Do I need a membership or to book in advance?",
+      a: "No. Drop-in classes are paid per class with no membership or joining fee, and most classes need no reservation. Private and home sessions are booked in advance so we can match you with a teacher.",
+    },
+    {
+      q: "Where are the classes held?",
+      a: "At our studio on Miteri Marg, Mid-Baneshwor-31, Kathmandu, a few minutes from New Baneshwor. Mats and props are provided. Virtual classes are live online, so you can join from anywhere.",
+    },
+  ];
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: feeFaqs.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
+
   return (
     <main style={{ background: "#FFFFFF", minHeight: "100vh" }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       {/* ── Page header ── */}
       <div className="schedule-hero" style={{
@@ -247,6 +283,60 @@ export default async function ClassSchedulePage() {
           </div>
         </div>
       </section>
+
+      {/* ── Class fees + questions ── */}
+      <section style={{ background: "#FFFFFF", padding: "5rem 1.5rem" }}>
+        <div style={{ maxWidth: 760, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
+            <p style={{ fontSize: "0.85rem", letterSpacing: "0.3em", textTransform: "uppercase",
+              color: "#F7941D", marginBottom: 14, fontWeight: 500 }}>Fees</p>
+            <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "clamp(2rem,4vw,2.8rem)",
+              fontWeight: 300, color: "#2A1208", lineHeight: 1.15 }}>
+              Yoga class <em style={{ color: "#A65808" }}>fees</em>
+            </h2>
+            <p style={{ fontSize: "0.95rem", color: "#4A2E1A", marginTop: 12 }}>
+              No joining fee and no contract. Pay per class or by the month.
+            </p>
+          </div>
+          <div style={{ border: "1px solid rgba(107,45,139,0.14)", borderRadius: "1.25rem", overflow: "hidden", marginBottom: "3rem" }}>
+            {fees.map((f, i) => (
+              <Link key={f.title} href={f.href} style={{
+                display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "baseline", gap: "0.25rem 1rem",
+                padding: "1rem 1.5rem", textDecoration: "none",
+                borderBottom: i < fees.length - 1 ? "1px solid rgba(107,45,139,0.08)" : "none",
+                background: i % 2 === 0 ? "#FFFFFF" : "rgba(107,45,139,0.025)",
+              }}>
+                <span style={{ fontSize: "0.98rem", color: "#2A1208", fontWeight: 500 }}>{f.title}</span>
+                <span style={{ textAlign: "right" }}>
+                  <span style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.25rem", color: "#6B2D8B" }}>{f.price}</span>
+                  {f.sub && <span style={{ display: "block", fontSize: "0.8rem", color: "#7A5840" }}>{f.sub}</span>}
+                </span>
+              </Link>
+            ))}
+          </div>
+          <div className="space-y-3">
+            {feeFaqs.map((f) => (
+              <details key={f.q} className="faq-item rounded-2xl" style={{ background: "#F9F5FF", border: "1px solid rgba(107,45,139,0.12)" }}>
+                <summary className="flex items-center justify-between gap-4 cursor-pointer list-none px-6 py-5">
+                  <span className="text-base font-medium" style={{ color: "#2A1208" }}>{f.q}</span>
+                  <span className="faq-mark flex-shrink-0 text-xl font-light leading-none" style={{ color: "#6B2D8B" }}>+</span>
+                </summary>
+                <p className="px-6 pb-5 text-sm leading-relaxed" style={{ color: "#4A2E1A" }}>{f.a}</p>
+              </details>
+            ))}
+          </div>
+          <style>{`
+            .faq-item > summary::-webkit-details-marker { display: none; }
+            .faq-item .faq-mark { transition: transform 0.2s ease; }
+            .faq-item[open] .faq-mark { transform: rotate(45deg); }
+          `}</style>
+        </div>
+      </section>
+
+      <FurtherReading
+        slugs={["yoga-class-fees-kathmandu", "first-yoga-class", "online-private-home-yoga", "desk-yoga-back-pain"]}
+        background="#FFF7E8"
+      />
     </main>
   );
 }

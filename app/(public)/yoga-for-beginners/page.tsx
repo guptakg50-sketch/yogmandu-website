@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
 import { withShareText } from "@/lib/seo";
 import Link from "next/link";
+import FurtherReading from "@/components/FurtherReading";
+
+// The Further Reading cards come from Supabase; re-render picks up newly
+// published posts within five minutes.
+export const revalidate = 300;
 
 const pageMetadata: Metadata = {
-  title: { absolute: "Yoga for Beginners in Baneshwor, Kathmandu | Yogmandu" },
+  title: { absolute: "Yoga for Beginners in Kathmandu — From NPR 600 | Yogmandu" },
   description:
-    "New to yoga? Start with beginner-friendly classes at Yogmandu in Baneshwor, Kathmandu — near New Baneshwor. Gentle Hatha & breathwork. No experience needed.",
+    "Never done yoga? Start with gentle beginner classes in Mid-Baneshwor, Kathmandu. Drop in from NPR 600, no membership. No flexibility or experience needed.",
   keywords: [
     "yoga for beginners",
     "yoga for beginners Kathmandu",
@@ -17,12 +22,14 @@ const pageMetadata: Metadata = {
     "first yoga class",
     "how to start yoga",
     "Hatha yoga beginners Nepal",
+    "yoga classes near me for beginners",
+    "beginner yoga class fees Kathmandu",
   ],
   alternates: { canonical: "https://yogmandu.com/yoga-for-beginners" },
   openGraph: {
-    title: "Yoga for Beginners in Kathmandu | Start Your Practice — Yogmandu",
+    title: "Yoga for Beginners in Kathmandu — From NPR 600 | Yogmandu",
     description:
-      "Beginner-friendly yoga in Kathmandu, Nepal. Gentle Hatha, pranayama and meditation. No experience or flexibility required — all levels welcome.",
+      "Never done yoga? Start with gentle beginner classes in Mid-Baneshwor, Kathmandu. Drop in from NPR 600, no membership. No flexibility or experience needed.",
     url: "https://yogmandu.com/yoga-for-beginners",
     images: ["/opengraph-image.png"],
   },
@@ -57,6 +64,10 @@ const faqs = [
   {
     q: "What should I wear and bring to my first class?",
     a: "Wear comfortable clothes you can move and stretch in. Bring water and, if you have one, a yoga mat — though mats are available at the studio. Practise on an empty-ish stomach (leave 2 hours after a large meal).",
+  },
+  {
+    q: "How much do beginner yoga classes cost?",
+    a: "A single drop-in class is NPR 600 (USD 6) with no membership, so you can try a class before committing. Regular monthly classes start from NPR 5,000 (USD 50) a month, and live online classes from NPR 2,500 (USD 25) a month.",
   },
   {
     q: "How often should a beginner practise yoga?",
@@ -110,6 +121,13 @@ const firstClass = [
   { step: "02", title: "Begin with breath", body: "Class opens with simple breathing (pranayama) to settle the mind and connect to the present moment.", color: "#F7941D" },
   { step: "03", title: "Move gently", body: "Warm-ups flow into foundational postures. You'll be offered easier options at every step.", color: "#8DC63F" },
   { step: "04", title: "Rest in stillness", body: "Every class closes with relaxation (savasana) — often the most loved part for beginners.", color: "#6B2D8B" },
+];
+
+// Same figures as the Yoga Classes hub cards on /class-schedule.
+const startOptions = [
+  { name: "Drop-in class", price: "NPR 600", sub: "USD 6 · per class, no membership", desc: "The easiest way to try yoga. Turn up to any class on the timetable.", href: "/class-schedule/drop-in", color: "#F7941D" },
+  { name: "Regular classes", price: "NPR 5,000", sub: "USD 50 · a month", desc: "Practise through the week and build a steady habit with the same teachers.", href: "/class-schedule", color: "#6B2D8B" },
+  { name: "Live online", price: "NPR 2,500", sub: "USD 25 · a month", desc: "Real-time classes from home, if getting to Baneshwor isn't practical.", href: "/class-schedule/virtual", color: "#8DC63F" },
 ];
 
 const beginnerClasses = [
@@ -237,6 +255,33 @@ export default function YogaForBeginnersPage() {
         </div>
       </section>
 
+      {/* What it costs to start */}
+      <section className="py-24 px-6" style={{ background: "#FFF7E8" }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#F7941D" }}>Fees</p>
+            <h2 className="text-4xl md:text-5xl font-light" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>
+              What it costs to start
+            </h2>
+            <div className="section-divider mt-6" />
+            <p className="mt-6 text-base font-light max-w-xl mx-auto" style={{ color: "#4A2E1A" }}>
+              No joining fee and no contract. Try a single class first, then choose what suits you.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {startOptions.map((o) => (
+              <Link key={o.name} href={o.href} className="lift-3d rounded-2xl p-8 block"
+                style={{ background: `${o.color}06`, border: `1.5px solid ${o.color}22`, borderTop: `3px solid ${o.color}` }}>
+                <h3 className="text-xl font-light mb-3" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>{o.name}</h3>
+                <div className="text-[2.2rem] font-light leading-none mb-1" style={{ fontFamily: "Cormorant Garamond, serif", color: o.color }}>{o.price}</div>
+                <p className="text-xs mb-4" style={{ color: "#7A5840" }}>{o.sub}</p>
+                <p className="text-sm leading-relaxed" style={{ color: "#4A2E1A" }}>{o.desc}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section className="py-24 px-6" style={{ background: "#FFFFFF" }}>
         <div className="max-w-3xl mx-auto">
@@ -266,6 +311,12 @@ export default function YogaForBeginnersPage() {
           .faq-item[open] .faq-mark { transform: rotate(45deg); }
         `}</style>
       </section>
+
+      <FurtherReading
+        slugs={["first-yoga-class", "pranayama-for-beginners", "yoga-class-fees-kathmandu", "yoga-nidra-deep-rest"]}
+        title="Before your first class"
+        background="#FFF7E8"
+      />
 
       {/* CTA */}
       <section className="py-20 px-6" style={{ background: "#F9F5FF" }}>
