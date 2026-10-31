@@ -52,3 +52,6 @@ scripts/.deploy.env
 
 # server file backups (local only)
 .deploy-backup/
+
+# backups written by scripts/release-share-previews.mjs
+share-previews-backup-*.json

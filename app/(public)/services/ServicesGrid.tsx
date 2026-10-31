@@ -86,7 +86,7 @@ const SERVICES: Service[] = [
     id: "sound", group: "Therapy & Wellness", color: "#F7941D",
     title: "Sound Healing Therapy",
     subtitle: "Tibetan singing bowl sessions",
-    body: "Authentic Tibetan singing bowl therapy. Individual (NPR 2,000 / USD 20), 3-session pack (NPR 5,500 / USD 55), or group sound bath (NPR 1,000 / USD 10 pp). 90 minutes per session.",
+    body: "Authentic Tibetan singing bowl therapy. Individual sessions from NPR 2,500 / USD 25, or a group sound bath at NPR 1,000 / USD 10 per person. 60 minutes per session.",
     icon: "🎵",
     bookHref: "/sound-healing-therapy", bookLabel: "Learn more",
   },

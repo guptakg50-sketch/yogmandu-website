@@ -92,7 +92,7 @@ export const SHARE_PAGES: SharePage[] = [
     path: "/sound-healing-therapy",
     label: "/sound-healing-therapy",
     title: "Sound Healing Therapy Nepal \u2014 Tibetan Singing Bowls | Yogmandu",
-    description: "Authentic Tibetan singing bowl sessions in Kathmandu. Individual USD 20 \u00b7 Group USD 10/person \u00b7 Level I & II certification. Book on WhatsApp.",
+    description: "Authentic Tibetan singing bowl sessions in Kathmandu. Individual USD 25 \u00b7 Group USD 10/person \u00b7 Level I & II certification. Book on WhatsApp.",
   },
   {
     path: "/sound-healing-therapy/course-level-1",

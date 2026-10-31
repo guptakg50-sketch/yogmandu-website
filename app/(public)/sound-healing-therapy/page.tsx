@@ -26,13 +26,13 @@ const pageMetadata: Metadata = {
   alternates: { canonical: "https://yogmandu.com/sound-healing-therapy" },
   openGraph: {
     title: "Sound Healing Therapy Nepal — Tibetan Singing Bowls | Yogmandu",
-    description: "Authentic Tibetan singing bowl sessions in Kathmandu. Individual USD 20 · Group USD 10/person · Level I & II certification. Book on WhatsApp.",
+    description: "Authentic Tibetan singing bowl sessions in Kathmandu. Individual USD 25 · Group USD 10/person · Level I & II certification. Book on WhatsApp.",
     url: "https://yogmandu.com/sound-healing-therapy",
     images: ["/opengraph-image.png"],
   },
   twitter: {
     title: "Sound Healing Therapy Nepal — Tibetan Singing Bowls | Yogmandu",
-    description: "Authentic Tibetan singing bowl sessions in Kathmandu. Individual USD 20 · Group USD 10/person · Level I & II certification.",
+    description: "Authentic Tibetan singing bowl sessions in Kathmandu. Individual USD 25 · Group USD 10/person · Level I & II certification.",
   },
 };
 
@@ -69,11 +69,11 @@ const serviceSchema = {
 const faqs = [
   {
     q: "What is a Tibetan singing bowl sound healing session?",
-    a: "A sound healing session uses hand-hammered Tibetan singing bowls placed on and around the body. The resonating frequencies promote deep relaxation, stress relief, and energetic balance. Sessions typically last 90 minutes.",
+    a: "A sound healing session uses hand-hammered Tibetan singing bowls placed on and around the body. The resonating frequencies promote deep relaxation, stress relief, and energetic balance. Sessions last about 60 minutes.",
   },
   {
     q: "How much does a sound healing session cost at Yogmandu?",
-    a: "Individual sessions are USD 20 (NPR 2,000). Group sessions are USD 10 per person with a minimum of 5 participants. A 3-session package is available for USD 55.",
+    a: "Individual sessions start from NPR 2,500 (USD 25) for 60 minutes. Group sound baths are NPR 1,000 (USD 10) per person. Packages and private group rates are available on request.",
   },
   {
     q: "Do I need experience for a sound healing session?",
