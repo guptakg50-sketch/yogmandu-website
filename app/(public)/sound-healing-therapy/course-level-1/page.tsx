@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { withShareText } from "@/lib/seo";
 import ServicePage from "../../service/ServicePage";
-import type { ServiceConfig } from "../../service/serviceContent";
+import { buildCourseSchema } from "@/lib/courseSchema";
 import { getServicePageConfig } from "@/lib/pageContent";
 
 // Content is admin-editable (Page Content → Service Pages); re-render picks
@@ -36,62 +36,6 @@ export async function generateMetadata(): Promise<Metadata> {
   return withShareText("/sound-healing-therapy/course-level-1", pageMetadata);
 }
 
-const STUDIO = {
-  "@type": "Place",
-  name: "Yogmandu",
-  address: { "@type": "PostalAddress", streetAddress: "Miteri Marg, Mid-Baneshwor-31", addressLocality: "Kathmandu", addressCountry: "NP" },
-} as const;
-
-// This page previously carried no structured data at all, unlike every YTT
-// page. The markup is derived from the same admin-editable config the page
-// renders, so hours and price can't drift from the visible content when the
-// client edits Page Content → Service Pages — Google requires structured data
-// to match what the user actually sees. Fields we can't read stay omitted
-// rather than being guessed.
-// Prices are written for humans and are often dual-currency
-// ("NPR 35,000 / USD 350"), so each amount must be paired with the symbol
-// that introduces it. Matching currency and amount independently reads the
-// first number with the last currency and publishes "USD 35,000".
-function parsePrices(text: string): { price: string; priceCurrency: string }[] {
-  return [...text.matchAll(/(NPR|Rs\.?|USD|\$)\s*([\d,]+(?:\.\d+)?)/gi)].map((m) => ({
-    priceCurrency: /usd|\$/i.test(m[1]) ? "USD" : "NPR",
-    price: m[2].replace(/,/g, ""),
-  }));
-}
-
-function buildCourseSchema(config: ServiceConfig) {
-  const hours = config.heroMeta.match(/(\d+)\s*hours?/i)?.[1];
-  const prices = parsePrices(config.price ?? "");
-
-  return {
-    "@context": "https://schema.org",
-    "@type": "Course",
-    name: `${config.heroTitleA} ${config.heroTitleEm}`.replace(/\s+/g, " ").trim(),
-    description: config.heroLead.length > 160 ? config.heroLead.slice(0, 159).replace(/\s+\S*$/, "") + "…" : config.heroLead,
-    provider: { "@type": "Organization", name: "Yogmandu", sameAs: "https://yogmandu.com" },
-    courseMode: "onsite",
-    location: STUDIO,
-    hasCourseInstance: {
-      "@type": "CourseInstance",
-      courseMode: "onsite",
-      ...(hours ? { courseWorkload: `PT${hours}H` } : {}),
-      location: STUDIO,
-    },
-    ...(prices.length
-      ? {
-          offers: prices.map((p) => ({
-            "@type": "Offer",
-            priceCurrency: p.priceCurrency,
-            price: p.price,
-            availability: "https://schema.org/InStock",
-            url: "https://yogmandu.com/sound-healing-therapy/course-level-1",
-          })),
-        }
-      : {}),
-    educationalCredentialAwarded: "Yogmandu Sound Healing Certificate — Level I",
-  };
-}
-
 const breadcrumbSchema = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
@@ -106,7 +50,7 @@ export default async function Page() {
   const config = await getServicePageConfig("SOUND_LEVEL_1");
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(buildCourseSchema(config)) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(buildCourseSchema(config, "https://yogmandu.com/sound-healing-therapy/course-level-1", "Yogmandu Sound Healing Certificate — Level I")) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <ServicePage config={config} />
     </>

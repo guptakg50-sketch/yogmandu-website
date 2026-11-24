@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { yogaAllianceCredentials, YACEP_PROFILE_URL } from "@/lib/credentials";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -75,6 +76,10 @@ export default async function TeacherPage({ params }: { params: Params }) {
   const website     = t.social?.website ?? "";
   const initials    = initialsOf(t.name);
 
+  // Credentials come from the role/certifications text shown on this page.
+  const credentials = yogaAllianceCredentials(`${t.role ?? ""} ${t.certifications ?? ""}`);
+  const sameAs = [website, slug === "arjuna-rakhal-magar" ? YACEP_PROFILE_URL : ""].filter(Boolean);
+
   const personSchema = {
     "@context": "https://schema.org",
     "@type": "Person",
@@ -82,10 +87,12 @@ export default async function TeacherPage({ params }: { params: Params }) {
     jobTitle: t.role || "Yoga Teacher",
     description: t.bio || "",
     url: `https://yogmandu.com/teachers/${slug}`,
-    image: photos[0] ? `https://yogmandu.com${photos[0]}` : undefined,
+    image: photos[0] ? new URL(photos[0], "https://yogmandu.com").href : undefined,
     worksFor: { "@type": "Organization", name: "Yogmandu", url: "https://yogmandu.com" },
     knowsAbout: specialties,
-    ...(website ? { sameAs: [website] } : {}),
+    "@id": `https://yogmandu.com/teachers/${slug}#person`,
+    ...(sameAs.length ? { sameAs } : {}),
+    ...(credentials.length ? { hasCredential: credentials } : {}),
   };
 
   const breadcrumbSchema = {

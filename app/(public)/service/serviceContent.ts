@@ -3,6 +3,8 @@
 // ServiceConfig object rendered by <ServicePage>, so every page stays visually
 // identical to the Teacher Training child pages and is trivial to edit here.
 
+import { YACEP_PROFILE_URL } from "@/lib/credentials";
+
 export type ServiceFaq = { q: string; a: string };
 export type ServiceStep = { n: string; t: string; b: string };
 
@@ -35,7 +37,7 @@ export type ServiceConfig = {
   /** Course syllabus, shown as its own section after "what's included". */
   curriculum?: ServiceCurriculum;
   /** Accreditation badge shown above the pricing section. */
-  badge?: { src: string; alt: string; caption: string };
+  badge?: { src: string; alt: string; caption: string; holder?: string; holderHref?: string; verifyHref?: string };
   /** Blog slugs shown as "Further reading" cards; unpublished ones are skipped. */
   furtherReading?: string[];
 };
@@ -283,6 +285,9 @@ const YACEP_BADGE = {
   src: "/images/badges/yacep-teal.webp",
   alt: "Yoga Alliance Continuing Education Provider (YACEP) badge",
   caption: "Certification: Yoga Alliance USA, YACEP",
+  holder: "Yogi Arjuna (Arjuna Rakhal Magar), E-RYT 500, YACEP",
+  holderHref: "/teachers/arjuna-rakhal-magar",
+  verifyHref: YACEP_PROFILE_URL,
 };
 
 export const SOUND_LEVEL_1: ServiceConfig = {

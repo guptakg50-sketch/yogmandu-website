@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { withShareText } from "@/lib/seo";
 import ServicePage from "../../service/ServicePage";
+import { buildCourseSchema } from "@/lib/courseSchema";
 import { getServicePageConfig } from "@/lib/pageContent";
 
 // Content is admin-editable (Page Content → Service Pages); re-render picks
@@ -26,6 +27,23 @@ export async function generateMetadata(): Promise<Metadata> {
   return withShareText("/sound-healing-therapy/course-level-2", pageMetadata);
 }
 
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://yogmandu.com" },
+    { "@type": "ListItem", position: 2, name: "Sound Healing Therapy", item: "https://yogmandu.com/sound-healing-therapy" },
+    { "@type": "ListItem", position: 3, name: "Course Level II", item: "https://yogmandu.com/sound-healing-therapy/course-level-2" },
+  ],
+};
+
 export default async function Page() {
-  return <ServicePage config={await getServicePageConfig("SOUND_LEVEL_2")} />;
+  const config = await getServicePageConfig("SOUND_LEVEL_2");
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(buildCourseSchema(config, "https://yogmandu.com/sound-healing-therapy/course-level-2", "Yogmandu Sound Healing Certificate — Level II")) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <ServicePage config={config} />
+    </>
+  );
 }
