@@ -282,7 +282,7 @@ export const SOUND_SESSIONS: ServiceConfig = {
 const YACEP_BADGE = {
   src: "/images/badges/yacep-teal.webp",
   alt: "Yoga Alliance Continuing Education Provider (YACEP) badge",
-  caption: "Yoga Alliance Continuing Education Provider (YACEP)",
+  caption: "Certification: Yoga Alliance USA, YACEP",
 };
 
 export const SOUND_LEVEL_1: ServiceConfig = {
@@ -292,7 +292,7 @@ export const SOUND_LEVEL_1: ServiceConfig = {
   heroTitleA: "Sound Healing Course",
   heroTitleEm: "— Level I",
   heroLead: "The foundation for working with sound — the science, energy bodies and chakras, and hands-on singing bowl practice. Your first step to becoming a certified sound healer.",
-  heroMeta: "20 hours · Foundational · Internationally recognised certificate",
+  heroMeta: "20 hours · Foundational · Certification: Yoga Alliance USA, YACEP",
   bookLabel: "Enrol in Level I",
   overviewHeading: "Your foundation in sound healing",
   overviewBody: [
@@ -377,7 +377,7 @@ export const SOUND_LEVEL_2: ServiceConfig = {
   heroTitleA: "Sound Healing Course",
   heroTitleEm: "— Level II",
   heroLead: "Deepen your knowledge and practical skills — gongs, tuning forks, biofield clearing and immersive sound baths. The advanced course for practitioners ready to work with others.",
-  heroMeta: "Advanced program · Level I required · Certificate on completion",
+  heroMeta: "Advanced program · Level I required · Certification: Yoga Alliance USA, YACEP",
   bookLabel: "Enrol in Level II",
   overviewHeading: "Become a professional practitioner",
   overviewBody: [
