@@ -13,7 +13,7 @@ export const revalidate = 300;
 const pageMetadata: Metadata = {
   title: { absolute: "Sound Healing Certification Level I, Nepal | Yogmandu" },
   description:
-    "Level I foundational sound healing certification in Kathmandu, Nepal. 20 hours of Tibetan singing bowl history, technique and session basics.",
+    "Level I foundational sound healing certification in Kathmandu, Nepal. 20 hours: science of sound, chakras, singing bowls and client session basics.",
   keywords: [
     "sound healing course Nepal",
     "sound healing certification Kathmandu",

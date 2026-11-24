@@ -58,10 +58,10 @@ export const SOUND_HEALING_HUB: HubConfig = {
       "Studio in Kathmandu", P, ["Tibetan singing bowls", "Deep nervous-system reset", "Individual or group"],
       "/sound-healing-therapy/sessions", { badge: "Most Booked", badgeColor: P, featured: true }),
     card("s-level1", "Course · Level I", "Course — Level I", "🌱", "20 hours", "Foundational",
-      "Certificate on completion", "#4A6418", ["Bowl history & technique", "Session structure & timing", "Foundational certificate"],
+      "Certificate on completion", "#4A6418", ["Sound science, chakras & energy bodies", "Singing bowl practice & session basics", "Foundational certificate"],
       "/sound-healing-therapy/course-level-1"),
     card("s-level2", "Course · Level II", "Course — Level II", "✨", "Advanced", "Level I required",
-      "Certificate on completion", P, ["Chakra mapping & client work", "Trauma-informed facilitation", "Advanced certificate"],
+      "Certificate on completion", P, ["Gongs, tuning forks & singing bowls", "Biofield clearing & sound baths", "Advanced certificate"],
       "/sound-healing-therapy/course-level-2"),
   ],
 };

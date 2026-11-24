@@ -57,9 +57,8 @@ const serviceSchema = {
   ],
   serviceType: "Sound Healing Therapy",
   offers: [
-    { "@type": "Offer", name: "Individual Session", priceCurrency: "USD", price: "20", description: "90-minute personal Tibetan singing bowl session." },
-    { "@type": "Offer", name: "Group Sound Bath", priceCurrency: "USD", price: "10", description: "90-minute group session, minimum 5 participants." },
-    { "@type": "Offer", name: "3-Session Package", priceCurrency: "USD", price: "55", description: "Three individual sessions at a discounted rate." },
+    { "@type": "Offer", name: "Individual Session", priceCurrency: "USD", price: "25", description: "60-minute personal Tibetan singing bowl session." },
+    { "@type": "Offer", name: "Group Sound Bath", priceCurrency: "USD", price: "10", description: "60-minute group session, price per person." },
   ],
 };
 

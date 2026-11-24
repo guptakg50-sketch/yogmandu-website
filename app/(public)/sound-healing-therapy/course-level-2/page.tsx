@@ -10,7 +10,7 @@ export const revalidate = 300;
 const pageMetadata: Metadata = {
   title: { absolute: "Sound Healing Course Level II (Advanced) in Nepal | Yogmandu" },
   description:
-    "Level II advanced sound healing certification in Kathmandu, Nepal — chakra mapping, client work and professional facilitation. Level I required. Certificate awarded.",
+    "Level II advanced sound healing certification in Kathmandu, Nepal — gongs, tuning forks, biofield clearing and sound baths. Level I required.",
   alternates: { canonical: "https://yogmandu.com/sound-healing-therapy/course-level-2" },
   openGraph: {
     title: "Sound Healing Course — Level II | Yogmandu",

@@ -6,6 +6,11 @@
 export type ServiceFaq = { q: string; a: string };
 export type ServiceStep = { n: string; t: string; b: string };
 
+/** A topic, optionally with sub-points (practical walk-throughs, session types). */
+export type CurriculumTopic = string | { text: string; sub: string[] };
+export type CurriculumModule = { title?: string; topics: CurriculumTopic[] };
+export type ServiceCurriculum = { heading: string; intro?: string; modules: CurriculumModule[]; outro?: string };
+
 export type ServiceConfig = {
   /** Booking id — the whole-page CTA links to /book?service=<slug>. */
   slug: string;
@@ -27,6 +32,10 @@ export type ServiceConfig = {
   faqs: ServiceFaq[];         // 3–4
   siblingLinks: { href: string; label: string }[];
   accent: string;             // hex accent from the palette
+  /** Course syllabus, shown as its own section after "what's included". */
+  curriculum?: ServiceCurriculum;
+  /** Accreditation badge shown above the pricing section. */
+  badge?: { src: string; alt: string; caption: string };
   /** Blog slugs shown as "Further reading" cards; unpublished ones are skipped. */
   furtherReading?: string[];
 };
@@ -270,19 +279,25 @@ export const SOUND_SESSIONS: ServiceConfig = {
   accent: "#6B2D8B",
 };
 
+const YACEP_BADGE = {
+  src: "/images/badges/yacep-teal.webp",
+  alt: "Yoga Alliance Continuing Education Provider (YACEP) badge",
+  caption: "Yoga Alliance Continuing Education Provider (YACEP)",
+};
+
 export const SOUND_LEVEL_1: ServiceConfig = {
   slug: "sound",
   breadcrumb: { href: "/sound-healing-therapy", label: "Sound Healing" },
   eyebrow: "Certification · Level I · Foundational",
   heroTitleA: "Sound Healing Course",
   heroTitleEm: "— Level I",
-  heroLead: "The foundation for working with Tibetan singing bowls — history, tradition and practical technique. Your first step to becoming a certified sound healer.",
+  heroLead: "The foundation for working with sound — the science, energy bodies and chakras, and hands-on singing bowl practice. Your first step to becoming a certified sound healer.",
   heroMeta: "20 hours · Foundational · Internationally recognised certificate",
   bookLabel: "Enrol in Level I",
   overviewHeading: "Your foundation in sound healing",
   overviewBody: [
-    "Level I is the foundational course for anyone beginning their journey with Tibetan singing bowls. You'll learn where these instruments come from, how to choose and read a bowl, and the practical technique to play them safely and effectively.",
-    "By the end you'll be able to structure and hold a simple sound healing session, and you'll have your own daily practice as a practitioner. It's the essential first step before Level II. Training is led by experienced, internationally certified sound healing trainers.",
+    "Level I is the foundational course for anyone beginning their journey as a sound healing practitioner. You'll study what sound healing is and the science behind it, how sound relates to the chakras and the body's energy field, and how to use singing bowls and Bija seed sound chanting in practice.",
+    "By the end you'll know the basics of a sound healing session and the types of sessions you can offer to clients, friends and family. It's the essential first step before Level II. Training is led by experienced, internationally certified sound healing trainers.",
   ],
   forYou: [
     "Complete beginners to sound healing",
@@ -291,17 +306,55 @@ export const SOUND_LEVEL_1: ServiceConfig = {
     "Those planning to progress to Level II",
   ],
   included: [
-    "Sound & music — how sound affects body, mind & energy",
-    "Nada Yoga — the yoga of sound",
-    "Origin & lineage of Himalayan bowls",
-    "Types of bowls, mallets & how to read a bowl",
-    "Auras, chakras & aura-cleansing techniques",
-    "Proper placement, session structure & self-practice",
+    "20 hours of training",
+    "Four modules, from the science of sound to client practice",
+    "Practical walk-throughs: Bija chanting, sound bath meditation & brass bowl session",
+    "Singing bowl & brass chakra bowl technique",
     "Internationally recognised Level I certificate",
   ],
+  curriculum: {
+    heading: "Sound Healing Practitioner Certification Course",
+    modules: [
+      { title: "Foundations of Sound Healing", topics: [
+        "What Is Sound and Sound Healing?",
+        "History and Modern Applications of Sound Healing",
+        "Science of Sound, Entrainment, and Cymatics",
+      ] },
+      { title: "Energy Bodies, Chakras, and Frequencies", topics: [
+        "Sound Healing and Our Energy Bodies",
+        "Chakras and Auric Layers / Biofield",
+        "The Torus",
+        "Frequencies Emitted by the Body and Body Energy",
+        "Emotional Correlations of Physical Pain",
+        "Healing Frequencies, Binaural Beats, and Tone Generators",
+        "Solfeggio and Chakra Frequencies",
+        "Chakra Sound Healing Affirmations",
+        "Brainwave States",
+        { text: "Bija Seed Sound Chanting", sub: ["Practical Walk-Through: Bija Seed Sound Chanting"] },
+      ] },
+      { title: "Singing Bowls and Sound Healing", topics: [
+        { text: "Chakra Affirmations with a Singing Bowl Sound Bath", sub: ["Practical Walk-Through: Sound Bath Meditation with Affirmations"] },
+        "Brass Singing Bowls",
+        { text: "Brass Chakra Singing Bowl Healing Session", sub: ["Practical Walk-Through: Brass Bowl Session"] },
+      ] },
+      { title: "Client Practice and Session Basics", topics: [
+        "Working with Clients, Friends, and Family",
+        "Sound Healing Session Basics",
+        { text: "Types of Sessions for Level One Practitioners:", sub: [
+          "Singing Bowl Sessions",
+          "Singing Bowl Sound Baths",
+          "Bija Seed Sound Chanting",
+          "Chakra Singing Bowl Meditation with Affirmations",
+          "Brass Chakra Singing Bowl Sound Baths",
+          "Mixed-Instrument Sound Healing Sessions",
+        ] },
+      ] },
+    ],
+  },
+  badge: YACEP_BADGE,
   steps: [
     { n: "1", t: "Enrol", b: "Message us to reserve your place and pick dates that suit you." },
-    { n: "2", t: "Train hands-on", b: "Learn technique, tradition and session basics over the 20-hour course." },
+    { n: "2", t: "Train hands-on", b: "Learn the foundations, singing bowl practice and session basics over the 20-hour course." },
     { n: "3", t: "Get certified", b: "Complete the course and receive your Level I certificate." },
   ],
   price: "NPR 35,000 / USD 350",
@@ -310,7 +363,7 @@ export const SOUND_LEVEL_1: ServiceConfig = {
     { q: "Do I need any experience for Level I?", a: "None at all. Level I is the foundational course and assumes no prior knowledge of sound healing or singing bowls." },
     { q: "How long is Level I?", a: "The Level I course runs for 20 hours. Schedules are flexible — message us with your preferred dates." },
     { q: "How much does Level I cost?", a: "Level I is NPR 35,000 for Nepalese students and USD 350 for international students, and includes your foundational certificate." },
-    { q: "Can I go on to Level II afterwards?", a: "Absolutely — Level I is the prerequisite for the advanced Level II course, where you deepen into professional facilitation." },
+    { q: "Can I go on to Level II afterwards?", a: "Absolutely — Level I is the prerequisite for the Level II course, where you add gongs, tuning forks and multi-instrument sound baths." },
   ],
   siblingLinks: SOUND_SIBLINGS.filter((l) => l.href !== "/sound-healing-therapy/course-level-1"),
   furtherReading: ["sound-healing-practitioner", "sound-healing-therapies-explained", "tibetan-singing-bowl-session"],
@@ -323,13 +376,13 @@ export const SOUND_LEVEL_2: ServiceConfig = {
   eyebrow: "Certification · Level II · Advanced",
   heroTitleA: "Sound Healing Course",
   heroTitleEm: "— Level II",
-  heroLead: "Deepen into professional facilitation — chakra mapping, advanced techniques and client work. The advanced course for practitioners ready to work with others.",
+  heroLead: "Deepen your knowledge and practical skills — gongs, tuning forks, biofield clearing and immersive sound baths. The advanced course for practitioners ready to work with others.",
   heroMeta: "Advanced program · Level I required · Certificate on completion",
   bookLabel: "Enrol in Level II",
   overviewHeading: "Become a professional practitioner",
   overviewBody: [
-    "Level II takes you beyond the foundations into confident, professional facilitation. You'll learn to map bowls precisely to the chakra system, design custom sessions around a client's needs, and work sensitively within trauma-informed boundaries.",
-    "You'll also learn to combine sound with breathwork and meditation, and cover the ethics and practicalities of building a sound-healing practice. Level I is the prerequisite. Training is led by experienced, internationally certified trainers.",
+    "In Level II you deepen your knowledge and practical skills as a sound healing practitioner. You'll work with different instruments individually and in combination: singing bowls, gongs, and weighted and non-weighted tuning forks.",
+    "You'll also learn to clear and attune the layers of the biofield, facilitate immersive sound baths, and understand how to conduct your own practice. Level I is the prerequisite. Training is led by experienced, internationally certified trainers.",
   ],
   forYou: [
     "Graduates of the Level I course",
@@ -338,24 +391,44 @@ export const SOUND_LEVEL_2: ServiceConfig = {
     "Anyone building a sound-healing practice",
   ],
   included: [
-    "Chakra system & precise bowl-to-chakra mapping",
-    "Designing custom sessions for client needs",
-    "Working with anxiety, PTSD & trauma-informed boundaries",
-    "Combining sound with breathwork & meditation",
-    "Building a sound-healing practice (ethics & business)",
+    "Singing bowl healing practicum (Vedic Therapy and Healing)",
+    "Gongs, weighted & non-weighted tuning forks",
+    "Biofield clearing & attunement",
+    "Immersive multi-instrument sound baths",
+    "Session types, durations & pricing for your own practice",
     "Internationally recognised Level II certificate",
   ],
+  curriculum: {
+    heading: "What you will learn in Level II",
+    intro: "In Level 2, you will deepen your knowledge and practical skills as a sound healing practitioner, covering:",
+    modules: [{ topics: [
+      "Using different sound healing instruments individually and in combination",
+      "More about singing bowl healing practicum (Vedic Therapy and Healing)",
+      "Gongs and their uses in sound healing",
+      "Understanding weighted and non-weighted tuning forks and their applications",
+      "Exploring chakra tuning fork frequencies, Solfeggio frequencies, and chakra balance",
+      "Understanding the masculine and feminine sides of the body",
+      "Using low-range Ohm tuning forks for grounding and healing",
+      "Applying sound healing fundamentals in every session",
+      "Clearing and attuning the layers of the biofield",
+      "Conducting weighted chakra, non-weighted Solfeggio, biofield clearing, and Ohm tuning fork sessions",
+      "Facilitating immersive sound baths using multiple instruments",
+      "Understanding session types, durations, pricing, and how to conduct your own sound healing practice",
+    ] }],
+    outro: "By the end of Level 2, you will have enhanced practical skills and greater confidence to begin offering sound healing sessions to friends, family, and clients.",
+  },
+  badge: YACEP_BADGE,
   steps: [
     { n: "1", t: "Confirm Level I", b: "Level I is the prerequisite — let us know when you completed it." },
-    { n: "2", t: "Train in depth", b: "Cover advanced facilitation, chakra work and client practice." },
+    { n: "2", t: "Train in depth", b: "Work with gongs, tuning forks, singing bowls and immersive sound baths." },
     { n: "3", t: "Get certified", b: "Complete your assessment and receive your Level II certificate." },
   ],
   price: "NPR 55,000 / USD 600",
   priceNote: "Nepalese students / international students · Level II certification",
   faqs: [
     { q: "Do I need Level I before Level II?", a: "Yes. Level II builds directly on the foundational skills from Level I, so completing Level I first is required." },
-    { q: "What extra does Level II cover?", a: "Chakra-to-bowl mapping, designing sessions for individual clients, trauma-informed practice, combining sound with breathwork, and the ethics and business of practising professionally." },
-    { q: "Will I be able to work with clients?", a: "Yes — Level II is designed to prepare you to facilitate professional one-to-one and group sessions with confidence." },
+    { q: "What extra does Level II cover?", a: "Gongs, weighted and non-weighted tuning forks, chakra and Solfeggio frequencies, biofield clearing and attunement, immersive multi-instrument sound baths, and how to run your own sound healing practice." },
+    { q: "Will I be able to work with clients?", a: "Yes — Level II gives you the practical skills and confidence to begin offering sound healing sessions to friends, family and clients." },
     { q: "How much does Level II cost?", a: "Level II is NPR 55,000 for Nepalese students and USD 600 for international students, and includes your advanced practitioner certificate." },
   ],
   siblingLinks: SOUND_SIBLINGS.filter((l) => l.href !== "/sound-healing-therapy/course-level-2"),

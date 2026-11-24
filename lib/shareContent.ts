@@ -98,7 +98,7 @@ export const SHARE_PAGES: SharePage[] = [
     path: "/sound-healing-therapy/course-level-1",
     label: "/sound-healing-therapy/course-level-1",
     title: "Sound Healing Certification Level I, Nepal | Yogmandu",
-    description: "Level I foundational sound healing certification in Kathmandu, Nepal. 20 hours of Tibetan singing bowl history, technique and session basics.",
+    description: "Level I foundational sound healing certification in Kathmandu, Nepal. 20 hours: science of sound, chakras, singing bowls and client session basics.",
   },
   {
     path: "/sound-healing-therapy/course-level-2",

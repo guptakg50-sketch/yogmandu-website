@@ -124,6 +124,59 @@ export default function ServicePage({ config: c, hub }: { config: ServiceConfig;
         </div>
       </section>
 
+      {c.curriculum && (
+        <section className="py-24 px-6" style={{ background: "#FFF7E8" }}>
+          <div className="max-w-5xl mx-auto">
+            <SectionHeading eyebrow="Course Content" title={c.curriculum.heading} color="#A65808" />
+            {c.curriculum.intro && (
+              <p className="text-base leading-relaxed text-center max-w-2xl mx-auto mb-10" style={{ color: "#4A2E1A" }}>{c.curriculum.intro}</p>
+            )}
+            <div className={`grid grid-cols-1 gap-6 ${c.curriculum.modules.length > 1 ? "md:grid-cols-2" : ""}`}>
+              {c.curriculum.modules.map((m, i) => (
+                <div key={m.title ?? i} className="rounded-2xl p-7 md:p-9" style={{ background: "#FFFFFF", border: `1.5px solid ${c.accent}2A` }}>
+                  {m.title && (
+                    <h3 className="text-2xl font-light mb-5" style={{ fontFamily: "Cormorant Garamond, serif", color: "#2A1208" }}>
+                      <span style={{ color: c.accent }}>{i + 1}.</span> {m.title}
+                    </h3>
+                  )}
+                  <ul className={`grid grid-cols-1 gap-x-10 gap-y-3 ${m.title ? "" : "md:grid-cols-2"}`}>
+                    {m.topics.map((topic) => {
+                      const text = typeof topic === "string" ? topic : topic.text;
+                      const sub = typeof topic === "string" ? [] : topic.sub;
+                      return (
+                        <li key={text} className="flex items-start gap-3 text-sm leading-relaxed" style={{ color: "#3D2515" }}>
+                          <span aria-hidden="true" style={{ marginTop: 8, width: 6, height: 6, borderRadius: "50%", flexShrink: 0, background: c.accent }} />
+                          <div>
+                            {text}
+                            {sub.length > 0 && (
+                              <ul className="mt-2 space-y-1.5 pl-4" style={{ borderLeft: `2px solid ${c.accent}33`, color: "#5A3A24" }}>
+                                {sub.map((x) => <li key={x}>{x}</li>)}
+                              </ul>
+                            )}
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ))}
+            </div>
+            {c.curriculum.outro && (
+              <p className="text-base leading-relaxed text-center max-w-2xl mx-auto mt-10" style={{ color: "#4A2E1A" }}>{c.curriculum.outro}</p>
+            )}
+          </div>
+        </section>
+      )}
+
+      {c.badge && (
+        <section className="py-16 px-6" style={{ background: "#FFFFFF" }}>
+          <div className="text-center">
+            <img src={c.badge.src} alt={c.badge.alt} width={160} height={160} loading="lazy" decoding="async" className="mx-auto" />
+            <p className="mt-5 text-sm font-medium" style={{ color: "#4A2E1A" }}>{c.badge.caption}</p>
+          </div>
+        </section>
+      )}
+
       {hub}
 
       {/* How it works */}
