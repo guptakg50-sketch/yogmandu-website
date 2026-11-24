@@ -1,5 +1,5 @@
 import type { ServiceConfig } from "@/app/(public)/service/serviceContent";
-import { yogaAllianceCredentials, YACEP_PROFILE_URL } from "@/lib/credentials";
+import { YACEP_PROVIDER } from "@/lib/credentials";
 
 // Course structured data for the sound healing levels, derived from the same
 // admin-editable config the page renders so it can't drift from what visitors
@@ -35,21 +35,7 @@ export function buildCourseSchema(config: ServiceConfig, url: string, credential
     description: config.heroLead.length > 160 ? config.heroLead.slice(0, 159).replace(/\s+\S*$/, "") + "…" : config.heroLead,
     url,
     inLanguage: "en",
-    provider: {
-      "@type": "Organization",
-      name: "Yogmandu",
-      url: "https://yogmandu.com",
-      // The YACEP designation is held by the founder, so it is attached to
-      // the person and backed by the public Yoga Alliance directory entry.
-      employee: {
-        "@type": "Person",
-        "@id": "https://yogmandu.com/teachers/arjuna-rakhal-magar#person",
-        name: "Arjuna Rakhal Magar",
-        url: "https://yogmandu.com/teachers/arjuna-rakhal-magar",
-        sameAs: [YACEP_PROFILE_URL],
-        hasCredential: yogaAllianceCredentials("YACEP"),
-      },
-    },
+    provider: YACEP_PROVIDER,
     ...(topics.length ? { teaches: topics } : {}),
     hasCourseInstance: {
       "@type": "CourseInstance",

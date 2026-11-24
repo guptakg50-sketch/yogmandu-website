@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import type { ServiceConfig } from "./serviceContent";
 import TimingNotice from "@/components/TimingNotice";
+import BadgeBand from "./BadgeBand";
 import FurtherReading from "@/components/FurtherReading";
 
 // Reusable rich service page — same section rhythm as the Teacher Training
@@ -168,29 +169,7 @@ export default function ServicePage({ config: c, hub }: { config: ServiceConfig;
         </section>
       )}
 
-      {c.badge && (
-        <section className="py-16 px-6" style={{ background: "#FFFFFF" }}>
-          <div className="text-center">
-            <img src={c.badge.src} alt={c.badge.alt} width={160} height={160} loading="lazy" decoding="async" className="mx-auto" />
-            <p className="mt-5 text-sm font-medium" style={{ color: "#4A2E1A" }}>{c.badge.caption}</p>
-            {c.badge.holder && (
-              <p className="mt-2 text-sm" style={{ color: "#4A2E1A" }}>
-                Yoga Alliance provider:{" "}
-                {c.badge.holderHref
-                  ? <Link href={c.badge.holderHref} className="underline" style={{ color: "#6B2D8B" }}>{c.badge.holder}</Link>
-                  : c.badge.holder}
-              </p>
-            )}
-            {c.badge.verifyHref && (
-              <p className="mt-2 text-sm">
-                <a href={c.badge.verifyHref} target="_blank" rel="noopener" className="underline" style={{ color: "#6B2D8B" }}>
-                  Verify on the Yoga Alliance directory ↗
-                </a>
-              </p>
-            )}
-          </div>
-        </section>
-      )}
+      {c.badge && <BadgeBand badge={c.badge} />}
 
       {hub}
 

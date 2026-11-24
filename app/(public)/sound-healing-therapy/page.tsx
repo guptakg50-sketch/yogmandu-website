@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { withShareText } from "@/lib/seo";
 import SingingBowl from "@/components/SingingBowlClient";
 import StatsOrbs from "@/components/StatsOrbs";
+import BadgeBand from "../service/BadgeBand";
+import { YACEP_BADGE } from "../service/serviceContent";
 import { ServiceHub } from "../service/ServiceHub";
+import { YACEP_PROVIDER } from "@/lib/credentials";
 import { getHubConfig, getSectionContent } from "@/lib/pageContent";
 
 // Hub cards + "In Session" photos are admin-editable (Page Content).
@@ -47,7 +50,7 @@ const serviceSchema = {
   "@type": "Service",
   name: "Sound Healing Therapy",
   description: "Authentic Tibetan singing bowl sound healing sessions in Kathmandu, Nepal. Individual, group, and certification courses available.",
-  provider: { "@type": "Organization", name: "Yogmandu", url: "https://yogmandu.com" },
+  provider: YACEP_PROVIDER,
   areaServed: [
     { "@type": "Place", name: "New Baneshwor, Kathmandu" },
     { "@type": "Place", name: "Mid-Baneshwor, Kathmandu" },
@@ -80,7 +83,7 @@ const faqs = [
   },
   {
     q: "Can I become a certified sound healing practitioner at Yogmandu?",
-    a: "Yes. Yogmandu offers Level I (Foundational, 20 hours) and Level II (Advanced) sound healing certification courses with internationally recognised certificates.",
+    a: "Yes. Yogmandu offers Level I (Foundational, 20 hours) and Level II (Advanced) sound healing certification courses with internationally recognised certificates. Certification: Yoga Alliance USA, YACEP.",
   },
   {
     q: "How do I book a sound healing session in Kathmandu?",
@@ -198,6 +201,8 @@ export default async function SoundHealingPage() {
 
       {/* Sound healing offerings — service hub (same 3D cards as Teacher Training), up top */}
       <ServiceHub {...hub} imageSlot="hub-SOUND_HEALING" />
+
+      <BadgeBand badge={YACEP_BADGE} />
 
       {/* How it works */}
       <section className="py-24 px-6" style={{ background: "#F9F5FF" }}>

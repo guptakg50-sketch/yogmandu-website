@@ -20,3 +20,19 @@ export function yogaAllianceCredentials(text: string) {
     recognizedBy: YOGA_ALLIANCE,
   }));
 }
+
+export const YACEP_PROVIDER = {
+  "@type": "Organization",
+  name: "Yogmandu",
+  url: "https://yogmandu.com",
+  // The YACEP designation is held by the founder, so it is attached to
+  // the person and backed by the public Yoga Alliance directory entry.
+  employee: {
+    "@type": "Person",
+    "@id": "https://yogmandu.com/teachers/arjuna-rakhal-magar#person",
+    name: "Arjuna Rakhal Magar",
+    url: "https://yogmandu.com/teachers/arjuna-rakhal-magar",
+    sameAs: [YACEP_PROFILE_URL],
+    hasCredential: yogaAllianceCredentials("YACEP"),
+  },
+};

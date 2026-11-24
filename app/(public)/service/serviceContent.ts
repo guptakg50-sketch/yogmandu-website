@@ -13,6 +13,8 @@ export type CurriculumTopic = string | { text: string; sub: string[] };
 export type CurriculumModule = { title?: string; topics: CurriculumTopic[] };
 export type ServiceCurriculum = { heading: string; intro?: string; modules: CurriculumModule[]; outro?: string };
 
+export type ServiceBadge = { src: string; alt: string; caption: string; holder?: string; holderHref?: string; verifyHref?: string };
+
 export type ServiceConfig = {
   /** Booking id — the whole-page CTA links to /book?service=<slug>. */
   slug: string;
@@ -37,7 +39,7 @@ export type ServiceConfig = {
   /** Course syllabus, shown as its own section after "what's included". */
   curriculum?: ServiceCurriculum;
   /** Accreditation badge shown above the pricing section. */
-  badge?: { src: string; alt: string; caption: string; holder?: string; holderHref?: string; verifyHref?: string };
+  badge?: ServiceBadge;
   /** Blog slugs shown as "Further reading" cards; unpublished ones are skipped. */
   furtherReading?: string[];
 };
@@ -281,7 +283,7 @@ export const SOUND_SESSIONS: ServiceConfig = {
   accent: "#6B2D8B",
 };
 
-const YACEP_BADGE = {
+export const YACEP_BADGE: ServiceBadge = {
   src: "/images/badges/yacep-teal.webp",
   alt: "Yoga Alliance Continuing Education Provider (YACEP) badge",
   caption: "Certification: Yoga Alliance USA, YACEP",
