@@ -31,6 +31,20 @@ const PATHS = [
   "/yoga-retreat-nepal",
   "/therapy-wellness/yoga-therapy",
   "/sound-healing-therapy",
+  "/sound-healing-therapy/course-level-1",
+  // November 2026: the October rewrites below were written in code but never
+  // served, because this snapshot still held the old short (76–94 char) text.
+  "/class-schedule/home",
+  "/specialized-yoga/childrens-yoga",
+  "/specialized-yoga/school-yoga",
+  "/specialized-yoga/senior-yoga",
+  "/yoga-teacher-training/online",
+  // Also rewritten in November 2026 (short descriptions, high impressions):
+  "/class-schedule/private",
+  "/class-schedule/virtual",
+  "/contact",
+  "/specialized-yoga",
+  "/therapy-wellness/reiki-healing",
 ];
 
 const ROW_ID = "content:section:SHARE_PREVIEWS";

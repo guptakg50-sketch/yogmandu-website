@@ -132,7 +132,14 @@ export default async function HomePage() {
 
             <p className="text-base leading-relaxed mb-8 max-w-md" style={{ color: "#4A2E1A", fontWeight: 400 }}>
               Daily yoga classes in Mid-Baneshwor, Kathmandu — minutes from New Baneshwor &amp; the airport.
-              Beginner-friendly classes for all ages, plus Yoga Alliance teacher training &amp; authentic Tibetan sound healing.
+              {/* In-copy link: Google shows the HOMEPAGE (pos ~6, 900+ impressions,
+                  0 clicks) for "yoga for beginners" instead of the dedicated page.
+                  A contextual link from the strongest page tells it which URL
+                  answers that search. */}
+              <Link href="/yoga-for-beginners" style={{ color: "#6B2D8B", textDecoration: "underline", textUnderlineOffset: 3 }}>
+                Yoga for beginners
+              </Link>
+              , classes for all ages, plus Yoga Alliance teacher training &amp; authentic Tibetan sound healing.
             </p>
 
             {/* ── 3 main focuses ── */}

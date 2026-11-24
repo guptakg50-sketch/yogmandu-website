@@ -84,8 +84,17 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   // dropped from the share preview.
   const topic = shareTopicForCategory(post.category);
   const previewImage = (post as { featuredImage?: string }).featuredImage || "";
-  const metaTitle = buildBlogTitle(post.title);
-  const metaDescription = buildBlogDescription(post.excerpt ?? "", (post as { body?: string }).body ?? "", post.title);
+  // The admin stores a separate SEO title and meta description per post, but
+  // they were never read — every post's <title> was its on-page headline. Use
+  // them when filled so a post can target a search phrase ("Om meaning")
+  // without rewriting the headline readers see.
+  const seo = post as { seoTitle?: string; metaDescription?: string };
+  const seoTitle = (seo.seoTitle ?? "").trim();
+  const seoDescription = (seo.metaDescription ?? "").trim();
+  const metaTitle = buildBlogTitle(seoTitle || post.title);
+  const metaDescription = seoDescription.length >= 80
+    ? trimTo(stripMarkdown(seoDescription), 155)
+    : buildBlogDescription(post.excerpt ?? "", (post as { body?: string }).body ?? "", post.title);
 
   return {
     title: { absolute: metaTitle },

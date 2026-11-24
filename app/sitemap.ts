@@ -1,7 +1,13 @@
 import type { MetadataRoute } from "next";
-import { statSync } from "fs";
-import { join } from "path";
-import { getPublishedBlogs, getCustomSitemapUrls, getGalleryItems } from "@/lib/publicData";
+import pageDates from "@/lib/generated/pageDates.json";
+import {
+  getPublishedBlogs,
+  getCustomSitemapUrls,
+  getGalleryItems,
+  getInstructors,
+  isInstructorVisible,
+  instructorSlug,
+} from "@/lib/publicData";
 import { getPublishedEvents, isPastEvent } from "@/lib/events";
 import { resolveGalleryPhotos, toAbsoluteSrc } from "./(public)/gallery/galleryData";
 
@@ -13,17 +19,22 @@ import { resolveGalleryPhotos, toAbsoluteSrc } from "./(public)/gallery/galleryD
 // custom URLs all come from the database, so this route must revalidate too.
 export const revalidate = 300;
 
-// Cache mtime lookups at module load so we don't stat repeatedly per request.
-function mtime(relPath: string): Date {
-  try {
-    return statSync(join(process.cwd(), relPath)).mtime;
-  } catch {
-    return BUILD_DATE;
-  }
-}
+// <lastmod> for code-defined pages comes from git (lib/generated/pageDates.json,
+// written by scripts/gen-page-dates.mjs before each build). This used to call
+// fs.statSync(), which has no filesystem to read on Cloudflare Workers, so
+// every static page reported "now" — 44 URLs claiming to change on every
+// sitemap regeneration. Google discounts lastmod on sitemaps like that.
+const DATES = pageDates as Record<string, string>;
 
-// Captured once at module-load (== build time for static generation).
-const BUILD_DATE = new Date();
+// Fallback for anything without its own date: the last commit of the whole
+// site. Stable between deploys, never "now".
+const BUILD_DATE = new Date(DATES["*"]);
+
+function mtime(relPath: string): Date {
+  const dir = relPath.replace(/\/[^/]+$/, "");
+  const iso = DATES[dir];
+  return iso ? new Date(iso) : BUILD_DATE;
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = "https://yogmandu.com";
@@ -119,6 +130,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority:        isPastEvent(event) ? 0.4 : 0.7,
   }));
 
+  // Teacher profile pages. They were live and already earning impressions in
+  // Search Console, but were only reachable through the About page cards, so
+  // Google found them late. Listing them here helps the instructor (E-E-A-T)
+  // pages get crawled with the rest of the site.
+  const instructors = await getInstructors().catch(() => null);
+  const teacherRoutes: MetadataRoute.Sitemap = (instructors ?? [])
+    .filter(isInstructorVisible)
+    .map((t) => ({
+      url:             `${base}/teachers/${instructorSlug(t.name)}`,
+      lastModified:    BUILD_DATE,
+      changeFrequency: "monthly" as const,
+      priority:        0.5,
+    }));
+
   // Admin-managed custom URLs (Supabase). Degrades gracefully if unavailable.
   const custom = await getCustomSitemapUrls().catch(() => null);
   const customRoutes: MetadataRoute.Sitemap = (custom ?? []).map((row) => ({
@@ -128,5 +153,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority:        row.priority,
   }));
 
-  return [...staticRoutes, ...blogRoutes, ...fallbackRoutes, ...eventRoutes, ...customRoutes];
+  return [...staticRoutes, ...blogRoutes, ...fallbackRoutes, ...eventRoutes, ...teacherRoutes, ...customRoutes];
 }

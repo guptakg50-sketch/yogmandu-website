@@ -56,19 +56,19 @@ export const SHARE_PAGES: SharePage[] = [
     path: "/class-schedule/private",
     label: "/class-schedule/private",
     title: "Private Yoga Classes Kathmandu | Yogmandu",
-    description: "One-to-one yoga tailored to you \u2014 faster progress with a teacher's full attention. Studio or your location.",
+    description: "Private one-to-one yoga in Kathmandu, tailored to your body and goals. Faster progress with a teacher's full attention, at our studio or your location.",
   },
   {
     path: "/class-schedule/virtual",
     label: "/class-schedule/virtual",
     title: "Virtual Live Yoga Online | Yogmandu Nepal",
-    description: "Practise live with our Himalayan teachers from home. Real-time, interactive classes from NPR 500.",
+    description: "Live online yoga classes taught in real time from our Kathmandu studio, not recordings. Join from anywhere, from NPR 500 a class or NPR 2,500 a month.",
   },
   {
     path: "/contact",
     label: "/contact",
     title: "Contact Yogmandu | Book Yoga & Sound Healing in Kathmandu",
-    description: "WhatsApp +977-9810263277 \u00b7 yogmandu@gmail.com \u00b7 Miteri Marg, Mid-Baneshwor-31, Kathmandu, Nepal.",
+    description: "Visit or message Yogmandu: Miteri Marg, Mid-Baneshwor-31, Kathmandu. WhatsApp +977-9810263277 or yogmandu@gmail.com. We usually reply within a day.",
   },
   {
     path: "/gallery",
@@ -116,7 +116,7 @@ export const SHARE_PAGES: SharePage[] = [
     path: "/specialized-yoga",
     label: "/specialized-yoga",
     title: "Specialized Yoga \u2014 Prenatal, Kids, Seniors, Schools | Yogmandu",
-    description: "Yoga for every stage of life: expecting mothers, children, seniors and schools. Kathmandu, Nepal.",
+    description: "Prenatal, children's, senior and school yoga in Kathmandu: gentle, age-appropriate classes adapted for every stage of life, taught by experienced teachers.",
   },
   {
     path: "/specialized-yoga/childrens-yoga",
@@ -158,7 +158,7 @@ export const SHARE_PAGES: SharePage[] = [
     path: "/therapy-wellness/reiki-healing",
     label: "/therapy-wellness/reiki-healing",
     title: "Reiki Healing Kathmandu | Yogmandu",
-    description: "A gentle energy-healing practice for deep relaxation and balance. Non-invasive and restorative.",
+    description: "One-to-one Reiki healing sessions in Mid-Baneshwor, Kathmandu: a gentle, non-invasive energy practice for deep relaxation, stress relief and balance.",
   },
   {
     path: "/therapy-wellness/yoga-therapy",
