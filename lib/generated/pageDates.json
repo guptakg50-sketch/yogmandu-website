@@ -1,5 +1,5 @@
 {
-  "app/(public)": "2026-10-30T04:24:19.000Z",
+  "app/(public)": "2026-11-24T02:29:28.000Z",
   "app/(public)/about": "2026-09-27T03:51:19.000Z",
   "app/(public)/accessibility": "2026-09-27T03:51:19.000Z",
   "app/(public)/account": "2026-05-24T04:11:32.000Z",
@@ -9,7 +9,7 @@
   "app/(public)/account/reset-password": "2026-05-24T03:40:00.000Z",
   "app/(public)/account/verify-email": "2026-05-23T08:35:25.000Z",
   "app/(public)/blog": "2026-09-27T03:51:19.000Z",
-  "app/(public)/blog/[slug]": "2026-10-30T04:24:19.000Z",
+  "app/(public)/blog/[slug]": "2026-11-24T02:29:28.000Z",
   "app/(public)/book": "2026-10-09T02:17:17.000Z",
   "app/(public)/class-schedule": "2026-10-30T04:24:19.000Z",
   "app/(public)/class-schedule/drop-in": "2026-07-30T18:19:22.000Z",
@@ -50,5 +50,5 @@
   "app/(public)/yoga-teacher-training/commuter": "2026-09-27T03:51:19.000Z",
   "app/(public)/yoga-teacher-training/online": "2026-09-27T03:51:19.000Z",
   "app/(public)/yoga-teacher-training/residential": "2026-09-27T03:51:19.000Z",
-  "*": "2026-11-24T02:21:10.000Z"
+  "*": "2026-11-24T02:29:28.000Z"
 }

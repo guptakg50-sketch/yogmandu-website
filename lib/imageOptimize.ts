@@ -20,13 +20,13 @@ interface Options {
 // simply skip optimization and store the original bytes. This keeps uploads
 // working on Workers instead of returning a 500 (which used to make the admin
 // fall back to an oversized base64 data URL and hit the request-size limit).
-type SharpModule = typeof import("sharp");
+type SharpModule = (typeof import("sharp"))["default"];
 let sharpPromise: Promise<SharpModule | null> | null = null;
 
 function loadSharp(): Promise<SharpModule | null> {
   if (!sharpPromise) {
     sharpPromise = import("sharp")
-      .then((m) => (m.default ?? m) as SharpModule)
+      .then((m) => m.default ?? null)
       .catch(() => null);
   }
   return sharpPromise;
